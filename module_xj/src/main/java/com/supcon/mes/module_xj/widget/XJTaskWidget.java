@@ -11,7 +11,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import androidx.annotation.NonNull;
+
 
 import com.app.annotation.BindByTag;
 import com.app.annotation.apt.Widget;
