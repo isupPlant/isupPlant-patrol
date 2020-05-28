@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="horizontal" android:layout_width="90dp"
+    android:layout_height="80dp">
+
+    <TextView
+        android:layout_width="78dp"
+        android:layout_height="60dp"
+        android:text=""
+        android:id="@+id/itemXJTempAreaName"
+        android:gravity="center"
+        android:textColor="@color/xjTextColor"
+        android:textSize="14sp"
+        android:tag="itemXJTempAreaName"
+        android:layout_centerVertical="true"
+        android:background="@drawable/sh_xj_temp_area"
+        />
+
+    <ImageView
+        android:layout_width="20dp"
+        android:layout_height="20dp"
+        android:id="@+id/itemXJTempAreaDel"
+        android:tag="itemXJTempAreaDel"
+        android:src="@drawable/sl_xj_temp_area_del"
+        android:layout_alignParentRight="true"
+        android:scaleType="center"
+        />
+</RelativeLayout>

@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="xjCheckedColor">#82b8fa</color>
+    <color name="xjTextColor">#555555</color>
+    <color name="xjTitleColor">#333333</color>
+    <color name="xjHintColor">#999999</color>
+    <color name="xjLineColor">#dcdcdc</color>
+    <color name="xjBtnColor2">#82B8FA</color>
+    <color name="xjBtnColor">#1e82d2</color>
+    <color name="xjBtnRedColor">#FF6059</color>
+</resources>

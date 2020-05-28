@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:gravity="center"
+    android:background="@color/white"
+    tools:ignore="MissingDefaultResource">
+
+    <com.supcon.mes.mbap.view.CustomTextView
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/dp_70"
+        android:padding="@dimen/dp_10"
+        android:id="@+id/temperatureVal"
+        android:tag="temperatureVal"
+        app:key="温度："
+        app:key_width="80dp"
+        app:content_hint="0.0℃"
+        />
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/dp_50"
+        android:layout_marginTop="@dimen/dp_10"
+        android:orientation="horizontal">
+        <Button
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:background="@color/red"
+            android:text="开启服务"
+            android:textColor="@color/white"
+            android:id="@+id/startBtn"
+            android:tag="startBtn"/>
+        <Button
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:background="@color/blue"
+            android:text="确定"
+            android:textColor="@color/white"
+            android:id="@+id/okBtn"
+            android:tag="okBtn"/>
+    </LinearLayout>
+
+</LinearLayout>

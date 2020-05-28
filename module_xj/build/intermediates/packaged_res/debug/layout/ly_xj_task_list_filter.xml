@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="40dp"
+    android:paddingLeft="@dimen/dp_15"
+    android:paddingRight="@dimen/dp_10"
+    android:orientation="horizontal"
+    android:background="@drawable/sh_white_stroke">
+    <RadioGroup
+        android:layout_width="0dp"
+        android:layout_weight="3"
+        android:layout_height="match_parent"
+        android:orientation="horizontal"
+        android:id="@+id/dateFilterGroup"
+        android:tag="dateFilterGroup"
+        >
+        <RadioButton
+            android:id="@+id/dateFilterAll"
+            style="@style/XJFilterStyle"
+            android:tag="dateFilterAll"
+            android:text="@string/middleware_all" />
+        <!--<include layout="@layout/ly_vertical_line"/>-->
+        <RadioButton
+            android:id="@+id/dateFilterToday"
+            style="@style/XJFilterStyle"
+            android:tag="dateFilterToday"
+            android:text="@string/middleware_today"
+            android:checked="true"
+            />
+
+        <!--<include layout="@layout/ly_vertical_line"/>-->
+
+        <RadioButton
+            android:id="@+id/dateFilterThisWeek"
+            style="@style/XJFilterStyle"
+            android:tag="dateFilterThisWeek"
+            android:text="@string/middleware_week" />
+
+        <!--<include layout="@layout/ly_vertical_line"/>-->
+
+        <RadioButton
+            android:id="@+id/dateFilterThisMonth"
+            style="@style/XJFilterStyle"
+            android:tag="dateFilterThisMonth"
+            android:text="@string/middleware_mouth" />
+    </RadioGroup>
+        <include layout="@layout/ly_vertical_line" android:layout_width="@dimen/dp_1" android:layout_height="match_parent" android:layout_marginTop="@dimen/dp_6" android:layout_marginBottom="@dimen/dp_6"
+            android:layout_marginLeft="@dimen/dp_10" android:layout_marginRight="@dimen/dp_10"/>
+    <RadioGroup
+        android:layout_width="0dp"
+        android:layout_weight="2"
+        android:layout_height="match_parent"
+        android:orientation="horizontal"
+        android:id="@+id/xjFilterGroup"
+        android:tag="xjFilterGroup"
+        >
+        <RadioButton
+            android:id="@+id/dateFilterXJAll"
+            style="@style/XJFilterStyle"
+            android:checked="true"
+            android:tag="dateFilterXJAll"
+            android:text="@string/middleware_all" />
+        <RadioButton
+            android:id="@+id/dateFilterXJUncheck"
+            style="@style/XJFilterStyle"
+            android:tag="dateFilterXJUncheck"
+            android:text="@string/xj_task_uncheck" />
+        <RadioButton
+            android:id="@+id/dateFilterXJchecked"
+            style="@style/XJFilterStyle"
+            android:tag="dateFilterXJchecked"
+            android:text="@string/xj_task_checked" />
+    </RadioGroup>
+
+</LinearLayout>

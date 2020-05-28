@@ -1,0 +1,153 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@drawable/sl_white_press"
+    android:padding="@dimen/dp_10">
+    <ImageView
+        android:layout_width="20dp"
+        android:layout_height="20dp"
+        android:id="@+id/itemXJWorkViewFlag"
+        android:layout_marginTop="@dimen/dp_5"
+        android:tag="itemXJWorkViewFlag"
+        android:src="@drawable/ic_xj_work_flag"
+        android:visibility="gone"
+        />
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="30dp"
+        android:textColor="@color/xjTitleColor"
+        android:textSize="@dimen/fontSize_14sp"
+        android:text=""
+        android:gravity="center_vertical"
+        android:id="@+id/itemXJWorkViewContent"
+        android:layout_toRightOf="@+id/itemXJWorkViewFlag"
+        android:layout_marginLeft="@dimen/dp_5"
+        android:tag="itemXJWorkViewContent"
+        android:maxLines="5"
+        />
+    <ImageView
+        android:layout_width="70dp"
+        android:layout_height="26dp"
+        android:background="@drawable/sl_xj_work_btn"
+        android:scaleType="center"
+        android:src="@drawable/ic_xj_work_view_redo"
+        android:layout_marginLeft="@dimen/dp_5"
+        android:id="@+id/itemXJWorkViewRedo"
+        android:tag="itemXJWorkViewRedo"
+        android:layout_alignParentRight="true"
+        />
+    <include layout="@layout/ly_line_light" android:layout_below="@+id/itemXJWorkViewContent" android:layout_height="@dimen/dp_1"
+        android:layout_width="match_parent" android:layout_marginTop="@dimen/dp_8"/>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="40dp"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:layout_below="@+id/itemXJWorkViewContent"
+        android:layout_marginTop="@dimen/dp_10"
+        android:layout_marginLeft="@dimen/dp_5"
+        android:id="@+id/itemXJWorkViewResultLayout"
+        android:tag="itemXJWorkViewResultLayout">
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_weight="3"
+            android:layout_height="40dp"
+            android:orientation="horizontal"
+            android:gravity="center"
+            android:layout_marginRight="@dimen/dp_5"
+            >
+            <TextView
+                android:layout_width="0dp"
+                android:layout_weight="2"
+                android:layout_height="match_parent"
+                android:background="@null"
+                android:textSize="14sp"
+                android:textColor="@color/xjTextColor"
+                android:textColorHint="@color/xjHintColor"
+                android:maxLines="2"
+                android:gravity="center_vertical"
+                android:id="@+id/itemXJWorkViewResult"
+                android:tag="itemXJWorkViewResult" />
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_weight="0.5"
+                android:layout_height="wrap_content"
+                android:textColor="@color/hintColor"
+                android:textSize="12sp"
+                android:id="@+id/itemXJWorkViewResultUnit"
+                android:tag="itemXJWorkViewResultUnit"
+                android:visibility="gone"
+                android:gravity="center"
+                android:padding="@dimen/dp_3"
+                />
+
+        </LinearLayout>
+        <include layout="@layout/ly_vertical_line"/>
+        <TextView
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="match_parent"
+            android:textSize="14sp"
+            android:textColor="@color/xjTextColor"
+            android:textColorHint="@color/xjHintColor"
+            android:maxLines="2"
+            android:gravity="center"
+            android:id="@+id/itemXJWorkViewConclusion"
+            android:tag="itemXJWorkViewConclusion" />
+    </LinearLayout>
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/itemXJWorkViewMoreLayout"
+        android:tag="itemXJWorkViewMoreLayout"
+        android:layout_below="@+id/itemXJWorkViewResultLayout"
+        android:layout_marginLeft="@dimen/dp_5"
+        android:visibility="visible"
+        >
+        <include layout="@layout/ly_line_light_light"/>
+
+        <com.supcon.mes.mbap.view.CustomGalleryView
+            android:id="@+id/itemXJWorkViewPics"
+            android:tag="itemXJWorkViewPics"
+            android:layout_width="match_parent"
+            android:layout_height="100dp"
+            android:layout_marginBottom="@dimen/dp_5"
+            android:layout_marginTop="@dimen/dp_3"
+            app:columns="3"
+            app:editable="false"
+            app:icon_visible="false"
+            app:text_height="0dp" />
+        <ImageView
+            android:layout_width="100dp"
+            android:layout_height="100dp"
+            android:background="#88626262"
+            android:src="@drawable/sl_top_more"
+            android:id="@+id/itemXJWorkViewPicMoreView"
+            android:tag="itemXJWorkViewPicMoreView"
+            android:layout_alignParentRight="true"
+            android:layout_marginTop="4dp"
+            android:layout_marginRight="@dimen/dp_2"
+            android:scaleType="centerInside"
+            />
+        <com.supcon.mes.mbap.view.CustomVerticalTextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/itemXJWorkViewPics"
+            app:max_lines="99"
+            app:text="备注"
+            app:text_size="14"
+            app:text_height="0dp"
+            app:content_color="@color/textColorlightblack"
+            android:id="@+id/itemXJWorkViewRemark"
+            android:tag="itemXJWorkViewRemark"
+            android:layout_marginTop="@dimen/dp_5"
+            />
+
+    </RelativeLayout>
+</RelativeLayout>
