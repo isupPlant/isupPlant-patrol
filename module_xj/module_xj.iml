@@ -195,7 +195,7 @@
     <orderEntry type="library" name="Gradle: com.contrarywind:wheelview:4.1.0@aar" level="project" />
     <orderEntry type="library" name="Gradle: com.github.tbruyelle:rxpermissions:0.10.2@aar" level="project" />
     <orderEntry type="library" name="Gradle: :../libs/blemulti-release:@aar" level="project" />
-    <orderEntry type="module" module-name="middleware" />
-    <orderEntry type="module" module-name="module_scan" />
+    <orderEntry type="module" module-name="isupplant-shell-middleware" />
+    <orderEntry type="module" module-name="isupplant-shell-module_scan" />
   </component>
 </module>
