@@ -1,0 +1,172 @@
+package com.supcon.mes.module_xj_temp.controller;
+
+import android.app.Activity;
+import android.text.TextUtils;
+import android.view.View;
+
+import com.supcon.common.view.base.controller.BaseViewController;
+import com.supcon.common.view.listener.OnChildViewClickListener;
+import com.supcon.common.view.util.LogUtil;
+import com.supcon.common.view.util.ToastUtils;
+import com.supcon.common.view.view.custom.ICustomView;
+import com.supcon.mes.mbap.utils.DateUtil;
+import com.supcon.mes.mbap.view.CustomDialog;
+import com.supcon.mes.middleware.R;
+import com.supcon.mes.middleware.controller.MyPickerController;
+import com.supcon.mes.middleware.model.listener.DateSelectListener;
+
+/**
+ * Created by wangshizhan on 2019/11/14
+ * Email:wangshizhan@supcom.com
+ */
+public class XJTempTimeController extends BaseViewController {
+
+    String customDateStart = "", customDateEnd = "";
+
+    DateSelectListener mDateSelectListener;
+
+    CustomDialog mCustomDialog;
+
+    private MyPickerController mDatePickController;
+
+    public XJTempTimeController(View rootView) {
+        super(rootView);
+    }
+
+    @Override
+    public void initView() {
+        super.initView();
+        initDatePickController();
+    }
+
+
+
+    @Override
+    public void initListener() {
+        super.initListener();
+
+    }
+
+    private void initDatePickController() {
+        mDatePickController = new MyPickerController((Activity) context);
+        mDatePickController.textSize(18);
+        mDatePickController.setCycleDisable(false);
+        mDatePickController.setSecondVisible(false);
+        mDatePickController.setCanceledOnTouchOutside(true);
+        mDatePickController.setDateOnly(true);
+    }
+
+
+    public void showCustomDialog() {
+
+        if(mCustomDialog == null) {
+
+            mCustomDialog = new CustomDialog(context)
+                    .layout(R.layout.v_dialog_custom_time)
+                    .bindChildListener(R.id.customStartTimeView, new OnChildViewClickListener() {
+                        @Override
+                        public void onChildViewClick(View childView, int action, Object obj) {
+                            if (action == -1) {
+                                customDateStart = "";
+                                ((ICustomView)childView).setContent("");
+                            } else {
+                                mDatePickController
+                                        .listener((year, month, day, hour, minute, second) -> {
+
+                                            String dateStr = year + "-" + month + "-" + day ;
+                                            LogUtil.i(dateStr);
+
+                                            if(!TextUtils.isEmpty(customDateEnd)){
+                                                long startDate = DateUtil.dateFormat(customDateStart, "yyyy-MM-dd HH:mm:ss");
+                                                long endDate = DateUtil.dateFormat(dateStr, "yyyy-MM-dd HH:mm:ss");
+
+                                                if(startDate > endDate){
+                                                    ToastUtils.show(context, context.getString(R.string.middleware_start_later));
+                                                    return;
+                                                }
+                                            }
+
+                                            customDateStart = dateStr;
+
+                                            ((ICustomView)childView).setContent(customDateStart);
+
+                                        })
+                                        .show(DateUtil.dateFormat(customDateStart));
+                            }
+                        }
+                    })
+                    .bindChildListener(R.id.customEndDateView, new OnChildViewClickListener() {
+                        @Override
+                        public void onChildViewClick(View childView, int action, Object obj) {
+                            if (action == -1) {
+                                customDateEnd = "";
+                                ((ICustomView)childView).setContent("");
+                            } else {
+                                mDatePickController
+                                        .listener((year, month, day, hour, minute, second) -> {
+
+                                            String dateStr = year + "-" + month + "-" + day ;
+                                            LogUtil.i(dateStr);
+
+                                            if(!TextUtils.isEmpty(customDateStart)){
+                                                long startDate = DateUtil.dateFormat(customDateStart, "yyyy-MM-dd");
+                                                long endDate = DateUtil.dateFormat(dateStr, "yyyy-MM-dd");
+
+                                                if(startDate > endDate){
+                                                    ToastUtils.show(context, context.getString(R.string.middleware_start_later));
+                                                    return;
+                                                }
+                                            }
+
+
+                                            customDateEnd = dateStr;
+
+                                            ((ICustomView)childView).setContent(customDateEnd);
+
+                                        })
+                                        .show(DateUtil.dateFormat(customDateEnd));
+                            }
+                        }
+                    })
+                    .bindClickListener(R.id.customDateViewOkBtn, v -> {
+
+                        if (TextUtils.isEmpty(customDateStart)) {
+                            ToastUtils.show(context, context.getString(R.string.middleware_select_start_date));
+                            return;
+                        }
+
+                        if (TextUtils.isEmpty(customDateEnd)) {
+                            ToastUtils.show(context,  context.getString(R.string.middleware_select_end_date));
+                            return;
+                        }
+
+                        if (mDateSelectListener != null) {
+                            mDateSelectListener.onDateSelect(customDateStart, customDateEnd);
+                        }
+
+                        mCustomDialog.dismiss();
+
+                    }, false)
+                    .bindClickListener(R.id.customDateViewCancelBtn, v -> {
+
+                        customDateStart = "";
+                        customDateEnd = "";
+                        ((ICustomView)mCustomDialog.getDialog().findViewById(R.id.customEndDateView)).setContent("");
+                        ((ICustomView)mCustomDialog.getDialog().findViewById(R.id.customStartDateView)).setContent("");
+                        if (mDateSelectListener != null) {
+                            mDateSelectListener.onDateSelect(customDateStart, customDateEnd);
+                        }
+
+                    }, true);
+        }
+
+        mCustomDialog.show();
+
+
+    }
+
+    public void setDateSelectListener(DateSelectListener dateSelectListener) {
+        mDateSelectListener = dateSelectListener;
+    }
+
+}
