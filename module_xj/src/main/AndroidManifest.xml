@@ -69,7 +69,7 @@
             android:windowSoftInputMode="adjustPan|stateAlwaysHidden"
             />
         <activity
-            android:name=".ui.XJTempTaskActivity"
+            android:name="com.supcon.mes.module_xj.ui.XJRouteListActivity"
             android:screenOrientation="portrait"
             android:theme="@style/AppNoTitleBarTheme"
             android:windowSoftInputMode="adjustPan|stateAlwaysHidden"

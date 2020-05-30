@@ -112,10 +112,10 @@ public class XJLocalTaskController extends BaseDataController implements XJLocal
 
     }
 
-    public XJTaskEntity getLocalTask(long id){
+    public XJTaskEntity getLocalTask(String tableNo){
 
-        if(mXJLocalTaskMap.containsKey(""+id)){
-            return mXJLocalTaskMap.get(""+id);
+        if(mXJLocalTaskMap.containsKey(tableNo)){
+            return mXJLocalTaskMap.get(tableNo);
         }
 
 

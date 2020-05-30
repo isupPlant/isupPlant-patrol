@@ -233,8 +233,8 @@ public class XJTaskListActivity extends BaseRefreshRecyclerActivity<XJTaskGroupE
                     @Override
                     public void onSuccess(Boolean result) {
                         if (result){
-                            rightBtn.setVisibility(View.VISIBLE);
-                            presenterRouter.create(DeploymentAPI.class).getCurrentDeployment("tempTaskWF");
+//                            rightBtn.setVisibility(View.VISIBLE);
+//                            presenterRouter.create(DeploymentAPI.class).getCurrentDeployment("tempTaskWF");
 
                         }
                     }
@@ -492,7 +492,7 @@ public class XJTaskListActivity extends BaseRefreshRecyclerActivity<XJTaskGroupE
                             return false;
                         }
 
-                        XJTaskEntity  taskEntity = getController(XJLocalTaskController.class).getLocalTask(xjTaskEntity.id);
+                        XJTaskEntity  taskEntity = getController(XJLocalTaskController.class).getLocalTask(xjTaskEntity.tableNo);
 
                         if(taskStatusPosition == 1 && taskEntity!=null && taskEntity.isFinished){//待检过滤
                             return false;
@@ -514,7 +514,7 @@ public class XJTaskListActivity extends BaseRefreshRecyclerActivity<XJTaskGroupE
 
                         if(XJCacheUtil.check(context, xjTaskEntity.tableNo)){
 
-                            XJTaskEntity taskEntity = getController(XJLocalTaskController.class).getLocalTask(xjTaskEntity.id);
+                            XJTaskEntity taskEntity = getController(XJLocalTaskController.class).getLocalTask(xjTaskEntity.tableNo);
 
                             if(taskEntity!=null){
                                 xjTaskEntity = taskEntity;
