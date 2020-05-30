@@ -4,6 +4,7 @@ import android.annotation.SuppressLint;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
+import android.widget.TextView;
 
 import com.app.annotation.BindByTag;
 import com.app.annotation.Presenter;
@@ -41,6 +42,9 @@ import io.reactivex.functions.Consumer;
 @Presenter(XJRoutePresenter.class)
 public class XJRouteListActivity extends BaseRefreshRecyclerActivity implements XJRouteContract.View {
 
+    @BindByTag("titleText")
+    TextView titleText;
+
     @BindByTag("contentView")
     RecyclerView contentView;
 
@@ -76,6 +80,7 @@ public class XJRouteListActivity extends BaseRefreshRecyclerActivity implements 
         StatusBarUtils.setWindowStatusBarColor(this, R.color.themeColor);
         contentView.setLayoutManager(new LinearLayoutManager(context));
         contentView.addItemDecoration(new SpaceItemDecoration(1));
+        titleText.setText("巡检路线选择");
     }
 
     @SuppressLint("CheckResult")

@@ -317,6 +317,9 @@ public class XJTaskDetailActivity extends BaseControllerActivity implements XJTa
 
             if(mXJTaskEntity.attrMap!=null)
                 xjTaskDetailStaff.setText(""+mXJTaskEntity.attrMap.get(XJ_TASK_STAFF_KEY));
+            else if(mXJTaskEntity.isTemp){
+                xjTaskDetailStaff.setText(mXJTaskEntity.staffName);
+            }
             initArea();
         }
     }

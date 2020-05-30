@@ -43,23 +43,19 @@ public class XJRouteAdapter extends BaseListDataRecyclerViewAdapter<XJRouteEntit
         @BindByTag("xjRouteRemark")
         TextView xjRouteRemark;
 
-
-
         public XJRouteViewHolder(Context context) {
-            super(context);
-        }
-
-        public XJRouteViewHolder(Context context, ViewGroup parent) {
-            super(context, parent);
-        }
-
-        public XJRouteViewHolder(View itemView) {
-            super(itemView);
+            super(context,parent);
         }
 
         @Override
         protected int layoutId() {
             return R.layout.item_xj_route;
+        }
+
+        @Override
+        protected void initListener() {
+            super.initListener();
+            itemView.setOnClickListener(v -> onItemChildViewClick(itemView, 0, getItem(getAdapterPosition())));
         }
 
         @Override

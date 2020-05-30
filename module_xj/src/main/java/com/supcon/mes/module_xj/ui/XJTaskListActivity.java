@@ -55,6 +55,7 @@ import com.supcon.mes.module_xj.model.api.XJTaskAPI;
 import com.supcon.mes.module_xj.model.bean.XJTaskEntity;
 import com.supcon.mes.module_xj.model.bean.XJTaskGroupEntity;
 import com.supcon.mes.module_xj.model.contract.XJTaskContract;
+import com.supcon.mes.module_xj.model.event.XJTempTaskAddEvent;
 import com.supcon.mes.module_xj.presenter.XJTaskPresenter;
 import com.supcon.mes.module_xj.ui.adapter.XJTaskGroupAdapter;
 import com.supcon.mes.sb2.config.SB2Config;
@@ -83,8 +84,10 @@ import io.reactivex.schedulers.Schedulers;
  * Email:wangshizhan@supcom.com
  */
 @Router(value = Constant.Router.XJ_TASK_LIST, viewCode = Constant.AppCode.XJGL)
-@Controller(value = {SystemCodeJsonController.class, XJTaskDateFilterController.class, XJTaskStatusFilterController.class,
-        XJLocalTaskController.class, XJTaskNoIssuedController.class, XJTaskUploadController.class, CheckUserPermissionController.class})
+@Controller(value = {SystemCodeJsonController.class, CheckUserPermissionController.class,
+        XJTaskDateFilterController.class, XJTaskStatusFilterController.class,/*顶部筛选*/
+        XJTaskNoIssuedController.class, XJTaskUploadController.class,/*获取，上传*/
+        XJLocalTaskController.class})
 @Presenter(value = {XJTaskPresenter.class, DeploymentPresenter.class})
 @SystemCode(entityCodes = {
         Constant.SystemCode.PATROL_taskState,
@@ -156,7 +159,7 @@ public class XJTaskListActivity extends BaseRefreshRecyclerActivity<XJTaskGroupE
     @Override
     protected void onDestroy() {
         super.onDestroy();
-
+        SharedPreferencesUtils.setParam(context, Constant.SPKey.XJ_TASKS_CACHE, GsonUtil.gsonString(mXJTaskEntities));
         EventBus.getDefault().unregister(this);
     }
 
@@ -165,6 +168,11 @@ public class XJTaskListActivity extends BaseRefreshRecyclerActivity<XJTaskGroupE
         needRefresh = true;
     }
 
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onTempTaskAdd(XJTempTaskAddEvent event) {
+        needRefresh = true;
+        mXJTaskEntities.add(0, event.getTempTaskEntity());
+    }
 
     @SuppressLint("CheckResult")
     @Override
@@ -233,8 +241,8 @@ public class XJTaskListActivity extends BaseRefreshRecyclerActivity<XJTaskGroupE
                     @Override
                     public void onSuccess(Boolean result) {
                         if (result){
-//                            rightBtn.setVisibility(View.VISIBLE);
-//                            presenterRouter.create(DeploymentAPI.class).getCurrentDeployment("tempTaskWF");
+                            rightBtn.setVisibility(View.VISIBLE);
+                            presenterRouter.create(DeploymentAPI.class).getCurrentDeployment("tempTaskWF");
 
                         }
                     }
@@ -460,6 +468,7 @@ public class XJTaskListActivity extends BaseRefreshRecyclerActivity<XJTaskGroupE
 
         if(entity.pageNo == 1){
             mXJTaskEntities.clear();
+            mXJTaskEntities.addAll(getXJTempTasks());
         }
 
 
@@ -471,9 +480,17 @@ public class XJTaskListActivity extends BaseRefreshRecyclerActivity<XJTaskGroupE
         else{
             createTaskGroups(mXJTaskEntities);
         }
+    }
 
+    private List<XJTaskEntity> getXJTempTasks(){
+        List<XJTaskEntity> tempTaskEntities = new ArrayList<>();
+        List<String> tempTasks = XJCacheUtil.getTempTasks(context);
+        for(String s : tempTasks){
+            XJTaskEntity xjTaskEntity = GsonUtil.gsonToBean(s, XJTaskEntity.class);
+            tempTaskEntities.add(xjTaskEntity);
+        }
 
-
+        return tempTaskEntities;
     }
 
     @SuppressLint("CheckResult")
@@ -500,7 +517,13 @@ public class XJTaskListActivity extends BaseRefreshRecyclerActivity<XJTaskGroupE
 
                         String key = xjTaskEntity.workRoute.code+""+ DateUtil.dateFormat(xjTaskEntity.startTime);
 
-                        if(!taskMap.containsKey(key)){
+                        if(xjTaskEntity.isTemp){
+                            List<XJTaskEntity> xjTaskEntities = new ArrayList<>();
+                            xjTaskEntities.add(xjTaskEntity);
+                            taskMap.put(xjTaskEntity.tableNo, xjTaskEntities);
+                        }
+
+                        else if(!taskMap.containsKey(key)){
                             taskMap.put(key, new ArrayList<>());
                         }
 
@@ -525,9 +548,11 @@ public class XJTaskListActivity extends BaseRefreshRecyclerActivity<XJTaskGroupE
                             }
                         }
 
-                        String key = xjTaskEntity.workRoute.code+""+ DateUtil.dateFormat(xjTaskEntity.startTime);
-                        List<XJTaskEntity> tasks = taskMap.get(key);
-                        tasks.add(0, xjTaskEntity);
+                        if(!xjTaskEntity.isTemp){
+                            String key = xjTaskEntity.workRoute.code+""+ DateUtil.dateFormat(xjTaskEntity.startTime);
+                            List<XJTaskEntity> tasks = taskMap.get(key);
+                            tasks.add(0, xjTaskEntity);
+                        }
                     }
                 }, new Consumer<Throwable>() {
                     @Override
@@ -552,6 +577,9 @@ public class XJTaskListActivity extends BaseRefreshRecyclerActivity<XJTaskGroupE
 
                             if(taskEntity.attrMap != null && taskEntity.attrMap.containsKey(XJ_TASK_STAFF_KEY)){
                                 xjTaskGroupEntity.staffName = (String) xjTaskEntities.get(0).attrMap.get(XJ_TASK_STAFF_KEY);
+                            }
+                            else if(taskEntity.isTemp){
+                                xjTaskGroupEntity.staffName = taskEntity.staffName;
                             }
 
                             xjTaskGroupEntity.date = taskEntity.startTime;
