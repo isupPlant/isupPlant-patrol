@@ -544,7 +544,7 @@ public class XJTaskListActivity extends BaseRefreshRecyclerActivity<XJTaskGroupE
                             }
                             else
                             {
-                                XJCacheUtil.remove(xjTaskEntity.tableNo);
+//                                XJCacheUtil.remove(xjTaskEntity.tableNo);
                             }
                         }
 

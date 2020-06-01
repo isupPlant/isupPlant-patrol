@@ -27,6 +27,7 @@ import com.supcon.mes.middleware.constant.Constant;
 import com.supcon.mes.middleware.controller.DateFilterController;
 import com.supcon.mes.middleware.controller.SystemCodeJsonController;
 import com.supcon.mes.middleware.model.bean.CommonBAPListEntity;
+import com.supcon.mes.middleware.model.event.RefreshEvent;
 import com.supcon.mes.middleware.model.inter.SystemCode;
 import com.supcon.mes.middleware.model.listener.DateSelectListener;
 import com.supcon.mes.middleware.util.ErrorMsgHelper;
@@ -43,6 +44,7 @@ import com.supcon.mes.module_xj.presenter.XJTaskPresenter;
 import com.supcon.mes.module_xj.presenter.XJTaskStatePresenter;
 import com.supcon.mes.module_xj.ui.adapter.XJTaskGroupAdapter;
 
+import org.greenrobot.eventbus.EventBus;
 import org.reactivestreams.Publisher;
 
 import java.util.ArrayList;
@@ -440,6 +442,7 @@ public class XJTaskGetActivity extends BaseRefreshRecyclerActivity<XJTaskGroupEn
     public void updateTaskStateSuccess() {
         onLoadSuccess();
         refreshListController.refreshBegin();
+        EventBus.getDefault().post(new RefreshEvent());
     }
 
     @Override
