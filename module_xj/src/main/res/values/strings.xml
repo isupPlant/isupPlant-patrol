@@ -2,7 +2,7 @@
 <resources>
     <string name="app_name">module_xj</string>
     <string name="xj_task">巡检任务</string>
-    <string name="xj_temp_task">临时任务</string>
+    <string name="xj_temp_task">临时巡检</string>
     <string name="xj_widget_get">未下发</string>
     <string name="xj_widget_uncheck">已下发</string>
     <string name="xj_widget_done">待上传</string>
