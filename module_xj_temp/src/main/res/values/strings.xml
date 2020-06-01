@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">module_xj_temp</string>
+    <string name="xj_temp_task">临时巡检</string>
+    <string name="xj_temp_task_exit_warning">已选择巡检内容，是否取消任务？</string>
+    <string name="xj_temp_task_exit_warning2">确定离开？</string>
+</resources>

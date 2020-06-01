@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+	<string name="app_name">module_xj_temp</string>
+	<string name="xj_temp_task">TempTask</string>
+	<string name="xj_temp_task_exit_warning">A task is modified, quit it anyway？</string>
+	<string name="xj_temp_task_exit_warning2">Are you sure to leave？</string>
+</resources>
