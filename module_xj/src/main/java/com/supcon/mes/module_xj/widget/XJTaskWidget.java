@@ -173,7 +173,7 @@ public class XJTaskWidget extends BaseWidgetLayout {
 
     private void goXJTaskList() {
 
-        IntentRouter.go(getContext(), Constant.Router.XJ_TASK_LIST);
+        IntentRouter.go(getContext(), Constant.AppCode.MPS_Patrol);
 
     }
 

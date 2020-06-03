@@ -83,7 +83,7 @@ import io.reactivex.schedulers.Schedulers;
  * Created by wangshizhan on 2020/1/9
  * Email:wangshizhan@supcom.com
  */
-@Router(value = Constant.Router.XJ_TASK_LIST, viewCode = Constant.AppCode.XJGL)
+@Router(value = Constant.AppCode.MPS_Patrol)
 @Controller(value = {SystemCodeJsonController.class, CheckUserPermissionController.class,
         XJTaskDateFilterController.class, XJTaskStatusFilterController.class,/*顶部筛选*/
         XJTaskNoIssuedController.class, XJTaskUploadController.class,/*获取，上传*/
