@@ -1,8 +1,5 @@
 *.bin
-*.java
-*.xml
-module_xj/
-=======
+
 # Built application files
 *.apk
 *.ap_
@@ -85,9 +82,6 @@ lint/tmp/
 module_login.zip
 gradle/wrapper/gradle-wrapper.properties
 gradle/wrapper/gradle-wrapper.jar
-middleware/src/main/res/drawable-xhdpi/ic_widget_title_blue.png
-middleware/src/main/res/drawable-xhdpi/ic_widget_title_black2.png
-middleware/src/main/res/drawable-xhdpi/ic_widget_title.png
 shell/official/release/output.json
 shell/class_files.txt
 shell/mobileTest/release/output.json
