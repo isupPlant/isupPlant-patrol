@@ -1,3 +1,8 @@
+*.bin
+*.java
+*.xml
+module_xj/
+=======
 # Built application files
 *.apk
 *.ap_
@@ -87,3 +92,4 @@ shell/official/release/output.json
 shell/class_files.txt
 shell/mobileTest/release/output.json
 middleware/middleware.iml___jb_tmp___
+module_xj_temp/
