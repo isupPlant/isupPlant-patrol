@@ -114,6 +114,7 @@ import java.util.Map;
       potrolTask.tableInfoId = xjTaskEntity.tableInfoId;
       potrolTask.taskState = new StringIdEntity(taskStateId);
       potrolTask.completeStaff = new ObjectEntity(SupPlantApplication.getAccountInfo().staffId);
+       potrolTask.isTemp = xjTaskEntity.isTemp;
    }
 
     public void setWorkItems(List<XJWorkEntity> works) {
@@ -163,7 +164,7 @@ import java.util.Map;
        public StringIdEntity taskState;
        public long tableInfoId;
        public ObjectEntity completeStaff;
-
+       public boolean isTemp;
     }
 
 

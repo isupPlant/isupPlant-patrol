@@ -63,7 +63,7 @@ public class XJTaskEntity extends BaseEntity {
 
     public int viewType;//0 首页； 1 上传、获取页面
     public boolean isChecked;
-
+    public boolean isTemp;
     public List<XJAreaEntity> areas;
 
 //    public List<XJLocalWorkItemEntity> works;

@@ -2,6 +2,7 @@
 <resources>
     <string name="app_name">module_xj</string>
     <string name="xj_task">巡检任务</string>
+    <string name="xj_temp_task">临时巡检</string>
     <string name="xj_widget_get">未下发</string>
     <string name="xj_widget_uncheck">已下发</string>
     <string name="xj_widget_done">待上传</string>
@@ -52,6 +53,6 @@
     <string name="xj_work_view_redo_warning">是否重录数据？</string>
     <string name="xj_work_view_redo_unable">该巡检项不允许重录!</string>
 
-    <string name="xj_temp_task_exit_warning">已设置巡检任务，是否取消任务？</string>
+    <string name="xj_temp_task_exit_warning">已选择巡检内容，是否取消任务？</string>
     <string name="xj_temp_task_exit_warning2">确定离开？</string>
 </resources>

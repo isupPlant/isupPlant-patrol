@@ -5,11 +5,16 @@ import android.content.Context;
 
 import com.app.annotation.Presenter;
 import com.supcon.common.view.base.controller.BaseDataController;
+import com.supcon.mes.middleware.model.event.RefreshEvent;
 import com.supcon.mes.middleware.model.listener.OnAPIResultListener;
 import com.supcon.mes.module_xj.model.api.XJLocalTaskAPI;
 import com.supcon.mes.module_xj.model.bean.XJTaskEntity;
 import com.supcon.mes.module_xj.model.contract.XJLocalTaskContract;
 import com.supcon.mes.module_xj.presenter.XJLocalTaskPresenter;
+
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -31,6 +36,8 @@ public class XJTaskUploadController extends BaseDataController implements XJLoca
 
     private OnAPIResultListener<Integer> mOnResultListener;
 
+    private boolean needRefresh = false;
+
     public XJTaskUploadController(Context context) {
         super(context);
     }
@@ -39,19 +46,33 @@ public class XJTaskUploadController extends BaseDataController implements XJLoca
     @Override
     public void onInit() {
         super.onInit();
+        EventBus.getDefault().register(this);
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        EventBus.getDefault().unregister(this);
+    }
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onRefresh(RefreshEvent refreshEvent) {
+        needRefresh = true;
     }
 
     @Override
     public void initData() {
         super.initData();
-
+        presenterRouter.create(XJLocalTaskAPI.class).getLocalTask(new HashMap<>());
     }
 
 
     @Override
     public void onResume() {
         super.onResume();
-        presenterRouter.create(XJLocalTaskAPI.class).getLocalTask(new HashMap<>());
+        if(needRefresh){
+            presenterRouter.create(XJLocalTaskAPI.class).getLocalTask(new HashMap<>());
+        }
     }
 
     public void setOnResultListener(OnAPIResultListener<Integer> onResultListener) {

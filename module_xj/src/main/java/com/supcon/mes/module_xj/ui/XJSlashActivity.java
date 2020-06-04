@@ -5,9 +5,10 @@ import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.os.Handler;
+import android.support.annotation.Nullable;
 import android.text.TextUtils;
 
-import androidx.annotation.Nullable;
+
 
 import com.supcon.common.view.util.LogUtil;
 import com.supcon.mes.mbap.MBapApp;

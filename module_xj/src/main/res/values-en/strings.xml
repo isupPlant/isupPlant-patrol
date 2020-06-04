@@ -2,6 +2,7 @@
 <resources>
 	<string name="app_name">module_xj</string>
 	<string name="xj_task">Patrol task</string>
+	<string name="xj_temp_task">TempTask</string>
 	<string name="xj_widget_get">Can Download</string>
 	<string name="xj_widget_uncheck">Can Upload</string>
 	<string name="xj_widget_done">Done</string>

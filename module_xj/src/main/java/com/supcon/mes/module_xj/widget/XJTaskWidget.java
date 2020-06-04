@@ -11,7 +11,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import androidx.annotation.NonNull;
+
 
 import com.app.annotation.BindByTag;
 import com.app.annotation.apt.Widget;
@@ -173,7 +173,7 @@ public class XJTaskWidget extends BaseWidgetLayout {
 
     private void goXJTaskList() {
 
-        IntentRouter.go(getContext(), Constant.Router.XJ_TASK_LIST);
+        IntentRouter.go(getContext(), Constant.AppCode.MPS_Patrol);
 
     }
 
