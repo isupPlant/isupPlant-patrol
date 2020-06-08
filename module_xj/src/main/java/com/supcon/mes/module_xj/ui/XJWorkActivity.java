@@ -9,6 +9,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.Spinner;
 import android.widget.TextView;
 
@@ -45,12 +47,15 @@ import com.supcon.mes.middleware.constant.TemperatureMode;
 import com.supcon.mes.middleware.constant.VibMode;
 import com.supcon.mes.middleware.controller.SystemCodeJsonController;
 import com.supcon.mes.middleware.model.bean.ObjectEntity;
+import com.supcon.mes.middleware.model.bean.PopupWindowEntity;
 import com.supcon.mes.middleware.model.bean.xj.XJAreaEntity;
 import com.supcon.mes.middleware.model.bean.xj.XJInputTypeEntity;
 import com.supcon.mes.middleware.model.bean.xj.XJInputTypeEntityDao;
 import com.supcon.mes.middleware.model.bean.xj.XJWorkEntity;
 import com.supcon.mes.middleware.model.inter.SystemCode;
+import com.supcon.mes.middleware.ui.view.CustomPopupWindow;
 import com.supcon.mes.middleware.util.AnimationUtil;
+import com.supcon.mes.middleware.util.PopupWindowItemHelper;
 import com.supcon.mes.middleware.util.SBTUtil;
 import com.supcon.mes.middleware.util.SnackbarHelper;
 import com.supcon.mes.middleware.util.SystemCodeManager;
@@ -72,6 +77,7 @@ import org.greenrobot.eventbus.ThreadMode;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
@@ -98,17 +104,17 @@ import io.reactivex.schedulers.Schedulers;
 })
 public class XJWorkActivity extends BaseRefreshRecyclerActivity<XJWorkEntity> {
 
-    @BindByTag("titleText")
-    TextView titleText;
+    @BindByTag("titleTextMiddle")
+    TextView titleTextMiddle;
 
     @BindByTag("leftBtn")
-    CustomImageButton leftBtn;
+    ImageButton leftBtn;
 
     @BindByTag("rightBtn")
-    CustomImageButton rightBtn;
+    ImageButton rightBtn;
 
-//    @BindByTag("rightBtn2")
-//    CustomImageButton rightBtn2;
+     @BindByTag("rightBtn_sec")
+     ImageButton rightBtn_sec;
 
     @BindByTag("contentView")
     RecyclerView contentView;
@@ -121,6 +127,10 @@ public class XJWorkActivity extends BaseRefreshRecyclerActivity<XJWorkEntity> {
     XJAreaEntity mXJAreaEntity;
 
     private Map<String, String> passReasonMap, realValueMap;
+
+    private List<PopupWindowEntity> mPopupWindowEntityList;
+
+    private CustomPopupWindow mCustomPopupWindow;
 
     private SinglePickController<String> mSingPicker;
 
@@ -139,6 +149,8 @@ public class XJWorkActivity extends BaseRefreshRecyclerActivity<XJWorkEntity> {
     private List<XJWorkEntity> mWorkEntities = new ArrayList<>();
 
     private boolean needRefresh = false;//重录之后，需要刷新列表
+
+    private TextView tempTv;
 
     @Override
     protected int getLayoutID() {
@@ -222,8 +234,10 @@ public class XJWorkActivity extends BaseRefreshRecyclerActivity<XJWorkEntity> {
     protected void initView() {
         super.initView();
         StatusBarUtils.setWindowStatusBarColor(this, R.color.themeColor);
-        titleText.setText(getString(R.string.xj_work));
+        titleTextMiddle.setVisibility(View.VISIBLE);
+        titleTextMiddle.setText(getString(R.string.xj_work));
         rightBtn.setImageResource(R.drawable.sl_xj_work_top_finish);
+        rightBtn_sec.setImageResource(R.drawable.sl_top_more);
 
         contentView.setLayoutManager(new LinearLayoutManager(context));
         contentView.addItemDecoration(new SpaceItemDecoration(DisplayUtil.dip2px(1, context)));
@@ -232,6 +246,16 @@ public class XJWorkActivity extends BaseRefreshRecyclerActivity<XJWorkEntity> {
         mSingPicker = new SinglePickController<>(this);
         mSingPicker.setCanceledOnTouchOutside(true);
 
+        initPopupWindowData();
+
+    }
+
+    private void initPopupWindowData() {
+        Map<String, Integer> map = new HashMap<>();
+        map.put(context.getString(R.string.xj_work_over), R.drawable.ic_xj_work_finish);
+        map.put(context.getString(R.string.xj_work_jump), R.drawable.ic_xj_work_skip);
+        mPopupWindowEntityList = PopupWindowItemHelper.initPopupWindowData(map);
+        mCustomPopupWindow = new CustomPopupWindow(context, mPopupWindowEntityList);
     }
 
     @Override
@@ -264,14 +288,20 @@ public class XJWorkActivity extends BaseRefreshRecyclerActivity<XJWorkEntity> {
                     }
                 });
 
-//        RxView.clicks(rightBtn2)
-//                .throttleFirst(200, TimeUnit.MILLISECONDS)
-//                .subscribe(new Consumer<Object>() {
-//                    @Override
-//                    public void accept(Object o) throws Exception {
-//                        showAllFinishDialog(0);
-//                    }
-//                });
+        RxView.clicks(rightBtn_sec)
+                .throttleFirst(200, TimeUnit.MILLISECONDS)
+                .subscribe(new Consumer<Object>() {
+                    @Override
+                    public void accept(Object o) throws Exception {
+                        mCustomPopupWindow.setOnItemClick(new AdapterView.OnItemClickListener() {
+                            @Override
+                            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                                dealPosition(position);
+                            }
+                        });
+                        mCustomPopupWindow.showPopupWindow(rightBtn_sec);
+                    }
+                });
 
         mXJWorkAdapter.setOnItemChildViewClickListener(new OnItemChildViewClickListener() {
             @Override
@@ -327,6 +357,68 @@ public class XJWorkActivity extends BaseRefreshRecyclerActivity<XJWorkEntity> {
             }
         });
 
+    }
+
+    private void dealPosition(int position) {
+        if (mPopupWindowEntityList == null) {
+            return;
+        }
+        PopupWindowEntity popupWindowEntity = mPopupWindowEntityList.get(position);
+        switch (popupWindowEntity.getText()) {
+            case "一键完成":
+                mCustomPopupWindow.dismiss();
+                showAllFinishDialog();
+                break;
+
+            case "一键跳过":
+                mCustomPopupWindow.dismiss();
+                showAllJumpDialog();
+                break;
+            default:
+        }
+    }
+
+    boolean isOneKeyJump = false;
+    private void showAllJumpDialog() {
+        new CustomDialog(context)
+                .twoButtonAlertDialog(getString(R.string.xj_work_jump_all))
+                .bindView(R.id.grayBtn, getString(R.string.no))
+                .bindView(R.id.redBtn, getString(R.string.yes))
+                .bindClickListener(R.id.grayBtn, null, true)
+                .bindClickListener(R.id.redBtn, new View.OnClickListener() {
+                    @SuppressLint("CheckResult")
+                    @Override
+                    public void onClick(View v) {
+                        if (mWorkEntities != null && mWorkEntities.size() > 0) {
+                            isOneKeyJump = true;
+                            XJWorkActivity.this.skipEam(0L);
+                        }
+                    }
+                }, true)
+                .show();
+
+    }
+
+    boolean isOneKeyOver = false;
+
+    public void showAllFinishDialog() {
+        new CustomDialog(context)
+                .twoButtonAlertDialog(getString(R.string.xj_work_over_all))
+                .bindView(R.id.grayBtn, getString(R.string.no))
+                .bindView(R.id.redBtn, getString(R.string.yes))
+                .bindClickListener(R.id.grayBtn, null, true)
+                .bindClickListener(R.id.redBtn, new View.OnClickListener() {
+                    @SuppressLint("CheckResult")
+                    @Override
+                    public void onClick(View v) {
+                        if (mWorkEntities != null && mWorkEntities.size() > 0) {
+                            isOneKeyOver = true;
+                            XJWorkActivity.this.doAllFinish(0);
+                        }
+
+                    }
+                }, true)
+                .show();
     }
 
     @SuppressLint("CheckResult")
@@ -632,7 +724,7 @@ public class XJWorkActivity extends BaseRefreshRecyclerActivity<XJWorkEntity> {
     private void showTesto805iDialog(int position, XJWorkEntity xjWorkItemEntity) {
         thermometervalue = null;
         mTesto805iDialog = new CustomDialog(context);
-        mTesto805iDialog.layout(R.layout.v_testo_805i_dialog)
+        mTesto805iDialog.layout(R.layout.v_temp_805i_dialog)
                 .bindClickListener(R.id.startBtn, new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
@@ -652,6 +744,9 @@ public class XJWorkActivity extends BaseRefreshRecyclerActivity<XJWorkEntity> {
                     }
                 }, true)
                 .show();
+        tempTv = ((TextView) mTesto805iDialog.getDialog().findViewById(R.id.viberStatus));
+        ((ImageView) mTesto805iDialog.getDialog().findViewById(R.id.viberStatusIv)).setImageResource(R.drawable.ic_device_connect2);
+        tempTv.setText("服务已连接");
 
     }
 
@@ -719,7 +814,11 @@ public class XJWorkActivity extends BaseRefreshRecyclerActivity<XJWorkEntity> {
                     @Override
                     public boolean test(XJWorkEntity xjWorkItemEntity) throws Exception {
 
-                        return !xjWorkItemEntity.isEamView && (eamId == xjWorkItemEntity.eamLongId) && !xjWorkItemEntity.isFinished;
+                        if (isOneKeyOver) {
+                            return !xjWorkItemEntity.isEamView && !xjWorkItemEntity.isFinished;
+                        } else {
+                            return !xjWorkItemEntity.isEamView && (eamId == xjWorkItemEntity.eamLongId) && !xjWorkItemEntity.isFinished;
+                        }
                     }
                 })
                 .subscribe(xjWorkItemEntity -> {
@@ -812,7 +911,7 @@ public class XJWorkActivity extends BaseRefreshRecyclerActivity<XJWorkEntity> {
                             } finally {
 
                             }
-
+                            isOneKeyOver = false;
                         });
 
 
@@ -871,9 +970,15 @@ public class XJWorkActivity extends BaseRefreshRecyclerActivity<XJWorkEntity> {
                 .subscribe(new Consumer<XJWorkEntity>() {
                     @Override
                     public void accept(XJWorkEntity xjWorkItemEntity) throws Exception {
-
-                        if(xjWorkItemEntity.isPass && eamId == xjWorkItemEntity.eamLongId)
-                            workItemEntities.add(xjWorkItemEntity);
+                        if (isOneKeyJump) {
+                            if (xjWorkItemEntity.isPass){
+                                workItemEntities.add(xjWorkItemEntity);
+                            }
+                        } else {
+                            if (xjWorkItemEntity.isPass && eamId == xjWorkItemEntity.eamLongId){
+                                workItemEntities.add(xjWorkItemEntity);
+                            }
+                        }
                     }
                 }, new Consumer<Throwable>() {
                     @Override
@@ -890,7 +995,7 @@ public class XJWorkActivity extends BaseRefreshRecyclerActivity<XJWorkEntity> {
                         else{
                             showAllSkipReasonPicker(workItemEntities);
                         }
-
+                        isOneKeyJump = false;
                     }
                 });
 
@@ -1112,14 +1217,19 @@ public class XJWorkActivity extends BaseRefreshRecyclerActivity<XJWorkEntity> {
 
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onMessageEvent(InfraredEvent event) {
+
+        String tag = event.tag;
+        if ("设备就绪，可按下测温".equals(tag)) {
+            tempTv.setText("设备就绪，可按下测温按钮");
+        } else if ("正在测温".equals(tag)) {
+            if (!"正在测温".equals(tempTv.getText().toString())) tempTv.setText(tag);
+        }
         if (TextUtils.isEmpty(event.tem))
             return;
 
-        if(mTesto805iDialog!=null) {
-
+        if (mTesto805iDialog != null) {
             String tem = thermometervalue = event.tem;
-            String tag = event.tag;
-            LogUtil.d(this.getClass().getSimpleName(),tem + "-" + tag);
+            LogUtil.d(this.getClass().getSimpleName(), tem + "-" + tag);
 
             CustomTextView temperatureVal = mTesto805iDialog.getDialog().findViewById(R.id.temperatureVal);
             if (temperatureVal != null)

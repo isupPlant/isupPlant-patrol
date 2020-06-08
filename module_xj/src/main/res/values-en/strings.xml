@@ -55,4 +55,8 @@
 
 	<string name="xj_temp_task_exit_warning">A task is modified, quit it anyway？</string>
 	<string name="xj_temp_task_exit_warning2">Are you sure to leave？</string>
+	<string name="xj_work_jump_all">Whether to skip all tour items with one key？</string>
+	<string name="xj_work_over_all">Whether to complete all the inspection items？</string>
+	<string name="xj_work_over">A key to complete</string>
+	<string name="xj_work_jump">A key to skip</string>
 </resources>

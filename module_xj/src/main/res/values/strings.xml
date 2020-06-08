@@ -55,4 +55,8 @@
 
     <string name="xj_temp_task_exit_warning">已选择巡检内容，是否取消任务？</string>
     <string name="xj_temp_task_exit_warning2">确定离开？</string>
+    <string name="xj_work_jump_all">是否一键跳过全部巡检项？</string>
+    <string name="xj_work_over_all">是否完成全部巡检项？</string>
+    <string name="xj_work_over">一键完成</string>
+    <string name="xj_work_jump">一键跳过</string>
 </resources>
