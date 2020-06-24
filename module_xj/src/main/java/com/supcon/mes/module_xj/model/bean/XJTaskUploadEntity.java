@@ -110,11 +110,13 @@ import java.util.Map;
    public XJTaskUploadEntity(XJTaskEntity xjTaskEntity, String taskStateId){
 
       potrolTask = new PotrolTask();
-      potrolTask.id = xjTaskEntity.id;
-      potrolTask.tableInfoId = xjTaskEntity.tableInfoId;
       potrolTask.taskState = new StringIdEntity(taskStateId);
       potrolTask.completeStaff = new ObjectEntity(SupPlantApplication.getAccountInfo().staffId);
        potrolTask.isTemp = xjTaskEntity.isTemp;
+       if (!potrolTask.isTemp){
+           potrolTask.tableInfoId = xjTaskEntity.tableInfoId;
+           potrolTask.id = xjTaskEntity.id;
+       }
    }
 
     public void setWorkItems(List<XJWorkEntity> works) {

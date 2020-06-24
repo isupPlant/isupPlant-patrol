@@ -84,9 +84,21 @@ public class XJTempAreaAdapter extends BaseListDataRecyclerViewAdapter<XJAreaEnt
         @Override
         protected void initListener() {
             super.initListener();
-            itemView.setOnClickListener(v -> onItemChildViewClick(itemView, 0, getItem(getAdapterPosition())));
 
             RxView.clicks(itemXJTempAreaCheckbox)
+                    .throttleFirst(200, TimeUnit.MILLISECONDS)
+                    .subscribe(new Consumer<Object>() {
+                        @Override
+                        public void accept(Object o) throws Exception {
+                            XJAreaEntity xjAreaEntity = getItem(getAdapterPosition());
+                            if(xjAreaEntity != null){
+                                xjAreaEntity.isChecked = !xjAreaEntity.isChecked;
+                                notifyItemChanged(getAdapterPosition());
+                            }
+
+                        }
+                    });
+            RxView.clicks(itemView)
                     .throttleFirst(200, TimeUnit.MILLISECONDS)
                     .subscribe(new Consumer<Object>() {
                         @Override

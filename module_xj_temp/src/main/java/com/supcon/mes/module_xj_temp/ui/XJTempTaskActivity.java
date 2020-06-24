@@ -24,6 +24,7 @@ import com.supcon.mes.mbap.view.CustomImageButton;
 import com.supcon.mes.mbap.view.CustomTextView;
 import com.supcon.mes.middleware.SupPlantApplication;
 import com.supcon.mes.middleware.constant.Constant;
+import com.supcon.mes.middleware.model.bean.Area;
 import com.supcon.mes.middleware.model.bean.SystemCodeEntity;
 import com.supcon.mes.middleware.model.bean.xj.XJAreaEntity;
 import com.supcon.mes.middleware.model.bean.xj.XJAreaEntityDao;
@@ -105,11 +106,11 @@ public class XJTempTaskActivity extends BaseControllerActivity {
         if("selectRoute".equals(event.getSelectTag())){
             mXJTaskEntity.workRoute = (XJRouteEntity) event.getEntity();
             mXJTaskEntity.patrolType = SystemCodeManager.getInstance().getSystemCodeEntity(mXJTaskEntity.workRoute.patrolType.id);
-            mXJTaskEntity.workRoute.name = mXJTaskEntity.workRoute.name+getResources().getString(R.string.xj_temp_task);
+            mXJTaskEntity.workRoute.name = mXJTaskEntity.workRoute.name;
             mXJTaskEntity.tableNo = mXJTaskEntity.workRoute.name+new Date().getTime();
             mXJTaskEntity.staffName = SupPlantApplication.getAccountInfo().staffName;
 
-            xjTempTaskRouteSelect.setContent(mXJTaskEntity.workRoute.name);
+            xjTempTaskRouteSelect.setContent(mXJTaskEntity.workRoute.name+getResources().getString(R.string.xj_temp_task));
 
             List<XJAreaEntity> areaEntities = SupPlantApplication.dao().getXJAreaEntityDao().queryBuilder()
                     .where(XJAreaEntityDao.Properties.WorkRouteId.eq(mXJTaskEntity.workRoute.id))
@@ -163,16 +164,17 @@ public class XJTempTaskActivity extends BaseControllerActivity {
                             return;
                         }
 
-                        if(mXJTaskEntity.startTime == 0){
-                            ToastUtils.show(context, "请选择巡检开始时间");
+                        if(mXJTaskEntity.startTime == 0||mXJTaskEntity.endTime == 0){
+                            ToastUtils.show(context, "请选择巡检开始和结束时间");
                             return;
                         }
-                        if(mXJTaskEntity.endTime == 0){
-                            ToastUtils.show(context, "请选择巡检结束时间");
-                            return;
+                        boolean isHaveAreas=false;
+                        for(XJAreaEntity xjAreaEntity:mXJTaskEntity.areas){
+                            if (xjAreaEntity.isChecked){
+                                isHaveAreas=true;
+                            }
                         }
-
-                        if(mXJTaskEntity.areas == null || mXJTaskEntity.areas.size() == 0){
+                        if(mXJTaskEntity.areas == null || mXJTaskEntity.areas.size() == 0||!isHaveAreas){
                             ToastUtils.show(context, "请选择巡检区域");
                             return;
                         }
@@ -249,21 +251,25 @@ public class XJTempTaskActivity extends BaseControllerActivity {
                     mXJTaskEntity.endTime = DateUtil.dateFormat(end, "yyyy-MM-dd HH:mm:ss");
                 }
 
-                StringBuilder stringBuilder = new StringBuilder(start);
-                stringBuilder.append("--");
-                stringBuilder.append(end);
-                xjTempTaskTimeSelect.setContent(stringBuilder.toString());
 
-
-            }
-        });
-
-        mXJTempAreaAdapter.setOnItemChildViewClickListener(new OnItemChildViewClickListener() {
-            @Override
-            public void onItemChildViewClick(View childView, int position, int action, Object obj) {
+                if (!TextUtils.isEmpty(start)&&!TextUtils.isEmpty(end)) {
+                    StringBuilder stringBuilder = new StringBuilder(start);
+                    stringBuilder.append("--");
+                    stringBuilder.append(end);
+                    xjTempTaskTimeSelect.setContent(stringBuilder.toString());
+                }else{
+                    xjTempTaskTimeSelect.setContent("");
+                }
 
             }
         });
+//
+//        mXJTempAreaAdapter.setOnItemChildViewClickListener(new OnItemChildViewClickListener() {
+//            @Override
+//            public void onItemChildViewClick(View childView, int position, int action, Object obj) {
+//
+//            }
+//        });
     }
 
 

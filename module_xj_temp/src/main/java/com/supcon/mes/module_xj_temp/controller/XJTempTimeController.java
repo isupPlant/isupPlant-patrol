@@ -113,7 +113,7 @@ public class XJTempTimeController extends BaseViewController {
                                                 long endDate = DateUtil.dateFormat(dateStr, "yyyy-MM-dd HH:mm:ss");
 
                                                 if(startDate > endDate){
-                                                    ToastUtils.show(context, context.getString(R.string.middleware_start_later));
+                                                    ToastUtils.show(context, context.getString(R.string.middleware_select_time_warning));
                                                     return;
                                                 }
                                             }
@@ -131,12 +131,12 @@ public class XJTempTimeController extends BaseViewController {
                     .bindClickListener(R.id.customTimeViewOkBtn, v -> {
 
                         if (TextUtils.isEmpty(customDateStart)) {
-                            ToastUtils.show(context, context.getString(R.string.middleware_select_start_date));
+                            ToastUtils.show(context,"请选择巡检开始时间");
                             return;
                         }
 
                         if (TextUtils.isEmpty(customDateEnd)) {
-                            ToastUtils.show(context,  context.getString(R.string.middleware_select_end_date));
+                            ToastUtils.show(context, "请选择巡检结束时间");
                             return;
                         }
 
