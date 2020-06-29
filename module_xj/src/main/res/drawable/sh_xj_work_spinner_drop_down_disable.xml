@@ -10,6 +10,6 @@
     <item>
         <bitmap
             android:gravity="end"
-            android:src="@drawable/ic_spinner_gray" />
+            android:src="@drawable/ic_xj_spinner_gray" />
     </item>
 </layer-list>
