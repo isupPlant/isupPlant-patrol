@@ -206,6 +206,9 @@ public class XJTaskListActivity extends BaseRefreshRecyclerActivity<XJTaskGroupE
         if(mXJTaskEntities.size() == 0){
             refreshListController.refreshBegin();
         }
+        else{
+            createTaskGroups(mXJTaskEntities);
+        }
     }
 
     @Override
@@ -486,7 +489,7 @@ public class XJTaskListActivity extends BaseRefreshRecyclerActivity<XJTaskGroupE
         List<XJTaskEntity> tempTaskEntities = new ArrayList<>();
         List<String> tempTasks = XJCacheUtil.getTempTasks(context);
         for(String s : tempTasks){
-            XJTaskEntity xjTaskEntity = GsonUtil.gsonToBean(s, XJTaskEntity.class);
+            XJTaskEntity xjTaskEntity = GsonUtil.gsonToBean(XJCacheUtil.getString(s.replace(".0", "")), XJTaskEntity.class);
             tempTaskEntities.add(xjTaskEntity);
         }
 

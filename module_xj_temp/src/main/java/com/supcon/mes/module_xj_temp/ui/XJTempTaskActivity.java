@@ -106,8 +106,8 @@ public class XJTempTaskActivity extends BaseControllerActivity {
         if("selectRoute".equals(event.getSelectTag())){
             mXJTaskEntity.workRoute = (XJRouteEntity) event.getEntity();
             mXJTaskEntity.patrolType = SystemCodeManager.getInstance().getSystemCodeEntity(mXJTaskEntity.workRoute.patrolType.id);
-            mXJTaskEntity.workRoute.name = mXJTaskEntity.workRoute.name;
-            mXJTaskEntity.tableNo = mXJTaskEntity.workRoute.name+new Date().getTime();
+//            mXJTaskEntity.workRoute.name = mXJTaskEntity.workRoute.name+"Temp";
+            mXJTaskEntity.tableNo = "Temp"+new Date().getTime();
             mXJTaskEntity.staffName = SupPlantApplication.getAccountInfo().staffName;
 
             xjTempTaskRouteSelect.setContent(mXJTaskEntity.workRoute.name+getResources().getString(R.string.xj_temp_task));
