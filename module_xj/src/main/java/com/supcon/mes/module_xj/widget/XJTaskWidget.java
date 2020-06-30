@@ -108,6 +108,7 @@ public class XJTaskWidget extends BaseWidgetLayout {
         widgetTitle.setText(getContext().getString(R.string.xj_task_total));
         mXJTaskUploadController = new XJTaskUploadController(context);
         mXJTaskUploadController.onInit();
+        mXJTaskUploadController.initData();
         mXJTaskIssuedController = new XJTaskIssuedController(context);
         mXJTaskIssuedController.onInit();
         mXJTaskNoIssuedController = new XJTaskNoIssuedController(context);
