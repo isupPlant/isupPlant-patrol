@@ -162,7 +162,7 @@ import java.util.Map;
 
     class PotrolTask extends BaseEntity{
 
-       public long id;
+       public Long id;
        public StringIdEntity taskState;
        public long tableInfoId;
        public ObjectEntity completeStaff;

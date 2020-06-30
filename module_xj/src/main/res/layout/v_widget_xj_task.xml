@@ -99,16 +99,17 @@
                     android:gravity="center"
                     android:textSize="14sp"
                     />
+
                 <TextView
+                    android:id="@+id/taskDoneNum"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="0"
                     android:gravity="center_vertical|right"
-                    android:textSize="20sp"
-                    android:textStyle="bold"
-                    android:id="@+id/taskDoneNum"
+                    android:tag="taskDoneNum"
+                    android:text="0"
                     android:textColor="#00C482"
-                    android:tag="taskDoneNum" />
+                    android:textSize="20sp"
+                    android:textStyle="bold" />
             </LinearLayout>
             <include layout="@layout/ly_line_light"/>
 

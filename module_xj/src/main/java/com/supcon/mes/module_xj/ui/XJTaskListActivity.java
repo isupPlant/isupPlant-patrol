@@ -165,7 +165,7 @@ public class XJTaskListActivity extends BaseRefreshRecyclerActivity<XJTaskGroupE
 
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onRefresh(RefreshEvent refreshEvent) {
-        needRefresh = true;
+        refreshListController.refreshBegin();
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
