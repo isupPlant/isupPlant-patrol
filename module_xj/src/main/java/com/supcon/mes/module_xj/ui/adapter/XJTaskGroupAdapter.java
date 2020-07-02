@@ -12,6 +12,7 @@ import com.supcon.common.view.base.adapter.BaseListDataRecyclerViewAdapter;
 import com.supcon.common.view.base.adapter.viewholder.BaseRecyclerViewHolder;
 import com.supcon.mes.mbap.utils.DateUtil;
 import com.supcon.mes.module_xj.R;
+import com.supcon.mes.module_xj.model.bean.XJTaskEntity;
 import com.supcon.mes.module_xj.model.bean.XJTaskGroupEntity;
 
 import java.util.List;
@@ -33,7 +34,7 @@ public class XJTaskGroupAdapter extends BaseListDataRecyclerViewAdapter<XJTaskGr
     protected BaseRecyclerViewHolder<XJTaskGroupEntity> getViewHolder(int viewType) {
         return new XJTaskRouterViewHolder(context, parent);
     }
-
+    private List<XJTaskEntity> mXJTaskEntity;
     class XJTaskRouterViewHolder extends BaseRecyclerViewHolder<XJTaskGroupEntity>{
 
 
@@ -87,8 +88,6 @@ public class XJTaskGroupAdapter extends BaseListDataRecyclerViewAdapter<XJTaskGr
 
         @Override
         protected void update(XJTaskGroupEntity data) {
-
-
             xjTaskGroupName.setText(data.name);
             xjTaskGroupType.setText(data.typeValue);
 
@@ -107,9 +106,17 @@ public class XJTaskGroupAdapter extends BaseListDataRecyclerViewAdapter<XJTaskGr
                 xjTaskGroupRecyclerView.setAdapter(mXJTaskAdapter);
                 mXJTaskAdapter.setList(data.taskEntities);
                 mXJTaskAdapter.notifyDataSetChanged();
+                setXJTaskEntity(data.taskEntities);
             }
 
         }
+
+    }
+    public void setXJTaskEntity(List<XJTaskEntity> xjTaskEntity){
+        this.mXJTaskEntity=xjTaskEntity;
+    }
+    public List<XJTaskEntity> getXJTaskEntity(){
+        return mXJTaskEntity;
     }
 
 }

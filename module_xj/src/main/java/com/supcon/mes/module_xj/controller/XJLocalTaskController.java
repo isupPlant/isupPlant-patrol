@@ -6,6 +6,8 @@ import android.util.ArrayMap;
 
 import com.app.annotation.Presenter;
 import com.supcon.common.view.base.controller.BaseDataController;
+import com.supcon.common.view.util.LogUtil;
+import com.supcon.common.view.util.ToastUtils;
 import com.supcon.mes.middleware.util.XJCacheUtil;
 import com.supcon.mes.module_xj.model.api.XJLocalTaskAPI;
 import com.supcon.mes.module_xj.model.bean.XJTaskEntity;
@@ -85,12 +87,13 @@ public class XJLocalTaskController extends BaseDataController implements XJLocal
     public void getLocalTaskSuccess(List entity) {
         List<XJTaskEntity> tasks = entity;
 
+
         Flowable.fromIterable(tasks)
                 .subscribeOn(Schedulers.newThread())
                 .subscribe(new Consumer<XJTaskEntity>() {
                     @Override
                     public void accept(XJTaskEntity taskEntity) throws Exception {
-                        mXJLocalTaskMap.put(String.valueOf(taskEntity.id), taskEntity);
+                        mXJLocalTaskMap.put(String.valueOf(taskEntity.tableNo), taskEntity);
 
                     }
                 });

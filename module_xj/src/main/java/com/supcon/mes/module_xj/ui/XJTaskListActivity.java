@@ -13,6 +13,8 @@ import com.app.annotation.BindByTag;
 import com.app.annotation.Controller;
 import com.app.annotation.Presenter;
 import com.app.annotation.apt.Router;
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 import com.jakewharton.rxbinding2.view.RxView;
 import com.supcon.common.view.base.activity.BaseRefreshRecyclerActivity;
 import com.supcon.common.view.base.adapter.IListAdapter;
@@ -147,7 +149,7 @@ public class XJTaskListActivity extends BaseRefreshRecyclerActivity<XJTaskGroupE
 //        if(!TextUtils.isEmpty(activityRouter)){
 //            SupPlantApplication.exitMain();
 //        }
-        String taskCache =  SharedPreferencesUtils.getParam(context, Constant.SPKey.XJ_TASKS_CACHE, "");
+        String taskCache =  SharedPreferencesUtils.getParam(context, Constant.SPKey.XJ_TASKS_CACHE+taskStatusPosition, "");
 
         if(!TextUtils.isEmpty(taskCache)){
             mXJTaskEntities.addAll(GsonUtil.jsonToList(taskCache, XJTaskEntity.class));
@@ -159,7 +161,7 @@ public class XJTaskListActivity extends BaseRefreshRecyclerActivity<XJTaskGroupE
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        SharedPreferencesUtils.setParam(context, Constant.SPKey.XJ_TASKS_CACHE, GsonUtil.gsonString(mXJTaskEntities));
+        SharedPreferencesUtils.setParam(context, Constant.SPKey.XJ_TASKS_CACHE+taskStatusPosition, GsonUtil.gsonString(mXJTaskGroupAdapter.getXJTaskEntity()));
         EventBus.getDefault().unregister(this);
     }
 
@@ -205,10 +207,10 @@ public class XJTaskListActivity extends BaseRefreshRecyclerActivity<XJTaskGroupE
 
         if(mXJTaskEntities.size() == 0){
             refreshListController.refreshBegin();
-        }
-        else{
+        } else{
             createTaskGroups(mXJTaskEntities);
         }
+
     }
 
     @Override
@@ -232,6 +234,7 @@ public class XJTaskListActivity extends BaseRefreshRecyclerActivity<XJTaskGroupE
         contentView.addItemDecoration(new SpaceItemDecoration(DisplayUtil.dip2px(1, context)));
         contentView.setAdapter(mXJTaskGroupAdapter);
     }
+
 
     @SuppressLint("CheckResult")
     @Override
@@ -264,7 +267,6 @@ public class XJTaskListActivity extends BaseRefreshRecyclerActivity<XJTaskGroupE
                         Bundle bundle = new Bundle();
                         bundle.putLong(Constant.IntentKey.DEPLOYMENT_ID, deploymentId);
                         IntentRouter.go(context, Constant.Router.XJ_TEMP_TASK, bundle);
-
                     }
                 });
 
@@ -436,7 +438,6 @@ public class XJTaskListActivity extends BaseRefreshRecyclerActivity<XJTaskGroupE
         }
 
 
-
     }
 
     private void initQueryMap() {
@@ -478,7 +479,6 @@ public class XJTaskListActivity extends BaseRefreshRecyclerActivity<XJTaskGroupE
         mXJTaskEntities.addAll(taskEntities);
         if(entity.hasNext){
             getXJTask(entity.nextPage, queryMap);
-
         }
         else{
             createTaskGroups(mXJTaskEntities);
@@ -490,7 +490,18 @@ public class XJTaskListActivity extends BaseRefreshRecyclerActivity<XJTaskGroupE
         List<String> tempTasks = XJCacheUtil.getTempTasks(context);
         for(String s : tempTasks){
             XJTaskEntity xjTaskEntity = GsonUtil.gsonToBean(XJCacheUtil.getString(s.replace(".0", "")), XJTaskEntity.class);
-            tempTaskEntities.add(xjTaskEntity);
+          if (taskStatusPosition==0){
+              tempTaskEntities.add(xjTaskEntity);
+          }else if (taskStatusPosition==1){
+              if (!xjTaskEntity.isFinished){
+                  tempTaskEntities.add(xjTaskEntity);
+              }
+          }else if(taskStatusPosition==2){
+              if (xjTaskEntity.isFinished){
+                  tempTaskEntities.add(xjTaskEntity);
+              }
+          }
+
         }
 
         return tempTaskEntities;
@@ -499,9 +510,9 @@ public class XJTaskListActivity extends BaseRefreshRecyclerActivity<XJTaskGroupE
     @SuppressLint("CheckResult")
     private void createTaskGroups(List<XJTaskEntity> taskEntities) {
 
+        LogUtil.e("测试"+taskEntities.toString());
         Map<String, List<XJTaskEntity>> taskMap = new LinkedHashMap<>();
         List<XJTaskGroupEntity> xjTaskGroupEntities = new ArrayList<>();
-
         Flowable.fromIterable(taskEntities)
                 .subscribeOn(Schedulers.newThread())
                 .filter(new Predicate<XJTaskEntity>() {
@@ -513,7 +524,6 @@ public class XJTaskListActivity extends BaseRefreshRecyclerActivity<XJTaskGroupE
                         }
 
                         XJTaskEntity  taskEntity = getController(XJLocalTaskController.class).getLocalTask(xjTaskEntity.tableNo);
-
                         if(taskStatusPosition == 1 && taskEntity!=null && taskEntity.isFinished){//待检过滤
                             return false;
                         }
@@ -543,6 +553,7 @@ public class XJTaskListActivity extends BaseRefreshRecyclerActivity<XJTaskGroupE
                             XJTaskEntity taskEntity = getController(XJLocalTaskController.class).getLocalTask(xjTaskEntity.tableNo);
 
                             if(taskEntity!=null){
+
                                 xjTaskEntity = taskEntity;
                             }
                             else
@@ -598,7 +609,6 @@ public class XJTaskListActivity extends BaseRefreshRecyclerActivity<XJTaskGroupE
                             xjTaskGroupEntity.spanCount = 2;
                             xjTaskGroupEntities.add(xjTaskGroupEntity);
                         }
-
                         refreshListController.refreshComplete(xjTaskGroupEntities);
 
                     }
