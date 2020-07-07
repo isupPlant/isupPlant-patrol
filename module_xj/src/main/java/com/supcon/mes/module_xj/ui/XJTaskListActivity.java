@@ -39,7 +39,7 @@ import com.supcon.mes.middleware.model.bean.DeploymentEntity;
 import com.supcon.mes.middleware.model.contract.DeploymentContract;
 import com.supcon.mes.middleware.model.event.RefreshEvent;
 import com.supcon.mes.middleware.model.inter.SystemCode;
-import com.supcon.mes.middleware.model.listener.DateSelectListener;
+
 import com.supcon.mes.middleware.model.listener.OnAPIResultListener;
 import com.supcon.mes.middleware.model.listener.OnSuccessListener;
 import com.supcon.mes.middleware.presenter.DeploymentPresenter;
@@ -60,6 +60,7 @@ import com.supcon.mes.module_xj.model.contract.XJTaskContract;
 import com.supcon.mes.module_xj.model.event.XJTempTaskAddEvent;
 import com.supcon.mes.module_xj.presenter.XJTaskPresenter;
 import com.supcon.mes.module_xj.ui.adapter.XJTaskGroupAdapter;
+import com.supcon.mes.module_xj.util.DateSelectListener;
 import com.supcon.mes.sb2.config.SB2Config;
 import com.supcon.mes.sb2.controller.SB2Controller;
 
@@ -138,7 +139,8 @@ public class XJTaskListActivity extends BaseRefreshRecyclerActivity<XJTaskGroupE
     private List<XJTaskEntity> mXJTaskEntities = new ArrayList<>();
     private long deploymentId ;
     private boolean needRefresh = false;
-
+    private  boolean isRefresh=false;
+    private String dateFilter="今天";
     @Override
     protected void onInit() {
         super.onInit();
@@ -149,25 +151,29 @@ public class XJTaskListActivity extends BaseRefreshRecyclerActivity<XJTaskGroupE
 //        if(!TextUtils.isEmpty(activityRouter)){
 //            SupPlantApplication.exitMain();
 //        }
-        String taskCache =  SharedPreferencesUtils.getParam(context, Constant.SPKey.XJ_TASKS_CACHE+taskStatusPosition, "");
+        String taskCache =  SharedPreferencesUtils.getParam(context, Constant.SPKey.XJ_TASKS_CACHE+dateFilter+taskStatusPosition, "");
 
         if(!TextUtils.isEmpty(taskCache)){
             mXJTaskEntities.addAll(GsonUtil.jsonToList(taskCache, XJTaskEntity.class));
         }
 
         EventBus.getDefault().register(this);
+
+
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        SharedPreferencesUtils.setParam(context, Constant.SPKey.XJ_TASKS_CACHE+taskStatusPosition, GsonUtil.gsonString(mXJTaskGroupAdapter.getXJTaskEntity()));
+        if (mXJTaskGroupAdapter.getXJTaskEntity()!=null&&mXJTaskGroupAdapter.getXJTaskEntity().size()>0){
+            SharedPreferencesUtils.setParam(context, Constant.SPKey.XJ_TASKS_CACHE+dateFilter+taskStatusPosition, GsonUtil.gsonString(mXJTaskGroupAdapter.getXJTaskEntity()));
+        }
         EventBus.getDefault().unregister(this);
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onRefresh(RefreshEvent refreshEvent) {
-        refreshListController.refreshBegin();
+        isRefresh=true;
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
@@ -328,9 +334,16 @@ public class XJTaskListActivity extends BaseRefreshRecyclerActivity<XJTaskGroupE
 
         getController(XJTaskDateFilterController.class).setDateSelectListener(new DateSelectListener() {
             @Override
-            public void onDateSelect(String start, String end) {
+            public void onDateSelect(String start, String end,String filter) {
                 LogUtil.d("start:"+start);
                 LogUtil.d("end:"+end);
+                dateFilter=filter;
+                //如果缓存中有先从缓存中取出显示
+                String taskCache =  SharedPreferencesUtils.getParam(context, Constant.SPKey.XJ_TASKS_CACHE+dateFilter+taskStatusPosition, "");
+                mXJTaskEntities.clear();
+                if(!TextUtils.isEmpty(taskCache)){
+                    mXJTaskEntities.addAll(GsonUtil.jsonToList(taskCache, XJTaskEntity.class));
+                }
 
                 if(TextUtils.isEmpty(start) || TextUtils.isEmpty(end)){
                     queryMap.remove(Constant.BAPQuery.XJ_START_TIME_1);
@@ -350,6 +363,7 @@ public class XJTaskListActivity extends BaseRefreshRecyclerActivity<XJTaskGroupE
             @Override
             public void onSuccess(Integer result) {
                 LogUtil.d("result:"+result);
+               
                 taskStatusPosition = result;
                 refreshListController.refreshBegin();
 
@@ -436,8 +450,10 @@ public class XJTaskListActivity extends BaseRefreshRecyclerActivity<XJTaskGroupE
             createTaskGroups(mXJTaskEntities);
             needRefresh = false;
         }
-
-
+        if (isRefresh){
+            refreshListController.refreshBegin();
+            isRefresh=false;
+        }
     }
 
     private void initQueryMap() {
@@ -510,7 +526,6 @@ public class XJTaskListActivity extends BaseRefreshRecyclerActivity<XJTaskGroupE
     @SuppressLint("CheckResult")
     private void createTaskGroups(List<XJTaskEntity> taskEntities) {
 
-        LogUtil.e("测试"+taskEntities.toString());
         Map<String, List<XJTaskEntity>> taskMap = new LinkedHashMap<>();
         List<XJTaskGroupEntity> xjTaskGroupEntities = new ArrayList<>();
         Flowable.fromIterable(taskEntities)
@@ -617,6 +632,7 @@ public class XJTaskListActivity extends BaseRefreshRecyclerActivity<XJTaskGroupE
 
 
     }
+
 
     @Override
     public void getTaskListFailed(String errorMsg) {

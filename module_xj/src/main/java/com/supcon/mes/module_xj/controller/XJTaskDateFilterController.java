@@ -7,8 +7,9 @@ import android.widget.RadioGroup;
 import com.app.annotation.BindByTag;
 import com.supcon.common.view.base.controller.BaseViewController;
 import com.supcon.mes.middleware.constant.Constant;
-import com.supcon.mes.middleware.model.listener.DateSelectListener;
+
 import com.supcon.mes.middleware.util.TimeUtil;
+import com.supcon.mes.module_xj.util.DateSelectListener;
 
 /**
  * Created by wangshizhan on 2019/11/14
@@ -75,7 +76,7 @@ public class XJTaskDateFilterController extends BaseViewController {
         String end = dates[1];
 
         if(mDateSelectListener!=null){
-            mDateSelectListener.onDateSelect(start, end);
+            mDateSelectListener.onDateSelect(start, end,timePeriod);
         }
     }
 
