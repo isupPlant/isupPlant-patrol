@@ -705,6 +705,7 @@ public class XJWorkAdapter extends BaseListDataRecyclerViewAdapter<XJWorkEntity>
                     itemXJWorkResultInput.setHint("请输入检查结果");
                 }
 
+
                 setUnit(xjInputTypeEntity.unitID!=null?xjInputTypeEntity.unitID.name:"");
 
                 String value = "";
@@ -727,9 +728,11 @@ public class XJWorkAdapter extends BaseListDataRecyclerViewAdapter<XJWorkEntity>
                         value = "";
                     }
 
-
+                    itemXJWorkResultInput.setHint("请输入数值");
                 } else {
-
+                    if ("PATROL_valueType/char".equals(xjInputTypeEntity.valType.id)){
+                        itemXJWorkResultInput.setHint("请输入文本");
+                    }
                     if (!TextUtils.isEmpty(data.defaultVal) && TextUtils.isEmpty(data.concluse)) {
                         value = data.defaultVal;
                     } else if (!TextUtils.isEmpty(data.concluse)) {

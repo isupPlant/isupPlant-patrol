@@ -363,7 +363,7 @@ public class XJTaskListActivity extends BaseRefreshRecyclerActivity<XJTaskGroupE
             @Override
             public void onSuccess(Integer result) {
                 LogUtil.d("result:"+result);
-               
+
                 taskStatusPosition = result;
                 refreshListController.refreshBegin();
 
