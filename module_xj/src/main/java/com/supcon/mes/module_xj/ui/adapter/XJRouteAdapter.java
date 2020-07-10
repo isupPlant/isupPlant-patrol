@@ -61,8 +61,8 @@ public class XJRouteAdapter extends BaseListDataRecyclerViewAdapter<XJRouteEntit
         @Override
         protected void update(XJRouteEntity data) {
             xjRouteName.setText(data.name);
-            if(data.patrolType!=null)
-                xjRouteType.setText(data.patrolType.value);
+            if(data.dept!=null&&data.dept.name!=null)
+                xjRouteType.setText(data.dept.name);
             else xjRouteType.setText("");
 
             if(!TextUtils.isEmpty(data.remark)){
