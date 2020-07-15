@@ -56,7 +56,7 @@ import io.reactivex.functions.Consumer;
  * Created by wangshizhan on 2020/5/25
  * Email:wangshizhan@supcom.com
  */
-@Router(Constant.Router.XJ_TEMP_TASK)
+@Router(Constant.AppCode.MPS_TempPatrol)
 @Controller(XJTempTimeController.class)
 public class XJTempTaskActivity extends BaseControllerActivity {
 

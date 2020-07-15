@@ -272,7 +272,7 @@ public class XJTaskListActivity extends BaseRefreshRecyclerActivity<XJTaskGroupE
                     public void accept(Object o) throws Exception {
                         Bundle bundle = new Bundle();
                         bundle.putLong(Constant.IntentKey.DEPLOYMENT_ID, deploymentId);
-                        IntentRouter.go(context, Constant.Router.XJ_TEMP_TASK, bundle);
+                        IntentRouter.go(context, Constant.AppCode.MPS_TempPatrol, bundle);
                     }
                 });
 
