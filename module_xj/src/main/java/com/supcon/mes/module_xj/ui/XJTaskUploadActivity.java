@@ -50,6 +50,7 @@ import org.greenrobot.eventbus.EventBus;
 import org.reactivestreams.Publisher;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -373,7 +374,7 @@ public class XJTaskUploadActivity extends BaseRefreshRecyclerActivity<XJTaskGrou
                             xjTaskGroupEntity.spanCount = 3;
                             xjTaskGroupEntities.add(xjTaskGroupEntity);
                         }
-                        xjTaskGroupEntities.sort(new Comparator<XJTaskGroupEntity>() {
+                        Collections.sort(xjTaskGroupEntities,new Comparator<XJTaskGroupEntity>() {
                             @Override
                             public int compare(XJTaskGroupEntity o1, XJTaskGroupEntity o2) {
                                 return (int) (o2.date - o1.date);
