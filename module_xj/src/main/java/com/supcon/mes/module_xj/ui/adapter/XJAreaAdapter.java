@@ -21,9 +21,11 @@ import java.util.List;
 
 /**
  * Created by wangshizhan on 2020/3/24
+ * 巡检区域列表适配器
  * Email:wangshizhan@supcom.com
  */
 public class XJAreaAdapter extends BaseListDataRecyclerViewAdapter<XJAreaEntity> {
+
 
     public XJAreaAdapter(Context context) {
         super(context);
