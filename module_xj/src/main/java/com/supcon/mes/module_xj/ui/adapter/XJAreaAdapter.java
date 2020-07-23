@@ -21,7 +21,7 @@ import java.util.List;
 
 /**
  * Created by wangshizhan on 2020/3/24
- * 巡检区域列表适配器
+ * 巡检区域列表适配器,用于显示区域信息
  * Email:wangshizhan@supcom.com
  */
 public class XJAreaAdapter extends BaseListDataRecyclerViewAdapter<XJAreaEntity> {
