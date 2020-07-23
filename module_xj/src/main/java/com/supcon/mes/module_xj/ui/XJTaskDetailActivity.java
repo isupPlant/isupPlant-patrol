@@ -7,7 +7,6 @@ import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
@@ -26,7 +25,6 @@ import com.supcon.common.view.listener.OnItemChildViewClickListener;
 import com.supcon.common.view.util.LogUtil;
 import com.supcon.common.view.util.SharedPreferencesUtils;
 import com.supcon.common.view.util.ToastUtils;
-import com.supcon.common.view.view.loader.base.OnLoaderFinishListener;
 import com.supcon.mes.mbap.utils.DateUtil;
 import com.supcon.mes.mbap.utils.GsonUtil;
 import com.supcon.mes.mbap.utils.controllers.SinglePickController;
@@ -359,64 +357,52 @@ public class XJTaskDetailActivity extends BaseControllerActivity implements XJTa
     protected void initListener() {
         super.initListener();
         RxView.clicks(xjTaskDetailParent)
-                .subscribe(new Consumer<Object>() {
-                    @Override
-                    public void accept(Object o) throws Exception {
-                        back();
-                    }
-                });
+                .subscribe(o -> back());
 
         if(mXJAreaAdapter!=null){
-            mXJAreaAdapter.setOnItemChildViewClickListener(new OnItemChildViewClickListener() {
-                @Override
-                public void onItemChildViewClick(View childView, int position, int action, Object obj) {
-                    XJAreaEntity xjAreaEntity = (XJAreaEntity) obj;
+            mXJAreaAdapter.setOnItemChildViewClickListener((childView, position, action, obj) -> {
+                XJAreaEntity xjAreaEntity = (XJAreaEntity) obj;
 
-                    if(mXJTaskEntity.realStartTime == 0){
-                        ToastUtils.show(context, getString(R.string.xj_area_sign_warning1));
-                        return;
-                    }
-
-                    if(mXJTaskEntity.areas==null || mXJTaskEntity.areas.size() == 0){
-                        ToastUtils.show(context, getString(R.string.xj_area_sign_warning2));
-                        return;
-                    }
-
-                    if(xjAreaEntity.isSigned || mXJTaskEntity.isFinished){
-                        goArea(xjAreaEntity);
-                    }
-                    else {
-                        showSignReason(xjAreaEntity);
-                    }
-
+                if(mXJTaskEntity.realStartTime == 0){
+                    ToastUtils.show(context, getString(R.string.xj_area_sign_warning1));
+                    return;
                 }
+
+                if(mXJTaskEntity.areas==null || mXJTaskEntity.areas.size() == 0){
+                    ToastUtils.show(context, getString(R.string.xj_area_sign_warning2));
+                    return;
+                }
+
+                if(xjAreaEntity.isSigned || mXJTaskEntity.isFinished){
+                    goArea(xjAreaEntity);
+                }
+                else {
+                    showSignReason(xjAreaEntity);
+                }
+
             });
         }
 
 
         RxView.clicks(xjTaskDetailTaskBtn)
                 .throttleFirst(200, TimeUnit.MILLISECONDS)
-                .subscribe(new Consumer<Object>() {
-                    @Override
-                    public void accept(Object o) throws Exception {
-                        if(mXJTaskEntity.realStartTime == 0){
+                .subscribe(o -> {
+                    if (mXJTaskEntity.realStartTime == 0) {
 
-                            if(mXJTaskEntity.areas==null || mXJTaskEntity.areas.size() == 0){
-                                ToastUtils.show(context, getString(R.string.xj_area_sign_warning2));
-                                return;
-                            }
-
-                            mXJTaskEntity.realStartTime = System.currentTimeMillis();
-                            XJCacheUtil.putString(mXJTaskEntity.tableNo, mXJTaskEntity.toString());
-                            //开始巡检
-                            xjTaskDetailTaskBtn.setBackgroundResource(R.drawable.sl_xj_task_red);
-                            xjTaskDetailTaskBtn.setText(getString(R.string.xj_task_end));
-                        }
-                        else{
-                            showFinishDialog();
+                        if (mXJTaskEntity.areas == null || mXJTaskEntity.areas.size() == 0) {
+                            ToastUtils.show(context, getString(R.string.xj_area_sign_warning2));
+                            return;
                         }
 
+                        mXJTaskEntity.realStartTime = System.currentTimeMillis();
+                        XJCacheUtil.putString(mXJTaskEntity.tableNo, mXJTaskEntity.toString());
+                        //开始巡检
+                        xjTaskDetailTaskBtn.setBackgroundResource(R.drawable.sl_xj_task_red);
+                        xjTaskDetailTaskBtn.setText(getString(R.string.xj_task_end));
+                    } else {
+                        showFinishDialog();
                     }
+
                 });
     }
 
@@ -437,12 +423,7 @@ public class XJTaskDetailActivity extends BaseControllerActivity implements XJTa
 
                     XJCacheUtil.putString(mXJTaskEntity.tableNo, mXJTaskEntity.toString());
                     EventBus.getDefault().post(new RefreshEvent());
-                    onLoadSuccessAndExit(getString(R.string.xj_task_finish_toast2), new OnLoaderFinishListener() {
-                        @Override
-                        public void onLoaderFinished() {
-                            back();
-                        }
-                    });
+                    onLoadSuccessAndExit(getString(R.string.xj_task_finish_toast2), () -> back());
 //                    presenterRouter.create(OLXJTaskStatusAPI.class).endTasks(String.valueOf(olxjTaskEntity.id), "结束任务", true);
                 }, true)
                 .show();
@@ -611,8 +592,6 @@ public class XJTaskDetailActivity extends BaseControllerActivity implements XJTa
      * @author zhangwenshuai1 2018/8/2
      */
     private void dealSign(String code) {
-
-
         int index = 0;
         for (XJAreaEntity areaEntity : mXJTaskEntity.areas) {
             if (code.equals(areaEntity.signCode)) {
