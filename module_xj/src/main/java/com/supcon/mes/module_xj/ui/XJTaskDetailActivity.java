@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
+import android.util.Pair;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
@@ -25,6 +26,8 @@ import com.supcon.common.view.listener.OnItemChildViewClickListener;
 import com.supcon.common.view.util.LogUtil;
 import com.supcon.common.view.util.SharedPreferencesUtils;
 import com.supcon.common.view.util.ToastUtils;
+import com.supcon.mes.expert_uhf.controller.ExpertUHFRFIDController;
+import com.supcon.mes.expert_uhf.helper.InventoryBuffer;
 import com.supcon.mes.mbap.utils.DateUtil;
 import com.supcon.mes.mbap.utils.GsonUtil;
 import com.supcon.mes.mbap.utils.controllers.SinglePickController;
@@ -80,7 +83,8 @@ import static com.supcon.mes.module_xj.ui.XJTaskListActivity.XJ_TASK_STAFF_KEY;
  * Email:wangshizhan@supcom.com
  */
 @Router(Constant.Router.XJ_TASK_DETAIL)
-@Controller(value = {SystemCodeJsonController.class, XJLocalTaskController.class})
+@Controller(value = {SystemCodeJsonController.class, XJLocalTaskController.class,
+        ExpertUHFRFIDController.class})
 @Presenter(value = {XJTaskSubmitPresenter.class})
 @SystemCode(entityCodes = {
         Constant.SystemCode.PATROL_signInType,
@@ -119,6 +123,8 @@ public class XJTaskDetailActivity extends BaseControllerActivity implements XJTa
     private ScanDriverController driverController;
     private EM55UHFRFIDHelper em55UHFRFIDHelper;
     Map<String, String> signTypeInfoMap;     //签到原因
+
+    private ExpertUHFRFIDController mExpertUHFRFIDController;
 
     @Override
     protected int getLayoutID() {
@@ -162,10 +168,10 @@ public class XJTaskDetailActivity extends BaseControllerActivity implements XJTa
         }
 
 
-        if (SBTUtil.isSupportUHF() && SharedPreferencesUtils.getParam(context, Constant.SPKey.UHF_ENABLE, false)){
-            em55UHFRFIDHelper = EM55UHFRFIDHelper.getInstance();
-            openDevice();
-        }
+//        if (SBTUtil.isSupportUHF() && SharedPreferencesUtils.getParam(context, Constant.SPKey.UHF_ENABLE, false)){
+//            em55UHFRFIDHelper = EM55UHFRFIDHelper.getInstance();
+//            openDevice();
+//        }
     }
 
     @Override
@@ -182,6 +188,7 @@ public class XJTaskDetailActivity extends BaseControllerActivity implements XJTa
                 .build(context);
         registerController(ScanDriverController.class.getSimpleName(), driverController);
         driverController.openScan();
+        mExpertUHFRFIDController = getController(ExpertUHFRFIDController.class);
     }
 
     @Override
@@ -193,30 +200,29 @@ public class XJTaskDetailActivity extends BaseControllerActivity implements XJTa
       @SuppressLint("CheckResult")
     private void openDevice() {
 
-
-        Flowable.just(true)
-                .subscribeOn(Schedulers.newThread())
-                .map(new Function<Boolean, Boolean>() {
-                    @Override
-                    public Boolean apply(Boolean aBoolean) throws Exception {
-                        return em55UHFRFIDHelper.open();
-                    }
-                })
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Consumer<Boolean>() {
-                    @Override
-                    public void accept(Boolean aBoolean) throws Exception {
-                        if (aBoolean) {
-                            if (!(App.getAppContext().store.lastElement() instanceof XJTaskDetailActivity)) {
-                                return;
-                            }
-                            em55UHFRFIDHelper.inventoryStart();
-                            ToastUtils.show(context, "超高频初始化成功！");
-                        } else {
-                            ToastUtils.show(context, "超高频初始化失败！");
-                        }
-                    }
-                });
+//        Flowable.just(true)
+//                .subscribeOn(Schedulers.newThread())
+//                .map(new Function<Boolean, Boolean>() {
+//                    @Override
+//                    public Boolean apply(Boolean aBoolean) throws Exception {
+//                        return em55UHFRFIDHelper.open();
+//                    }
+//                })
+//                .observeOn(AndroidSchedulers.mainThread())
+//                .subscribe(new Consumer<Boolean>() {
+//                    @Override
+//                    public void accept(Boolean aBoolean) throws Exception {
+//                        if (aBoolean) {
+//                            if (!(App.getAppContext().store.lastElement() instanceof XJTaskDetailActivity)) {
+//                                return;
+//                            }
+//                            em55UHFRFIDHelper.inventoryStart();
+//                            ToastUtils.show(context, "超高频初始化成功！");
+//                        } else {
+//                            ToastUtils.show(context, "超高频初始化失败！");
+//                        }
+//                    }
+//                });
     }
 
 
@@ -241,11 +247,26 @@ public class XJTaskDetailActivity extends BaseControllerActivity implements XJTa
 
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        mExpertUHFRFIDController.start(new ExpertUHFRFIDController.UHFResult() {
+            @Override
+            public void result(Pair<String, InventoryBuffer.InventoryTagMap> result) {
+
+                if(TextUtils.isEmpty(result.first)){
+                    UhfRfidEvent uhfRfidEvent = new UhfRfidEvent(result.second.strEPC);
+                    EventBus.getDefault().post(uhfRfidEvent);
+                }
+            }
+        });
+    }
 
     @Override
     protected void onStop() {
         super.onStop();
 
+        mExpertUHFRFIDController.stop();
         if (em55UHFRFIDHelper != null && em55UHFRFIDHelper.isStart())
             em55UHFRFIDHelper.inventoryStop();
     }

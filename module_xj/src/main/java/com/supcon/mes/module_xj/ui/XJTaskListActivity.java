@@ -24,6 +24,7 @@ import com.supcon.common.view.util.DisplayUtil;
 import com.supcon.common.view.util.LogUtil;
 import com.supcon.common.view.util.SharedPreferencesUtils;
 import com.supcon.common.view.util.StatusBarUtils;
+import com.supcon.mes.expert_uhf.controller.ExpertUHFRFIDController;
 import com.supcon.mes.mbap.utils.DateUtil;
 import com.supcon.mes.mbap.utils.GsonUtil;
 import com.supcon.mes.mbap.utils.SpaceItemDecoration;
@@ -144,6 +145,7 @@ public class XJTaskListActivity extends BaseRefreshRecyclerActivity<XJTaskGroupE
     @Override
     protected void onInit() {
         super.onInit();
+        ExpertUHFRFIDController.initSerialPort(this);
         refreshListController.setAutoPullDownRefresh(false);
         refreshListController.setPullDownRefreshEnabled(true);
 
@@ -408,24 +410,21 @@ public class XJTaskListActivity extends BaseRefreshRecyclerActivity<XJTaskGroupE
             }
         });
 
-        mXJTaskGroupAdapter.setOnItemChildViewClickListener(new OnItemChildViewClickListener() {
-            @Override
-            public void onItemChildViewClick(View childView, int position, int action, Object obj) {
-                XJTaskEntity xjTaskEntity = (XJTaskEntity) obj;
+        mXJTaskGroupAdapter.setOnItemChildViewClickListener((childView, position, action, obj) -> {
+            XJTaskEntity xjTaskEntity = (XJTaskEntity) obj;
 
-                if(xjTaskEntity == null){
-                    return;
-                }
-
-                Bundle bundle = new Bundle();
-                if(XJCacheUtil.check(context, xjTaskEntity.tableNo)){//检查本地缓存
-                    bundle.putString(Constant.IntentKey.XJ_TASK_ENTITY_STR, XJCacheUtil.getString(xjTaskEntity.tableNo));
-                }
-                else{
-                    bundle.putString(Constant.IntentKey.XJ_TASK_ENTITY_STR, xjTaskEntity.toString());
-                }
-                IntentRouter.go(context, Constant.Router.XJ_TASK_DETAIL, bundle);
+            if(xjTaskEntity == null){
+                return;
             }
+
+            Bundle bundle = new Bundle();
+            if(XJCacheUtil.check(context, xjTaskEntity.tableNo)){//检查本地缓存
+                bundle.putString(Constant.IntentKey.XJ_TASK_ENTITY_STR, XJCacheUtil.getString(xjTaskEntity.tableNo));
+            }
+            else{
+                bundle.putString(Constant.IntentKey.XJ_TASK_ENTITY_STR, xjTaskEntity.toString());
+            }
+            IntentRouter.go(context, Constant.Router.XJ_TASK_DETAIL, bundle);
         });
     }
 

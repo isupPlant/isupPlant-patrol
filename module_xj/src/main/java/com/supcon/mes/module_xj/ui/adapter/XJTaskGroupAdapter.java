@@ -10,6 +10,7 @@ import android.widget.TextView;
 import com.app.annotation.BindByTag;
 import com.supcon.common.view.base.adapter.BaseListDataRecyclerViewAdapter;
 import com.supcon.common.view.base.adapter.viewholder.BaseRecyclerViewHolder;
+import com.supcon.common.view.listener.OnItemChildViewClickListener;
 import com.supcon.mes.mbap.utils.DateUtil;
 import com.supcon.mes.module_xj.R;
 import com.supcon.mes.module_xj.model.bean.XJTaskEntity;
@@ -82,8 +83,12 @@ public class XJTaskGroupAdapter extends BaseListDataRecyclerViewAdapter<XJTaskGr
         protected void initListener() {
             super.initListener();
             mXJTaskAdapter.setOnItemChildViewClickListener(
-                    (childView, position, action, obj) ->
-                            onItemChildViewClick(xjTaskGroupRecyclerView, action, obj));
+                    new OnItemChildViewClickListener() {
+                        @Override
+                        public void onItemChildViewClick(View childView, int position, int action, Object obj) {
+                            XJTaskRouterViewHolder.this.onItemChildViewClick(xjTaskGroupRecyclerView, action, obj);
+                        }
+                    });
         }
 
         @Override
