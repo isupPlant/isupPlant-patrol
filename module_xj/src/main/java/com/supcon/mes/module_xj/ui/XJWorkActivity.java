@@ -173,7 +173,11 @@ public class XJWorkActivity extends BaseRefreshRecyclerActivity<XJWorkEntity> {
 
         if(tempMode == TemperatureMode.EXPERT.getCode()||vibMode == VibMode.EXPERT.getCode()){
             if(expertViberController == null) {
-                expertViberController = new ExpertController(ExpertController.createContentView(context), true);
+                View contentView = ExpertController.createContentView(context);
+                contentView.findViewById(R.id.viberFinishBtn).setOnClickListener(v->{
+                    expertViberController.hide();
+                });
+                expertViberController = new ExpertController(contentView, true);
 //        mMGViberController.setTemperatureNeed(true);
                 expertViberController.onInit();
                 expertViberController.initView();
@@ -646,10 +650,18 @@ public class XJWorkActivity extends BaseRefreshRecyclerActivity<XJWorkEntity> {
 //                        LogUtil.d("onDataSelect:" + data));
 //            }
             expertViberController.show();
+            expertViberController.setOnFinishListener(new OnRunResult<String>() {
+                @Override
+                public void result(Pair<String, String> result) {
+
+                    xjWorkEntity.concluse = result.second;
+                    mXJWorkAdapter.notifyItemChanged(mPosition);
+                }
+            });
             expertViberController.run(new OnRunResult<String>() {
                 @Override
                 public void result(Pair<String, String> result) {
-                    LogUtil.e("ciruy", result.second);
+                    if(result.first!=null)return;
                 }
             });
         }
@@ -732,10 +744,17 @@ public class XJWorkActivity extends BaseRefreshRecyclerActivity<XJWorkEntity> {
 //                        LogUtil.d("onDataSelect:" + data));
 //            }
             expertViberController.show();
+            expertViberController.setOnFinishListener(new OnRunResult<String>() {
+                @Override
+                public void result(Pair<String, String> result) {
+                    xjWorkEntity.concluse = result.second;
+                    mXJWorkAdapter.notifyItemChanged(mPosition);
+                }
+            });
             expertViberController.run(new OnRunResult<String>() {
                 @Override
                 public void result(Pair<String, String> result) {
-                    LogUtil.e("ciruy", result.second);
+                    if(result.first!=null)return;
                 }
             });
         }

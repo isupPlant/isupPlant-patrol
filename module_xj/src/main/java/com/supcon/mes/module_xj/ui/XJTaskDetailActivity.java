@@ -20,11 +20,8 @@ import com.app.annotation.Controller;
 import com.app.annotation.Presenter;
 import com.app.annotation.apt.Router;
 import com.jakewharton.rxbinding2.view.RxView;
-import com.supcon.common.view.App;
 import com.supcon.common.view.base.activity.BaseControllerActivity;
-import com.supcon.common.view.listener.OnItemChildViewClickListener;
 import com.supcon.common.view.util.LogUtil;
-import com.supcon.common.view.util.SharedPreferencesUtils;
 import com.supcon.common.view.util.ToastUtils;
 import com.supcon.mes.expert_uhf.controller.ExpertUHFRFIDController;
 import com.supcon.mes.expert_uhf.helper.InventoryBuffer;
@@ -39,7 +36,6 @@ import com.supcon.mes.middleware.model.bean.xj.XJAreaEntity;
 import com.supcon.mes.middleware.model.bean.xj.XJAreaEntityDao;
 import com.supcon.mes.middleware.model.event.RefreshEvent;
 import com.supcon.mes.middleware.model.inter.SystemCode;
-import com.supcon.mes.middleware.util.SBTUtil;
 import com.supcon.mes.middleware.util.SystemCodeManager;
 import com.supcon.mes.middleware.util.XJCacheUtil;
 import com.supcon.mes.module_scan.controller.ScanDriverController;
@@ -58,6 +54,7 @@ import com.supcon.mes.sb2.model.event.BarcodeEvent;
 import com.supcon.mes.sb2.model.event.SB2AttachEvent;
 import com.supcon.mes.sb2.model.event.UhfRfidEvent;
 import com.supcon.mes.sb2.util.EM55UHFRFIDHelper;
+import com.supcon.mes.sb2.util.SoundHelper;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
@@ -72,9 +69,6 @@ import java.util.concurrent.TimeUnit;
 
 import io.reactivex.Flowable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
-import io.reactivex.functions.Consumer;
-import io.reactivex.functions.Function;
-import io.reactivex.schedulers.Schedulers;
 
 import static com.supcon.mes.module_xj.ui.XJTaskListActivity.XJ_TASK_STAFF_KEY;
 
@@ -89,7 +83,7 @@ import static com.supcon.mes.module_xj.ui.XJTaskListActivity.XJ_TASK_STAFF_KEY;
 @SystemCode(entityCodes = {
         Constant.SystemCode.PATROL_signInType,
         Constant.SystemCode.PATROL_passReason
-        })
+})
 public class XJTaskDetailActivity extends BaseControllerActivity implements XJTaskSubmitContract.View {
 
     @BindByTag("xjTaskDetailRouteName")
@@ -115,16 +109,13 @@ public class XJTaskDetailActivity extends BaseControllerActivity implements XJTa
 
     @BindByTag("xjTaskDetailParent")
     RelativeLayout xjTaskDetailParent;
-
+    Map<String, String> signTypeInfoMap;     //签到原因
     private XJTaskEntity mXJTaskEntity;
-
     private XJAreaAdapter mXJAreaAdapter;
-
     private ScanDriverController driverController;
     private EM55UHFRFIDHelper em55UHFRFIDHelper;
-    Map<String, String> signTypeInfoMap;     //签到原因
-
     private ExpertUHFRFIDController mExpertUHFRFIDController;
+    private int enterPosition = -1;
 
     @Override
     protected int getLayoutID() {
@@ -163,7 +154,7 @@ public class XJTaskDetailActivity extends BaseControllerActivity implements XJTa
         String taskStr = getIntent().getStringExtra(Constant.IntentKey.XJ_TASK_ENTITY_STR);
 
 
-        if(!TextUtils.isEmpty(taskStr)){
+        if (!TextUtils.isEmpty(taskStr)) {
             mXJTaskEntity = GsonUtil.gsonToBean(taskStr, XJTaskEntity.class);
         }
 
@@ -197,7 +188,7 @@ public class XJTaskDetailActivity extends BaseControllerActivity implements XJTa
         driverController.onNewIntent(intent);
     }
 
-      @SuppressLint("CheckResult")
+    @SuppressLint("CheckResult")
     private void openDevice() {
 
 //        Flowable.just(true)
@@ -225,8 +216,6 @@ public class XJTaskDetailActivity extends BaseControllerActivity implements XJTa
 //                });
     }
 
-
-
     @Override
     protected void onRestart() {
         super.onRestart();
@@ -246,18 +235,18 @@ public class XJTaskDetailActivity extends BaseControllerActivity implements XJTa
         }
 
     }
-
+    private SoundHelper mSoundHelper = new SoundHelper();
     @Override
     protected void onResume() {
         super.onResume();
-        mExpertUHFRFIDController.start(new ExpertUHFRFIDController.UHFResult() {
-            @Override
-            public void result(Pair<String, InventoryBuffer.InventoryTagMap> result) {
-
-                if(TextUtils.isEmpty(result.first)){
-                    UhfRfidEvent uhfRfidEvent = new UhfRfidEvent(result.second.strEPC);
-                    EventBus.getDefault().post(uhfRfidEvent);
-                }
+        mExpertUHFRFIDController.start(result -> {
+            if (TextUtils.isEmpty(result.first)) {
+                char[] str = result.second.strEPC.replaceAll(" ", "").toCharArray();
+                StringBuilder stringBuilder = new StringBuilder();
+                for (char c : str)
+                    if (c >= '0' && c <= '9' && stringBuilder.length() < 8)
+                        stringBuilder.append(c);
+                EventBus.getDefault().post(new UhfRfidEvent(stringBuilder.toString()));
             }
         });
     }
@@ -276,7 +265,7 @@ public class XJTaskDetailActivity extends BaseControllerActivity implements XJTa
         super.onDestroy();
         EventBus.getDefault().unregister(this);
 
-        if (em55UHFRFIDHelper != null){
+        if (em55UHFRFIDHelper != null) {
             em55UHFRFIDHelper.close();
         }
     }
@@ -290,7 +279,6 @@ public class XJTaskDetailActivity extends BaseControllerActivity implements XJTa
 
     }
 
-
     @Override
     protected void initData() {
         super.initData();
@@ -298,32 +286,29 @@ public class XJTaskDetailActivity extends BaseControllerActivity implements XJTa
         signTypeInfoMap = getController(SystemCodeJsonController.class).getCodeMap(Constant.SystemCode.PATROL_signInType);
     }
 
+    private void updateView() {
+        if (mXJTaskEntity != null) {
 
-    private void updateView(){
-        if(mXJTaskEntity!=null){
 
-
-            if(mXJTaskEntity.workRoute!=null)
+            if (mXJTaskEntity.workRoute != null)
                 xjTaskDetailRouteName.setText(mXJTaskEntity.workRoute.name);
 
             xjTaskDetailTableNo.setText(mXJTaskEntity.tableNo);
 
-            xjTaskDetailTaskState.setText(mXJTaskEntity.isFinished?getString(R.string.xj_task_checked):getString(R.string.xj_task_uncheck));
+            xjTaskDetailTaskState.setText(mXJTaskEntity.isFinished ? getString(R.string.xj_task_checked) : getString(R.string.xj_task_uncheck));
             xjTaskDetailTaskState.setTextColor(getResources().getColor(R.color.xjBtnColor));
 
-            if(mXJTaskEntity.isFinished){
+            if (mXJTaskEntity.isFinished) {
                 xjTaskDetailTaskBtn.setVisibility(View.GONE);
                 xjTaskDetailTaskState.setTextColor(getResources().getColor(R.color.xjBtnColor));
                 xjTaskDetailTaskState.setBackgroundResource(R.drawable.sh_xj_blue_stroke);
-            }
-            else if(mXJTaskEntity.realStartTime!=0){
+            } else if (mXJTaskEntity.realStartTime != 0) {
                 xjTaskDetailTaskState.setTextColor(getResources().getColor(R.color.xjBtnRedColor));
                 xjTaskDetailTaskState.setBackgroundResource(R.drawable.sh_xj_red_stroke);
                 xjTaskDetailTaskBtn.setVisibility(View.VISIBLE);
                 xjTaskDetailTaskBtn.setText(getString(R.string.xj_task_end));
                 xjTaskDetailTaskBtn.setBackgroundResource(R.drawable.sl_xj_task_red);
-            }
-            else{
+            } else {
                 xjTaskDetailTaskState.setTextColor(getResources().getColor(R.color.xjBtnRedColor));
                 xjTaskDetailTaskState.setBackgroundResource(R.drawable.sh_xj_red_stroke);
                 xjTaskDetailTaskBtn.setVisibility(View.VISIBLE);
@@ -332,22 +317,21 @@ public class XJTaskDetailActivity extends BaseControllerActivity implements XJTa
             }
 
             xjTaskDetailDate.setText(DateUtil.dateFormat(mXJTaskEntity.startTime, "MM-dd HH:mm")
-                    +" - "+DateUtil.dateFormat(mXJTaskEntity.endTime, "MM-dd HH:mm"));
+                    + " - " + DateUtil.dateFormat(mXJTaskEntity.endTime, "MM-dd HH:mm"));
 
-            if(mXJTaskEntity.attrMap!=null)
-                xjTaskDetailStaff.setText(""+mXJTaskEntity.attrMap.get(XJ_TASK_STAFF_KEY));
-            else if(mXJTaskEntity.isTemp){
+            if (mXJTaskEntity.attrMap != null)
+                xjTaskDetailStaff.setText("" + mXJTaskEntity.attrMap.get(XJ_TASK_STAFF_KEY));
+            else if (mXJTaskEntity.isTemp) {
                 xjTaskDetailStaff.setText(mXJTaskEntity.staffName);
             }
             initArea();
         }
     }
 
-
     private void initArea() {
 
 
-        if(mXJTaskEntity.areas == null){
+        if (mXJTaskEntity.areas == null) {
 
             List<XJAreaEntity> areaEntities = SupPlantApplication.dao().getXJAreaEntityDao().queryBuilder()
                     .where(XJAreaEntityDao.Properties.WorkRouteId.eq(mXJTaskEntity.workRoute.id))
@@ -360,7 +344,7 @@ public class XJTaskDetailActivity extends BaseControllerActivity implements XJTa
         }
 
 
-        if(mXJTaskEntity.areas == null || mXJTaskEntity.areas.size() == 0){
+        if (mXJTaskEntity.areas == null || mXJTaskEntity.areas.size() == 0) {
 
             ToastUtils.show(context, getString(R.string.xj_area_empty_warning));
         }
@@ -380,24 +364,23 @@ public class XJTaskDetailActivity extends BaseControllerActivity implements XJTa
         RxView.clicks(xjTaskDetailParent)
                 .subscribe(o -> back());
 
-        if(mXJAreaAdapter!=null){
+        if (mXJAreaAdapter != null) {
             mXJAreaAdapter.setOnItemChildViewClickListener((childView, position, action, obj) -> {
                 XJAreaEntity xjAreaEntity = (XJAreaEntity) obj;
 
-                if(mXJTaskEntity.realStartTime == 0){
+                if (mXJTaskEntity.realStartTime == 0) {
                     ToastUtils.show(context, getString(R.string.xj_area_sign_warning1));
                     return;
                 }
 
-                if(mXJTaskEntity.areas==null || mXJTaskEntity.areas.size() == 0){
+                if (mXJTaskEntity.areas == null || mXJTaskEntity.areas.size() == 0) {
                     ToastUtils.show(context, getString(R.string.xj_area_sign_warning2));
                     return;
                 }
 
-                if(xjAreaEntity.isSigned || mXJTaskEntity.isFinished){
+                if (xjAreaEntity.isSigned || mXJTaskEntity.isFinished) {
                     goArea(xjAreaEntity);
-                }
-                else {
+                } else {
                     showSignReason(xjAreaEntity);
                 }
 
@@ -427,12 +410,10 @@ public class XJTaskDetailActivity extends BaseControllerActivity implements XJTa
                 });
     }
 
-
-
     private void showFinishDialog() {
         mXJTaskEntity.isFinished = checkAreaFinishState(mXJTaskEntity.areas);
         new CustomDialog(context)
-                .twoButtonAlertDialog(mXJTaskEntity.isFinished? getString(R.string.xj_task_finish_warning2) : getString(R.string.xj_task_finish_warning1))
+                .twoButtonAlertDialog(mXJTaskEntity.isFinished ? getString(R.string.xj_task_finish_warning2) : getString(R.string.xj_task_finish_warning1))
                 .bindClickListener(R.id.grayBtn, v -> {
                 }, true)
                 .bindClickListener(R.id.redBtn, v -> {
@@ -450,15 +431,15 @@ public class XJTaskDetailActivity extends BaseControllerActivity implements XJTa
                 .show();
     }
 
-    private boolean checkAreaFinishState(List<XJAreaEntity> areaEntities){
+    private boolean checkAreaFinishState(List<XJAreaEntity> areaEntities) {
 
 
-        if(areaEntities == null || areaEntities.size() == 0){
+        if (areaEntities == null || areaEntities.size() == 0) {
             return true;
         }
 
-        for(XJAreaEntity xjAreaEntity : areaEntities){
-            if(!xjAreaEntity.isFinished){
+        for (XJAreaEntity xjAreaEntity : areaEntities) {
+            if (!xjAreaEntity.isFinished) {
                 return false;
             }
         }
@@ -473,11 +454,11 @@ public class XJTaskDetailActivity extends BaseControllerActivity implements XJTa
      * @description 手工签到原因上拉菜单
      */
     private void showSignReason(XJAreaEntity xjAreaEntity) {
-        if (xjAreaEntity.isSigned && xjAreaEntity.cardTime!=0) {
+        if (xjAreaEntity.isSigned && xjAreaEntity.cardTime != 0) {
             goArea(xjAreaEntity);
         } else {
             if (signTypeInfoMap.size() <= 0) {
-                ToastUtils.show(context,"签到原因为空，请退出页面重新加载");
+                ToastUtils.show(context, "签到原因为空，请退出页面重新加载");
                 return;
             }
 
@@ -487,11 +468,11 @@ public class XJTaskDetailActivity extends BaseControllerActivity implements XJTa
             new SinglePickController<String>(this).list(values).listener((index, item) -> {
 
 
-                for(String key:signTypeInfoMap.keySet()){
+                for (String key : signTypeInfoMap.keySet()) {
 
                     String value = signTypeInfoMap.get(key);
 
-                    if(value.equals(item)){
+                    if (value.equals(item)) {
                         xjAreaEntity.signInReason = SystemCodeManager.getInstance().getSystemCodeEntity(key);
                         break;
                     }
@@ -509,7 +490,6 @@ public class XJTaskDetailActivity extends BaseControllerActivity implements XJTa
 
     }
 
-    private int enterPosition = -1;
     /**
      * @param
      * @description 跳转巡检项列表
@@ -532,7 +512,6 @@ public class XJTaskDetailActivity extends BaseControllerActivity implements XJTa
         }
         return index;
     }
-
 
 
     private void doGoArea(XJAreaEntity xjAreaEntity) {
@@ -570,11 +549,9 @@ public class XJTaskDetailActivity extends BaseControllerActivity implements XJTa
         if (CodeUtlis.NFC_TYPE.equals(codeResultEvent.type)) {
             NFCEntity nfcEntity = GsonUtil.gsonToBean(resultCode, NFCEntity.class);
             dealSign(nfcEntity.content);
-        }
-        else if(CodeUtlis.UHF_TYPE.equals(codeResultEvent.type)){
+        } else if (CodeUtlis.UHF_TYPE.equals(codeResultEvent.type)) {
             dealSign(resultCode);
-        }
-        else if(CodeUtlis.HW_TYPE.equals(codeResultEvent.type)){
+        } else if (CodeUtlis.HW_TYPE.equals(codeResultEvent.type)) {
             dealSign(resultCode);
         }
 
@@ -588,7 +565,7 @@ public class XJTaskDetailActivity extends BaseControllerActivity implements XJTa
 
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void getUhfRfidEpcCode(UhfRfidEvent uhfRfidEvent) {
-        LogUtil.d("EPC:"+uhfRfidEvent.getEpcCode());
+        LogUtil.d("EPC:" + uhfRfidEvent.getEpcCode());
         dealSign(uhfRfidEvent.getEpcCode());
     }
 //
@@ -618,8 +595,11 @@ public class XJTaskDetailActivity extends BaseControllerActivity implements XJTa
             if (code.equals(areaEntity.signCode)) {
                 updateXJAreaEntity(areaEntity);//update数据
                 LogUtil.i("BarcodeEvent1", code);
-                enterPosition = index;
-                doGoArea(areaEntity);  //跳转
+                if(enterPosition!=index) {
+                    doGoArea(areaEntity);  //跳转
+                    enterPosition = index;
+                    break;
+                }
             }
             index++;
         }
