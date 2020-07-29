@@ -19,19 +19,23 @@
         android:src="@drawable/ic_xj_work_flag"
         android:visibility="gone"
         />
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="30dp"
-        android:textColor="@color/xjTitleColor"
-        android:textSize="@dimen/fontSize_14sp"
-        android:text="设备11"
-        android:gravity="center_vertical"
+
+    <com.supcon.mes.middleware.ui.view.search.CustomPopTextView
         android:id="@+id/itemXJWorkContent"
-        android:layout_toRightOf="@+id/itemXJWorkFlag"
+        android:layout_width="match_parent"
+        android:layout_height="30dp"
         android:layout_marginLeft="@dimen/dp_5"
-        android:tag="itemXJWorkContent"
+        android:layout_toLeftOf="@+id/itemXJWorkFold"
+        android:layout_marginRight="@dimen/dp_20"
+        android:layout_toRightOf="@+id/itemXJWorkFlag"
+        app:key_width="0dp"
+        app:content_color="@color/xjTitleColor"
+        android:gravity="center_vertical"
         android:maxLines="5"
-        />
+        android:tag="itemXJWorkContent"
+        android:text="设备11"
+        android:textColor="@color/xjTitleColor"
+        android:textSize="@dimen/fontSize_14sp" />
 
 
     <ImageView

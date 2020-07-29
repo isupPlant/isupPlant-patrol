@@ -43,6 +43,7 @@ import com.supcon.mes.middleware.model.bean.xj.XJInputTypeEntity;
 import com.supcon.mes.middleware.model.bean.xj.XJInputTypeEntityDao;
 import com.supcon.mes.middleware.model.bean.xj.XJWorkEntity;
 import com.supcon.mes.middleware.ui.view.SimpleSwitchView;
+import com.supcon.mes.middleware.ui.view.search.CustomPopTextView;
 import com.supcon.mes.middleware.util.SBTUtil;
 import com.supcon.mes.middleware.util.SystemCodeManager;
 import com.supcon.mes.module_xj.IntentRouter;
@@ -211,7 +212,7 @@ public class XJWorkAdapter extends BaseListDataRecyclerViewAdapter<XJWorkEntity>
         ImageView itemXJWorkFlag;
 
         @BindByTag("itemXJWorkContent")
-        TextView itemXJWorkContent;
+        CustomPopTextView itemXJWorkContent;
 
         @BindByTag("itemXJWorkFold")
         ImageView itemXJWorkFold;
@@ -648,7 +649,7 @@ public class XJWorkAdapter extends BaseListDataRecyclerViewAdapter<XJWorkEntity>
                 return;
             }
 
-            itemXJWorkContent.setText(data.content);
+            itemXJWorkContent.setContent(data.content);
             Drawable drawableLeft ;
 
             if(!TextUtils.isEmpty(data.realRemark)){
