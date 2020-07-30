@@ -47,6 +47,25 @@
                 android:text="待检"
                 android:gravity="center"
                 />
+          <RelativeLayout
+              android:layout_width="match_parent"
+              android:layout_height="wrap_content"
+              android:layout_marginTop="@dimen/dp_12"
+              android:layout_marginLeft="@dimen/dp_5"
+              android:id="@+id/rlXjTaskDetailTableNo"
+              android:layout_below="@+id/xjTaskDetailRouteName">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/xjTaskDetailTableNo"
+                android:tag="xjTaskDetailTableNo"
+                android:lines="1"
+                android:text="potroltasknew_20180306_001"
+                android:layout_centerVertical="true"
+                android:textColor="#6B6B6B"
+                android:textSize="12sp"
+                />
             <Button
                 android:layout_width="70dp"
                 android:layout_height="26dp"
@@ -58,20 +77,9 @@
                 android:textSize="15sp"
                 android:tag="xjTaskDetailTaskBtn"
                 android:layout_marginRight="@dimen/dp_5"
+                android:layout_centerVertical="true"
                 />
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:id="@+id/xjTaskDetailTableNo"
-                android:tag="xjTaskDetailTableNo"
-                android:lines="1"
-                android:text="potroltasknew_20180306_001"
-                android:textColor="#6B6B6B"
-                android:textSize="12sp"
-                android:layout_below="@+id/xjTaskDetailRouteName"
-                android:layout_marginTop="@dimen/dp_12"
-                android:layout_marginLeft="@dimen/dp_5"
-                />
+          </RelativeLayout>
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -83,7 +91,7 @@
                 android:textSize="13sp"
                 android:drawableLeft="@drawable/ic_xj_task_time2"
                 android:drawablePadding="@dimen/dp_10"
-                android:layout_below="@+id/xjTaskDetailTableNo"
+                android:layout_below="@+id/rlXjTaskDetailTableNo"
                 android:layout_marginTop="18dp"
                 android:layout_marginLeft="@dimen/dp_5"
                 />
