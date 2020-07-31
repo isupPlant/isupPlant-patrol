@@ -352,6 +352,7 @@ public class XJTaskDetailActivity extends BaseControllerActivity implements XJTa
         mXJAreaAdapter = new XJAreaAdapter(context);
 
         xjTaskDetailContentView.setLayoutManager(new LinearLayoutManager(context));
+        mXJAreaAdapter.exceptionIds = mXJTaskEntity.exceptinWorkIds;
         mXJAreaAdapter.setList(mXJTaskEntity.areas);
         xjTaskDetailContentView.setAdapter(mXJAreaAdapter);
 
@@ -439,7 +440,7 @@ public class XJTaskDetailActivity extends BaseControllerActivity implements XJTa
         }
 
         for (XJAreaEntity xjAreaEntity : areaEntities) {
-            if (!xjAreaEntity.isFinished) {
+            if (!xjAreaEntity.isFinished&&xjAreaEntity.getTotalNum(mXJTaskEntity.exceptinWorkIds)>0) {
                 return false;
             }
         }
@@ -518,7 +519,7 @@ public class XJTaskDetailActivity extends BaseControllerActivity implements XJTa
         Bundle bundle = new Bundle();
         Collections.sort(xjAreaEntity.works);
         bundle.putSerializable(Constant.IntentKey.XJ_AREA_ENTITY_STR, xjAreaEntity.toString());
-
+        bundle.putString(Constant.IntentKey.XJ_AREA_EXCEPTION_IDS, mXJTaskEntity.exceptinWorkIds);
         if (xjAreaEntity.isFinished || mXJTaskEntity.isFinished) {
             bundle.putBoolean(Constant.IntentKey.XJ_IS_FROM_TASK, true);
             bundle.putBoolean(Constant.IntentKey.XJ_IS_FINISHED, mXJTaskEntity.isFinished);
@@ -598,8 +599,8 @@ public class XJTaskDetailActivity extends BaseControllerActivity implements XJTa
                 if(enterPosition!=index) {
                     doGoArea(areaEntity);  //跳转
                     enterPosition = index;
-                    break;
                 }
+                break;
             }
             index++;
         }

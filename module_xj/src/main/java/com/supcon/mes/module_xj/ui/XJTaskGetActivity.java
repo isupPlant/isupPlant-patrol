@@ -14,8 +14,6 @@ import com.app.annotation.apt.Router;
 import com.jakewharton.rxbinding2.view.RxView;
 import com.supcon.common.view.base.activity.BaseRefreshRecyclerActivity;
 import com.supcon.common.view.base.adapter.IListAdapter;
-import com.supcon.common.view.listener.OnRefreshListener;
-import com.supcon.common.view.listener.OnRefreshPageListener;
 import com.supcon.common.view.util.DisplayUtil;
 import com.supcon.common.view.util.LogUtil;
 import com.supcon.common.view.util.StatusBarUtils;
@@ -29,10 +27,8 @@ import com.supcon.mes.middleware.controller.SystemCodeJsonController;
 import com.supcon.mes.middleware.model.bean.CommonBAPListEntity;
 import com.supcon.mes.middleware.model.event.RefreshEvent;
 import com.supcon.mes.middleware.model.inter.SystemCode;
-import com.supcon.mes.middleware.model.listener.DateSelectListener;
 import com.supcon.mes.middleware.util.ErrorMsgHelper;
 import com.supcon.mes.middleware.util.XJCacheUtil;
-import com.supcon.mes.module_xj.IntentRouter;
 import com.supcon.mes.module_xj.R;
 import com.supcon.mes.module_xj.model.api.XJTaskAPI;
 import com.supcon.mes.module_xj.model.api.XJTaskStateAPI;
@@ -56,10 +52,7 @@ import java.util.concurrent.TimeUnit;
 
 import io.reactivex.Flowable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
-import io.reactivex.functions.Action;
-import io.reactivex.functions.Consumer;
 import io.reactivex.functions.Function;
-import io.reactivex.functions.Predicate;
 import io.reactivex.schedulers.Schedulers;
 
 /**
@@ -73,26 +66,24 @@ import io.reactivex.schedulers.Schedulers;
         Constant.SystemCode.PATROL_taskState
 
 })
-public class XJTaskGetActivity extends BaseRefreshRecyclerActivity<XJTaskGroupEntity> implements XJTaskContract.View, XJTaskStateContract.View {
+public class XJTaskGetActivity extends BaseRefreshRecyclerActivity<XJTaskGroupEntity>
+        implements XJTaskContract.View,
+        XJTaskStateContract.View {
 
+    private static final String XJ_TASK_STAFF_KEY =
+            "PATROL_1_0_0_patrolTask_potrolTaskList_LISTPT_ASSO_3a556662_35fb_4884_a6ab_1aff5d055ac7";
     @BindByTag("titleText")
     TextView titleText;
-
     @BindByTag("contentView")
     RecyclerView contentView;
-
     @BindByTag("leftBtn")
     CustomImageButton leftBtn;
-
     @BindByTag("rightBtn")
     CustomImageButton rightBtn;
-
     @BindByTag("xjTaskGetBtn")
     TextView xjTaskGetBtn;
-
     private XJTaskGroupAdapter mXJTaskGroupAdapter;
     private Map<String, Object> queryMap = new HashMap<>();
-    private static final String  XJ_TASK_STAFF_KEY = "PATROL_1_0_0_patrolTask_potrolTaskList_LISTPT_ASSO_3a556662_35fb_4884_a6ab_1aff5d055ac7";
     private List<XJTaskEntity> mXJTaskEntities = new ArrayList<>();
     private boolean isAll = false;
 
@@ -123,7 +114,7 @@ public class XJTaskGetActivity extends BaseRefreshRecyclerActivity<XJTaskGroupEn
     @Override
     protected void initView() {
         super.initView();
-        StatusBarUtils.setWindowStatusBarColor(this,R.color.themeColor);
+        StatusBarUtils.setWindowStatusBarColor(this, R.color.themeColor);
         titleText.setText(getString(R.string.xj_task_get));
         rightBtn.setVisibility(View.VISIBLE);
         rightBtn.setImageResource(R.drawable.ic_top_all);
@@ -142,12 +133,11 @@ public class XJTaskGetActivity extends BaseRefreshRecyclerActivity<XJTaskGroupEn
         leftBtn.setOnClickListener(v -> onBackPressed());
 
         RxView.clicks(rightBtn).throttleFirst(200, TimeUnit.MILLISECONDS).subscribe(o -> {
-            if(!isAll){
+            if (!isAll) {
                 rightBtn.setImageResource(R.drawable.ic_top_all_p);
                 selectAll();
                 isAll = true;
-            }
-            else{
+            } else {
                 rightBtn.setImageResource(R.drawable.ic_top_all);
                 unselectAll();
                 isAll = false;
@@ -155,12 +145,9 @@ public class XJTaskGetActivity extends BaseRefreshRecyclerActivity<XJTaskGroupEn
         });
 
 
-        refreshListController.setOnRefreshListener(new OnRefreshListener() {
-            @Override
-            public void onRefresh() {
-                mXJTaskEntities.clear();
-                getXJTask(1, queryMap);
-            }
+        refreshListController.setOnRefreshListener(() -> {
+            mXJTaskEntities.clear();
+            getXJTask(1, queryMap);
         });
 //        refreshListController.setOnRefreshPageListener(new OnRefreshPageListener() {
 //            @Override
@@ -172,47 +159,35 @@ public class XJTaskGetActivity extends BaseRefreshRecyclerActivity<XJTaskGroupEn
 //        });
 
 
-        getController(DateFilterController.class).setDateSelectListener(new DateSelectListener() {
-            @Override
-            public void onDateSelect(String start, String end) {
-                LogUtil.d("start:"+start);
-                LogUtil.d("end:"+end);
+        getController(DateFilterController.class).setDateSelectListener((start, end) -> {
+            LogUtil.d("start:" + start);
+            LogUtil.d("end:" + end);
 
-                if(TextUtils.isEmpty(start) || TextUtils.isEmpty(end)){
-                    queryMap.remove(Constant.BAPQuery.XJ_START_TIME_1);
-                    queryMap.remove(Constant.BAPQuery.XJ_START_TIME_2);
-                }
-                else {
+            if (TextUtils.isEmpty(start) || TextUtils.isEmpty(end)) {
+                queryMap.remove(Constant.BAPQuery.XJ_START_TIME_1);
+                queryMap.remove(Constant.BAPQuery.XJ_START_TIME_2);
+            } else {
 
-                    queryMap.put(Constant.BAPQuery.XJ_START_TIME_1, start);
-                    queryMap.put(Constant.BAPQuery.XJ_START_TIME_2, end);
-                }
-                refreshListController.refreshBegin();
+                queryMap.put(Constant.BAPQuery.XJ_START_TIME_1, start);
+                queryMap.put(Constant.BAPQuery.XJ_START_TIME_2, end);
             }
+            refreshListController.refreshBegin();
         });
 //        getController(DateFilterController.class).setDateChecked(Constant.Date.TODAY);
 
         RxView.clicks(xjTaskGetBtn)
                 .throttleFirst(200, TimeUnit.MILLISECONDS)
-                .subscribe(new Consumer<Object>() {
-                    @Override
-                    public void accept(Object o) throws Exception {
-
-
-                        updateTaskState();
-
-                    }
-                });
+                .subscribe(o -> updateTaskState());
     }
 
     private void selectAll() {
 
-        if(mXJTaskGroupAdapter.getList() == null){
+        if (mXJTaskGroupAdapter.getList() == null) {
             return;
         }
-        for(XJTaskGroupEntity xjTaskGroupEntity : mXJTaskGroupAdapter.getList()){
+        for (XJTaskGroupEntity xjTaskGroupEntity : mXJTaskGroupAdapter.getList()) {
 
-            for(XJTaskEntity xjTaskEntity : xjTaskGroupEntity.taskEntities){
+            for (XJTaskEntity xjTaskEntity : xjTaskGroupEntity.taskEntities) {
                 xjTaskEntity.isChecked = true;
             }
 
@@ -223,12 +198,12 @@ public class XJTaskGetActivity extends BaseRefreshRecyclerActivity<XJTaskGroupEn
 
     private void unselectAll() {
 
-        if(mXJTaskGroupAdapter.getList() == null){
+        if (mXJTaskGroupAdapter.getList() == null) {
             return;
         }
-        for(XJTaskGroupEntity xjTaskGroupEntity : mXJTaskGroupAdapter.getList()){
+        for (XJTaskGroupEntity xjTaskGroupEntity : mXJTaskGroupAdapter.getList()) {
 
-            for(XJTaskEntity xjTaskEntity : xjTaskGroupEntity.taskEntities){
+            for (XJTaskEntity xjTaskEntity : xjTaskGroupEntity.taskEntities) {
                 xjTaskEntity.isChecked = false;
             }
 
@@ -239,64 +214,39 @@ public class XJTaskGetActivity extends BaseRefreshRecyclerActivity<XJTaskGroupEn
 
     @SuppressLint("CheckResult")
     private void updateTaskState() {
-
-
         List<XJTaskGroupEntity> taskGroupEntities = mXJTaskGroupAdapter.getList();
-        if(taskGroupEntities==null || taskGroupEntities.size() == 0){
-
+        if (taskGroupEntities == null || taskGroupEntities.size() == 0) {
             ToastUtils.show(context, getString(R.string.xj_task_get_warning1));
             return;
         }
 
         List<XJTaskEntity> taskEntities = new ArrayList<>();
-
-
         Flowable.fromIterable(taskGroupEntities)
-                .flatMap(new Function<XJTaskGroupEntity, Publisher<XJTaskEntity>>() {
-                    @Override
-                    public Publisher<XJTaskEntity> apply(XJTaskGroupEntity xjTaskGroupEntity) throws Exception {
-                        return Flowable.fromIterable(xjTaskGroupEntity.taskEntities);
-                    }
-                })
+                .flatMap((Function<XJTaskGroupEntity, Publisher<XJTaskEntity>>)
+                        xjTaskGroupEntity -> Flowable.fromIterable(xjTaskGroupEntity.taskEntities))
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Consumer<XJTaskEntity>() {
-                    @Override
-                    public void accept(XJTaskEntity xjTaskEntity) throws Exception {
-                        if (xjTaskEntity.isChecked) {
-                            taskEntities.add(xjTaskEntity);
+                .subscribe(xjTaskEntity -> {
+                    if (xjTaskEntity.isChecked) {
+                        taskEntities.add(xjTaskEntity);
+                    }
+                }, throwable -> {
+                }, () -> {
+                    LogUtil.d("size:" + taskEntities.size());
+
+                    StringBuilder idList = new StringBuilder();
+                    if (taskEntities.size() != 0) {
+                        for (XJTaskEntity xjTaskEntity : taskEntities) {
+                            idList.append(xjTaskEntity.id);
+                            idList.append(",");
                         }
+                        idList.replace(idList.length() - 1, idList.length(), "");
+                        Map<String, Object> queryMap = new HashMap<>();
+                        queryMap.put("idList", idList.toString());
+                        queryMap.put("changeState", "PATROL_taskState/issued");
+                        presenterRouter.create(XJTaskStateAPI.class).updateTaskState(queryMap);
+                        onLoading(getString(R.string.xj_task_geting));
                     }
-                }, new Consumer<Throwable>() {
-                    @Override
-                    public void accept(Throwable throwable) throws Exception {
-
-                    }
-                }, new Action() {
-                    @Override
-                    public void run() throws Exception {
-                        LogUtil.d("size:"+taskEntities.size());
-
-                        StringBuilder idList = new StringBuilder();
-
-
-                        if(taskEntities.size()!=0){
-                            for(XJTaskEntity xjTaskEntity : taskEntities){
-                                idList.append(xjTaskEntity.id);
-                                idList.append(",");
-                            }
-
-                            idList.replace(idList.length()-1, idList.length(), "");
-                            Map<String, Object> queryMap = new HashMap<>();
-                            queryMap.put("idList", idList.toString());
-                            queryMap.put("changeState", "PATROL_taskState/issued");
-                            presenterRouter.create(XJTaskStateAPI.class).updateTaskState(queryMap);
-                            onLoading(getString(R.string.xj_task_geting));
-                        }
-
-
-                    }
-                })
-        ;
+                });
 
 
     }
@@ -324,7 +274,7 @@ public class XJTaskGetActivity extends BaseRefreshRecyclerActivity<XJTaskGroupEn
 
         List<XJTaskEntity> taskEntities = entity.result;
 
-        if(taskEntities==null){
+        if (taskEntities == null) {
 
             refreshListController.refreshComplete(null);
 
@@ -332,17 +282,12 @@ public class XJTaskGetActivity extends BaseRefreshRecyclerActivity<XJTaskGroupEn
         }
 
         mXJTaskEntities.addAll(taskEntities);
-        if(entity.hasNext){
+        if (entity.hasNext) {
             getXJTask(entity.nextPage, queryMap);
 
-        }
-        else{
+        } else {
             createTaskGroups(mXJTaskEntities);
         }
-
-
-
-
 
 
     }
@@ -355,80 +300,67 @@ public class XJTaskGetActivity extends BaseRefreshRecyclerActivity<XJTaskGroupEn
 
         Flowable.fromIterable(taskEntities)
                 .subscribeOn(Schedulers.newThread())
-                .filter(new Predicate<XJTaskEntity>() {
-                    @Override
-                    public boolean test(XJTaskEntity xjTaskEntity) throws Exception {
+                .filter(xjTaskEntity -> {
 
-                        if(xjTaskEntity.workRoute == null){
-                            return false;
-                        }
-
-                        String key = xjTaskEntity.workRoute.code+""+ DateUtil.dateFormat(xjTaskEntity.startTime);
-
-                        if(!taskMap.containsKey(key)){
-                            taskMap.put(key, new ArrayList<>());
-                        }
-
-                        if(XJCacheUtil.check(context, xjTaskEntity.tableNo)){//清除历史数据
-                            XJCacheUtil.remove(xjTaskEntity.tableNo);
-                        }
-
-                        return true;
+                    if (xjTaskEntity.workRoute == null) {
+                        return false;
                     }
+
+                    String key = xjTaskEntity.workRoute.code + "" + DateUtil.dateFormat(xjTaskEntity.startTime);
+
+                    if (!taskMap.containsKey(key)) {
+                        taskMap.put(key, new ArrayList<>());
+                    }
+
+                    if (XJCacheUtil.check(context, xjTaskEntity.tableNo)) {//清除历史数据
+                        XJCacheUtil.remove(xjTaskEntity.tableNo);
+                    }
+
+                    return true;
                 })
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Consumer<XJTaskEntity>() {
-                    @Override
-                    public void accept(XJTaskEntity xjTaskEntity) throws Exception {
+                .subscribe(xjTaskEntity -> {
 
-                        xjTaskEntity.viewType = 1;//下载上传视图类型
-                        String key = xjTaskEntity.workRoute.code+""+ DateUtil.dateFormat(xjTaskEntity.startTime);
-                        List<XJTaskEntity> tasks = taskMap.get(key);
-                        tasks.add(0, xjTaskEntity);
-                    }
-                }, new Consumer<Throwable>() {
-                    @Override
-                    public void accept(Throwable throwable) throws Exception {
+                    xjTaskEntity.viewType = 1;//下载上传视图类型
+                    String key = xjTaskEntity.workRoute.code + "" + DateUtil.dateFormat(xjTaskEntity.startTime);
+                    List<XJTaskEntity> tasks = taskMap.get(key);
+                    tasks.add(0, xjTaskEntity);
+                }, throwable -> {
 
-                    }
-                }, new Action() {
-                    @Override
-                    public void run() throws Exception {
+                }, () -> {
 
-                        for(String key: taskMap.keySet()){
+                    for (String key : taskMap.keySet()) {
 
-                            XJTaskGroupEntity xjTaskGroupEntity = new XJTaskGroupEntity();
-                            List<XJTaskEntity> xjTaskEntities = taskMap.get(key);
-                            if(xjTaskEntities == null || xjTaskEntities.size() == 0){
-                                continue;
-                            }
-
-                            xjTaskGroupEntity.taskEntities = xjTaskEntities;
-
-                            XJTaskEntity taskEntity = xjTaskEntities.get(0);
-
-                            if(taskEntity.attrMap != null && taskEntity.attrMap.containsKey(XJ_TASK_STAFF_KEY)){
-                                xjTaskGroupEntity.staffName = (String) xjTaskEntities.get(0).attrMap.get(XJ_TASK_STAFF_KEY);
-                            }
-
-                            xjTaskGroupEntity.date = taskEntity.startTime;
-
-                            if(taskEntity.workRoute!=null){
-                                xjTaskGroupEntity.name = taskEntity.workRoute.name;
-                            }
-
-                            if(taskEntity.patrolType!=null){
-                                xjTaskGroupEntity.typeValue = taskEntity.patrolType.value;
-                            }
-                            xjTaskGroupEntity.spanCount = 3;
-                            xjTaskGroupEntities.add(xjTaskGroupEntity);
+                        XJTaskGroupEntity xjTaskGroupEntity = new XJTaskGroupEntity();
+                        List<XJTaskEntity> xjTaskEntities = taskMap.get(key);
+                        if (xjTaskEntities == null || xjTaskEntities.size() == 0) {
+                            continue;
                         }
 
-                        refreshListController.refreshComplete(xjTaskGroupEntities);
+                        xjTaskGroupEntity.taskEntities = xjTaskEntities;
 
+                        XJTaskEntity taskEntity = xjTaskEntities.get(0);
+
+                        if (taskEntity.attrMap != null && taskEntity.attrMap.containsKey(XJ_TASK_STAFF_KEY)) {
+                            xjTaskGroupEntity.staffName = (String) xjTaskEntities.get(0).attrMap.get(XJ_TASK_STAFF_KEY);
+                        }
+
+                        xjTaskGroupEntity.date = taskEntity.startTime;
+
+                        if (taskEntity.workRoute != null) {
+                            xjTaskGroupEntity.name = taskEntity.workRoute.name;
+                        }
+
+                        if (taskEntity.patrolType != null) {
+                            xjTaskGroupEntity.typeValue = taskEntity.patrolType.value;
+                        }
+                        xjTaskGroupEntity.spanCount = 3;
+                        xjTaskGroupEntities.add(xjTaskGroupEntity);
                     }
-                });
 
+                    refreshListController.refreshComplete(xjTaskGroupEntities);
+
+                });
 
 
     }

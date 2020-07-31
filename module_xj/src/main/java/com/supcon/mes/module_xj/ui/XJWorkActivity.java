@@ -24,7 +24,6 @@ import com.mes.supcon.expert_ewg01p.controller.ExpertController;
 import com.mes.supcon.expert_ewg01p.model.OnRunResult;
 import com.supcon.common.view.base.activity.BaseRefreshRecyclerActivity;
 import com.supcon.common.view.base.adapter.IListAdapter;
-import com.supcon.common.view.listener.OnItemChildViewClickListener;
 import com.supcon.common.view.util.DisplayUtil;
 import com.supcon.common.view.util.LogUtil;
 import com.supcon.common.view.util.SharedPreferencesUtils;
@@ -78,6 +77,7 @@ import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -86,9 +86,6 @@ import java.util.concurrent.TimeUnit;
 
 import io.reactivex.Flowable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
-import io.reactivex.functions.Action;
-import io.reactivex.functions.Consumer;
-import io.reactivex.functions.Predicate;
 import io.reactivex.schedulers.Schedulers;
 
 /**
@@ -150,7 +147,8 @@ public class XJWorkActivity extends BaseRefreshRecyclerActivity<XJWorkEntity> {
     private List<XJWorkEntity> mWorkEntities = new ArrayList<>();
     private boolean needRefresh = false;//重录之后，需要刷新列表
     private TextView tempTv;
-
+    private List<String> exceptionIds = new ArrayList<>();
+    String exceptionIdsStr;
     @Override
     protected int getLayoutID() {
         return R.layout.ac_xj_work;
@@ -161,6 +159,9 @@ public class XJWorkActivity extends BaseRefreshRecyclerActivity<XJWorkEntity> {
         super.onInit();
         EventBus.getDefault().register(this);
         String xjAreaEntityStr = getIntent().getStringExtra(Constant.IntentKey.XJ_AREA_ENTITY_STR);
+        exceptionIdsStr = getIntent().getStringExtra(Constant.IntentKey.XJ_AREA_EXCEPTION_IDS);
+        if (!TextUtils.isEmpty(exceptionIdsStr))
+            exceptionIds = Arrays.asList(exceptionIdsStr.split(","));
         if (xjAreaEntityStr != null) {
             mXJAreaEntity = GsonUtil.gsonToBean(xjAreaEntityStr, XJAreaEntity.class);
         }
@@ -171,20 +172,17 @@ public class XJWorkActivity extends BaseRefreshRecyclerActivity<XJWorkEntity> {
         int tempMode = SharedPreferencesUtils.getParam(context, Constant.SPKey.TEMP_MODE, 0);
         int vibMode = SharedPreferencesUtils.getParam(context, Constant.SPKey.VIB_MODE, 0);
 
-        if(tempMode == TemperatureMode.EXPERT.getCode()||vibMode == VibMode.EXPERT.getCode()){
-            if(expertViberController == null) {
+        if (tempMode == TemperatureMode.EXPERT.getCode() || vibMode == VibMode.EXPERT.getCode()) {
+            if (expertViberController == null) {
                 View contentView = ExpertController.createContentView(context);
-                contentView.findViewById(R.id.viberFinishBtn).setOnClickListener(v->{
-                    expertViberController.hide();
-                });
+                contentView.findViewById(R.id.viberFinishBtn).setOnClickListener(v -> expertViberController.hide());
                 expertViberController = new ExpertController(contentView, true);
-//        mMGViberController.setTemperatureNeed(true);
                 expertViberController.onInit();
                 expertViberController.initView();
                 expertViberController.initListener();
                 expertViberController.initData();
                 registerController(MGViberController.class.getSimpleName(), mMGViberController);
-            }else {
+            } else {
                 expertViberController.initData();
             }
         }
@@ -211,7 +209,7 @@ public class XJWorkActivity extends BaseRefreshRecyclerActivity<XJWorkEntity> {
     @Override
     protected void onStop() {
         super.onStop();
-        if(expertViberController!=null)expertViberController.onStop();
+        if (expertViberController != null) expertViberController.onStop();
     }
 
     @Override
@@ -231,7 +229,7 @@ public class XJWorkActivity extends BaseRefreshRecyclerActivity<XJWorkEntity> {
             mAV160Controller.onDestroy();
         }
 
-        if(expertViberController!=null)
+        if (expertViberController != null)
             expertViberController.onDestroy();
 
         int finishNum = 0;
@@ -242,7 +240,7 @@ public class XJWorkActivity extends BaseRefreshRecyclerActivity<XJWorkEntity> {
         }
 
         mXJAreaEntity.finishNum = finishNum;
-        mXJAreaEntity.isFinished = mXJAreaEntity.finishNum == mXJAreaEntity.works.size();
+        mXJAreaEntity.isFinished = mXJAreaEntity.finishNum == mXJAreaEntity.getTotalNum(exceptionIdsStr);
 
         EventBus.getDefault().post(new XJAreaRefreshEvent(mXJAreaEntity));
     }
@@ -286,80 +284,60 @@ public class XJWorkActivity extends BaseRefreshRecyclerActivity<XJWorkEntity> {
         super.initListener();
         RxView.clicks(leftBtn)
                 .throttleFirst(200, TimeUnit.MILLISECONDS)
-                .subscribe(new Consumer<Object>() {
-                    @Override
-                    public void accept(Object o) throws Exception {
-                        onBackPressed();
-                    }
-                });
+                .subscribe(o -> onBackPressed());
 
 
         RxView.clicks(rightBtn)
                 .throttleFirst(200, TimeUnit.MILLISECONDS)
-                .subscribe(new Consumer<Object>() {
-                    @Override
-                    public void accept(Object o) throws Exception {
-                        Bundle bundle = new Bundle();
-                        bundle.putSerializable(Constant.IntentKey.XJ_AREA_ENTITY_STR, mXJAreaEntity.toString());
-                        IntentRouter.go(context, Constant.Router.XJ_WORK_ITEM_VIEW, bundle);
-                    }
+                .subscribe(o -> {
+                    Bundle bundle = new Bundle();
+                    bundle.putSerializable(Constant.IntentKey.XJ_AREA_ENTITY_STR, mXJAreaEntity.toString());
+                    IntentRouter.go(context, Constant.Router.XJ_WORK_ITEM_VIEW, bundle);
                 });
 
         RxView.clicks(rightBtn_sec)
                 .throttleFirst(200, TimeUnit.MILLISECONDS)
-                .subscribe(new Consumer<Object>() {
-                    @Override
-                    public void accept(Object o) throws Exception {
-                        mCustomPopupWindow.setOnItemClick(new AdapterView.OnItemClickListener() {
-                            @Override
-                            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                                dealPosition(position);
-                            }
-                        });
-                        mCustomPopupWindow.showPopupWindow(rightBtn_sec);
-                    }
+                .subscribe(o -> {
+                    mCustomPopupWindow.setOnItemClick((parent, view, position, id) -> dealPosition(position));
+                    mCustomPopupWindow.showPopupWindow(rightBtn_sec);
                 });
 
-        mXJWorkAdapter.setOnItemChildViewClickListener(new OnItemChildViewClickListener() {
-            @Override
-            public void onItemChildViewClick(View childView, int position, int action, Object obj) {
-//                LogUtil.d(""+childView.getTag());
-                XJWorkEntity xjWorkEntity = (XJWorkEntity) obj;
-                String tag = (String) childView.getTag();
-                mPosition = position;
-                switch (tag) {
+        mXJWorkAdapter.setOnItemChildViewClickListener((childView, position, action, obj) -> {
+            XJWorkEntity xjWorkEntity = (XJWorkEntity) obj;
+            String tag = (String) childView.getTag();
+            mPosition = position;
+            switch (tag) {
 
-                    case "itemXJWorkFinish":
-                        showAllFinishDialog(xjWorkEntity.eamLongId);
-                        break;
+                case "itemXJWorkFinish":
+                    showAllFinishDialog(xjWorkEntity.eamLongId);
+                    break;
 
-                    case "itemXJWorkSkip":
-                        skipEam(xjWorkEntity.eamLongId);
-                        break;
+                case "itemXJWorkSkip":
+                    skipEam(xjWorkEntity.eamLongId);
+                    break;
 
-                    case "itemXJWorkTempBtn":
-                        //Todo:
-                        showTempView(xjWorkEntity);
-                        break;
+                case "itemXJWorkTempBtn":
+                    //Todo:
+                    showTempView(xjWorkEntity);
+                    break;
 
-                    case "itemXJWorkVibBtn":
-                        //Todo:
-                        showVibView(xjWorkEntity);
-                        break;
+                case "itemXJWorkVibBtn":
+                    //Todo:
+                    showVibView(xjWorkEntity);
+                    break;
 
-                    //多选
-                    case "itemXJWorkResultMultiSelect":
-                        dialogMoreChoice(xjWorkEntity, position);
-                        break;
+                //多选
+                case "itemXJWorkResultMultiSelect":
+                    dialogMoreChoice(xjWorkEntity, position);
+                    break;
 
-                    case "itemXJWorkRemarkBtn":
-                        showEditDialog(xjWorkEntity, position);
-                        break;
-
-                }
-
+                case "itemXJWorkRemarkBtn":
+                    showEditDialog(xjWorkEntity, position);
+                    break;
 
             }
+
+
         });
 
         eamSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
@@ -403,14 +381,10 @@ public class XJWorkActivity extends BaseRefreshRecyclerActivity<XJWorkEntity> {
                 .bindView(R.id.grayBtn, getString(R.string.no))
                 .bindView(R.id.redBtn, getString(R.string.yes))
                 .bindClickListener(R.id.grayBtn, null, true)
-                .bindClickListener(R.id.redBtn, new View.OnClickListener() {
-                    @SuppressLint("CheckResult")
-                    @Override
-                    public void onClick(View v) {
-                        if (mWorkEntities != null && mWorkEntities.size() > 0) {
-                            isOneKeyJump = true;
-                            XJWorkActivity.this.skipEam(0L);
-                        }
+                .bindClickListener(R.id.redBtn, v -> {
+                    if (mWorkEntities != null && mWorkEntities.size() > 0) {
+                        isOneKeyJump = true;
+                        XJWorkActivity.this.skipEam(0L);
                     }
                 }, true)
                 .show();
@@ -423,16 +397,12 @@ public class XJWorkActivity extends BaseRefreshRecyclerActivity<XJWorkEntity> {
                 .bindView(R.id.grayBtn, getString(R.string.no))
                 .bindView(R.id.redBtn, getString(R.string.yes))
                 .bindClickListener(R.id.grayBtn, null, true)
-                .bindClickListener(R.id.redBtn, new View.OnClickListener() {
-                    @SuppressLint("CheckResult")
-                    @Override
-                    public void onClick(View v) {
-                        if (mWorkEntities != null && mWorkEntities.size() > 0) {
-                            isOneKeyOver = true;
-                            XJWorkActivity.this.doAllFinish(0);
-                        }
-
+                .bindClickListener(R.id.redBtn, v -> {
+                    if (mWorkEntities != null && mWorkEntities.size() > 0) {
+                        isOneKeyOver = true;
+                        XJWorkActivity.this.doAllFinish(0);
                     }
+
                 }, true)
                 .show();
     }
@@ -449,12 +419,9 @@ public class XJWorkActivity extends BaseRefreshRecyclerActivity<XJWorkEntity> {
         CustomVerticalEditText iCustomView = remarkDialog.getDialog().findViewById(R.id.remarkInput);
         RxTextView.textChanges(iCustomView.editText())
                 .skipInitialValue()
-                .subscribe(new Consumer<CharSequence>() {
-                    @Override
-                    public void accept(CharSequence charSequence) throws Exception {
-                        xjWorkEntity.remark = charSequence.toString();
-                        xjWorkEntity.realRemark = charSequence.toString();
-                    }
+                .subscribe(charSequence -> {
+                    xjWorkEntity.remark = charSequence.toString();
+                    xjWorkEntity.realRemark = charSequence.toString();
                 });
         if (xjWorkEntity.remark != null) {
             iCustomView.setContent(xjWorkEntity.remark);
@@ -503,15 +470,11 @@ public class XJWorkActivity extends BaseRefreshRecyclerActivity<XJWorkEntity> {
     @SuppressLint("CheckResult")
     private void initWorks() {
         List<XJWorkEntity> noEamWorks = new ArrayList<>();
+        //遍历当前巡检区域下的所有巡检项,过滤掉所有未启动的巡检项以及例外的巡检内容
         Flowable.fromIterable(mXJAreaEntity.works)
                 .subscribeOn(Schedulers.newThread())
-                .filter(new Predicate<XJWorkEntity>() {
-                    @Override
-                    public boolean test(XJWorkEntity xjWorkEntity) throws Exception {
-
-                        return !xjWorkEntity.isFinished;
-                    }
-                })
+                .filter(xjWorkEntity -> !xjWorkEntity.isFinished && xjWorkEntity.isRun)
+                .filter(xjWorkEntity -> !exceptionIds.contains(String.valueOf(xjWorkEntity.id)))
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(xjWorkEntity -> {
 
@@ -538,34 +501,29 @@ public class XJWorkActivity extends BaseRefreshRecyclerActivity<XJWorkEntity> {
                         }
                         mWorkEntities.add(xjWorkEntity);
                     }
-                }, new Consumer<Throwable>() {
-                    @Override
-                    public void accept(Throwable throwable) throws Exception {
+                }, throwable -> {
 
-                    }
-                }, new Action() {
-                    @Override
-                    public void run() throws Exception {
+                }, () -> {
 //                        refreshListController.refreshComplete(mWorkEntities);
-                        if (noEamWorks.size() != 0) {
-                            XJWorkEntity workEntity = new XJWorkEntity();
-                            workEntity.isEamView = true;
-                            workEntity.eamNum = deviceNames.size() + 1;
-
-                            if (deviceNames.size() == 0) {
-                                workEntity.eamName = "区域巡检";
-                            } else {
-                                workEntity.eamName = "无设备巡检";
-
-                            }
-                            deviceNames.add(workEntity.eamName);
-                            mWorkEntities.add(workEntity);
-                            mWorkEntities.addAll(noEamWorks);
-                        }
+                    if (noEamWorks.size() != 0) {
+                        XJWorkEntity workEntity = new XJWorkEntity();
+                        workEntity.isEamView = true;
+                        workEntity.eamNum = deviceNames.size() + 1;
 
                         if (deviceNames.size() == 0) {
-                            ((ViewGroup) eamSpinner.getParent()).setVisibility(View.GONE);
-                            refreshListController.refreshComplete(mWorkEntities);
+                            workEntity.eamName = "区域巡检";
+                        } else {
+                            workEntity.eamName = "无设备巡检";
+
+                        }
+                        deviceNames.add(workEntity.eamName);
+                        mWorkEntities.add(workEntity);
+                        mWorkEntities.addAll(noEamWorks);
+                    }
+
+                    if (deviceNames.size() == 0) {
+                        ((ViewGroup) eamSpinner.getParent()).setVisibility(View.GONE);
+                        refreshListController.refreshComplete(mWorkEntities);
 //                            if(mWorkEntities.size() == 0){
 //                                refreshListController.refreshComplete(null);
 //                                return;
@@ -576,21 +534,20 @@ public class XJWorkActivity extends BaseRefreshRecyclerActivity<XJWorkEntity> {
 //                            mWorkEntities.add(0, workEntity);
 //
 //                            refreshListController.refreshComplete(mWorkEntities);
+                    } else {
+
+                        if (deviceNames.size() == 1) {
+                            ((ViewGroup) eamSpinner.getParent()).setVisibility(View.GONE);
+                            refreshListController.refreshComplete(mWorkEntities);
                         } else {
-
-                            if (deviceNames.size() == 1) {
-                                ((ViewGroup) eamSpinner.getParent()).setVisibility(View.GONE);
-                                refreshListController.refreshComplete(mWorkEntities);
-                            } else {
-                                deviceNames.add(0, getString(R.string.xj_work_eam_all));
-                                ((ViewGroup) eamSpinner.getParent()).setVisibility(View.VISIBLE);
-                                ArrayAdapter<String> eamSpinnerAdapter = new ArrayAdapter<>(context, R.layout.ly_spinner_item_dark, deviceNames);  //创建一个数组适配器
-                                eamSpinnerAdapter.setDropDownViewResource(R.layout.ly_spinner_dropdown_item);     //设置下拉列表框的下拉选项样式
-                                eamSpinner.setAdapter(eamSpinnerAdapter);
-                            }
-
-
+                            deviceNames.add(0, getString(R.string.xj_work_eam_all));
+                            ((ViewGroup) eamSpinner.getParent()).setVisibility(View.VISIBLE);
+                            ArrayAdapter<String> eamSpinnerAdapter = new ArrayAdapter<>(context, R.layout.ly_spinner_item_dark, deviceNames);  //创建一个数组适配器
+                            eamSpinnerAdapter.setDropDownViewResource(R.layout.ly_spinner_dropdown_item);     //设置下拉列表框的下拉选项样式
+                            eamSpinner.setAdapter(eamSpinnerAdapter);
                         }
+
+
                     }
                 });
 
@@ -605,30 +562,11 @@ public class XJWorkActivity extends BaseRefreshRecyclerActivity<XJWorkEntity> {
         List<XJWorkEntity> workEntities = new ArrayList<>();
         Flowable.fromIterable(mWorkEntities)
                 .subscribeOn(Schedulers.newThread())
-                .filter(new Predicate<XJWorkEntity>() {
-                    @Override
-                    public boolean test(XJWorkEntity xjWorkEntity) throws Exception {
-
-                        return isAll || xjWorkEntity.eamId != null && xjWorkEntity.eamId.name != null && xjWorkEntity.eamId.name.equals(deviceName);
-                    }
-                })
+                .filter(xjWorkEntity -> isAll || xjWorkEntity.eamId != null && xjWorkEntity.eamId.name != null && xjWorkEntity.eamId.name.equals(deviceName))
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Consumer<XJWorkEntity>() {
-                    @Override
-                    public void accept(XJWorkEntity xjWorkEntity) throws Exception {
-                        workEntities.add(xjWorkEntity);
-                    }
-                }, new Consumer<Throwable>() {
-                    @Override
-                    public void accept(Throwable throwable) throws Exception {
+                .subscribe(workEntities::add, throwable -> {
 
-                    }
-                }, new Action() {
-                    @Override
-                    public void run() throws Exception {
-                        refreshListController.refreshComplete(workEntities);
-                    }
-                });
+                }, () -> refreshListController.refreshComplete(workEntities));
     }
 
     private void showVibView(XJWorkEntity xjWorkEntity) {
@@ -650,19 +588,13 @@ public class XJWorkActivity extends BaseRefreshRecyclerActivity<XJWorkEntity> {
 //                        LogUtil.d("onDataSelect:" + data));
 //            }
             expertViberController.show();
-            expertViberController.setOnFinishListener(new OnRunResult<String>() {
-                @Override
-                public void result(Pair<String, String> result) {
+            expertViberController.setOnFinishListener(result -> {
 
-                    xjWorkEntity.concluse = result.second;
-                    mXJWorkAdapter.notifyItemChanged(mPosition);
-                }
+                xjWorkEntity.concluse = result.second;
+                mXJWorkAdapter.notifyItemChanged(mPosition);
             });
-            expertViberController.run(new OnRunResult<String>() {
-                @Override
-                public void result(Pair<String, String> result) {
-                    if(result.first!=null)return;
-                }
+            expertViberController.run(result -> {
+                if (result.first != null) return;
             });
         }
     }
@@ -744,18 +676,12 @@ public class XJWorkActivity extends BaseRefreshRecyclerActivity<XJWorkEntity> {
 //                        LogUtil.d("onDataSelect:" + data));
 //            }
             expertViberController.show();
-            expertViberController.setOnFinishListener(new OnRunResult<String>() {
-                @Override
-                public void result(Pair<String, String> result) {
-                    xjWorkEntity.concluse = result.second;
-                    mXJWorkAdapter.notifyItemChanged(mPosition);
-                }
+            expertViberController.setOnFinishListener(result -> {
+                xjWorkEntity.concluse = result.second;
+                mXJWorkAdapter.notifyItemChanged(mPosition);
             });
-            expertViberController.run(new OnRunResult<String>() {
-                @Override
-                public void result(Pair<String, String> result) {
-                    if(result.first!=null)return;
-                }
+            expertViberController.run(result -> {
+                if (result.first != null) return;
             });
         }
 
@@ -917,12 +843,7 @@ public class XJWorkActivity extends BaseRefreshRecyclerActivity<XJWorkEntity> {
 //                                    mXJAreaEntity.isFinished = true;
 //                                    finish();
 
-                                    onLoadSuccessAndExit("操作完成", new OnLoaderFinishListener() {
-                                        @Override
-                                        public void onLoaderFinished() {
-                                            finish();
-                                        }
-                                    });
+                                    onLoadSuccessAndExit("操作完成", () -> finish());
                                 } else {
 
                                     refreshWorkList();
@@ -1063,7 +984,7 @@ public class XJWorkActivity extends BaseRefreshRecyclerActivity<XJWorkEntity> {
 
                     }, () -> {
                         mXJAreaEntity.finishNum = xjWorkItemEntities.size();
-                        if (xjWorkItemEntities.size() == mXJAreaEntity.works.size()) {
+                        if (xjWorkItemEntities.size() == mXJAreaEntity.getTotalNum(exceptionIdsStr)) {
                             mXJAreaEntity.isFinished = true;
                             back();
                         } else {

@@ -35,43 +35,23 @@ public class XJLocalTaskPresenter extends XJLocalTaskContract.Presenter {
         List<XJTaskEntity> taskEntities = new ArrayList<>();
         Flowable.fromIterable(taskNames)
                 .subscribeOn(Schedulers.newThread())
-                .filter(new Predicate<String>() {
-                    @Override
-                    public boolean test(String s) throws Exception {
-                        String cache = XJCacheUtil.getString(s.replace(".0", ""));
-                        if (!TextUtils.isEmpty(cache)) {
-                            return true;
-                        }
+                .filter(s -> {
+                    String cache = XJCacheUtil.getString(s.replace(".0", ""));
+                    if (!TextUtils.isEmpty(cache)) {
+                        return true;
+                    }
 
-                        return false;
-                    }
+                    return false;
                 })
-                .map(new Function<String, XJTaskEntity>() {
-                    @Override
-                    public XJTaskEntity apply(String s) throws Exception {
-                        String cache = XJCacheUtil.getString(s.replace(".0", ""));
-                        XJTaskEntity xjLocalTaskEntity = GsonUtil.gsonToBean(cache, XJTaskEntity.class);
-                        return xjLocalTaskEntity;
-                    }
+                .map(s -> {
+                    String cache = XJCacheUtil.getString(s.replace(".0", ""));
+                    XJTaskEntity xjLocalTaskEntity = GsonUtil.gsonToBean(cache, XJTaskEntity.class);
+                    return xjLocalTaskEntity;
                 })
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Consumer<XJTaskEntity>() {
-                    @Override
-                    public void accept(XJTaskEntity xjTaskEntity) throws Exception {
-                        taskEntities.add(xjTaskEntity);
+                .subscribe(taskEntities::add, throwable -> {
 
-                    }
-                }, new Consumer<Throwable>() {
-                    @Override
-                    public void accept(Throwable throwable) throws Exception {
-
-                    }
-                }, new Action() {
-                    @Override
-                    public void run() throws Exception {
-                        getView().getLocalTaskSuccess(taskEntities);
-                    }
-                });
+                }, () -> getView().getLocalTaskSuccess(taskEntities));
 
 
     }

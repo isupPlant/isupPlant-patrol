@@ -35,6 +35,7 @@ public class XJAreaAdapter extends BaseListDataRecyclerViewAdapter<XJAreaEntity>
         super(context, list);
     }
 
+    public String exceptionIds;
     @Override
     protected BaseRecyclerViewHolder<XJAreaEntity> getViewHolder(int viewType) {
 
@@ -98,8 +99,10 @@ public class XJAreaAdapter extends BaseListDataRecyclerViewAdapter<XJAreaEntity>
                         .orderAsc(XJWorkEntityDao.Properties.Sort)
                         .list();
 
+                data.works = xjWorkEntities;
                 if(xjWorkEntities!=null && xjWorkEntities.size()!=0){
-                    data.process = String.format(context.getString(R.string.xj_area_process), "0",""+xjWorkEntities.size());
+//                    data.process = String.format(context.getString(R.string.xj_area_process), "0",""+xjWorkEntities.size());
+                    data.process = String.format(context.getString(R.string.xj_area_process), "0",""+data.getTotalNum(exceptionIds));
                     itemXJAreaProcess.setText(data.process);
                     itemXJAreaTag.setImageResource(R.drawable.ic_xj_area_undone);
                 }
@@ -110,10 +113,9 @@ public class XJAreaAdapter extends BaseListDataRecyclerViewAdapter<XJAreaEntity>
 //                    itemXJAreaTag.setImageResource(R.drawable.ic_xj_area_done);
                 }
 
-                data.works = xjWorkEntities;
             }
             else{
-                data.process = String.format(context.getString(R.string.xj_area_process), ""+data.finishNum,""+data.works.size());
+                data.process = String.format(context.getString(R.string.xj_area_process), ""+data.finishNum,""+data.getTotalNum(exceptionIds));
                 itemXJAreaProcess.setText(data.process);
 
                 if(data.isFinished){

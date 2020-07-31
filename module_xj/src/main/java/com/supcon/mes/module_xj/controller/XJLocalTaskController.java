@@ -6,13 +6,10 @@ import android.util.ArrayMap;
 
 import com.app.annotation.Presenter;
 import com.supcon.common.view.base.controller.BaseDataController;
-import com.supcon.common.view.util.LogUtil;
-import com.supcon.common.view.util.ToastUtils;
 import com.supcon.mes.middleware.util.XJCacheUtil;
 import com.supcon.mes.module_xj.model.api.XJLocalTaskAPI;
 import com.supcon.mes.module_xj.model.bean.XJTaskEntity;
 import com.supcon.mes.module_xj.model.contract.XJLocalTaskContract;
-import com.supcon.mes.module_xj.model.event.XJAreaRefreshEvent;
 import com.supcon.mes.module_xj.model.event.XJTaskRefreshEvent;
 import com.supcon.mes.module_xj.presenter.XJLocalTaskPresenter;
 
@@ -23,11 +20,8 @@ import org.greenrobot.eventbus.ThreadMode;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.TimeUnit;
 
 import io.reactivex.Flowable;
-import io.reactivex.android.schedulers.AndroidSchedulers;
-import io.reactivex.functions.Consumer;
 import io.reactivex.schedulers.Schedulers;
 
 /**
@@ -51,22 +45,10 @@ public class XJLocalTaskController extends BaseDataController implements XJLocal
     }
 
 
-
     @SuppressLint("CheckResult")
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onTaskUpdate(XJTaskRefreshEvent xjTaskRefreshEvent) {
         presenterRouter.create(XJLocalTaskAPI.class).getLocalTask(new HashMap<>());
-
-    }
-
-    @Override
-    public void initListener() {
-        super.initListener();
-    }
-
-    @Override
-    public void initData() {
-        super.initData();
 
     }
 
@@ -90,13 +72,7 @@ public class XJLocalTaskController extends BaseDataController implements XJLocal
 
         Flowable.fromIterable(tasks)
                 .subscribeOn(Schedulers.newThread())
-                .subscribe(new Consumer<XJTaskEntity>() {
-                    @Override
-                    public void accept(XJTaskEntity taskEntity) throws Exception {
-                        mXJLocalTaskMap.put(String.valueOf(taskEntity.tableNo), taskEntity);
-
-                    }
-                });
+                .subscribe(taskEntity -> mXJLocalTaskMap.put(String.valueOf(taskEntity.tableNo), taskEntity));
 
     }
 
@@ -115,9 +91,9 @@ public class XJLocalTaskController extends BaseDataController implements XJLocal
 
     }
 
-    public XJTaskEntity getLocalTask(String tableNo){
+    public XJTaskEntity getLocalTask(String tableNo) {
 
-        if(mXJLocalTaskMap.containsKey(tableNo)){
+        if (mXJLocalTaskMap.containsKey(tableNo)) {
             return mXJLocalTaskMap.get(tableNo);
         }
 
@@ -126,14 +102,14 @@ public class XJLocalTaskController extends BaseDataController implements XJLocal
     }
 
 
-    public void save(XJTaskEntity xjLocalTaskEntity){
-        String key  = xjLocalTaskEntity.tableNo;
+    public void save(XJTaskEntity xjLocalTaskEntity) {
+        String key = xjLocalTaskEntity.tableNo;
         mXJLocalTaskMap.put(key, xjLocalTaskEntity);
         XJCacheUtil.putString(key, xjLocalTaskEntity.toString());
     }
 
-    public void add(XJTaskEntity xjLocalTaskEntity){
-        String key  = xjLocalTaskEntity.tableNo;
+    public void add(XJTaskEntity xjLocalTaskEntity) {
+        String key = xjLocalTaskEntity.tableNo;
         mXJLocalTaskMap.put(key, xjLocalTaskEntity);
         XJCacheUtil.putString(key, xjLocalTaskEntity.toString());
     }

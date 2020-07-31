@@ -66,5 +66,6 @@ public class XJTaskEntity extends BaseEntity {
     public boolean isTemp;
     public List<XJAreaEntity> areas;
 
+    public String exceptinWorkIds;
 //    public List<XJLocalWorkItemEntity> works;
 }

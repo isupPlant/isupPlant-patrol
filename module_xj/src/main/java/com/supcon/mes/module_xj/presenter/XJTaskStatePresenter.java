@@ -29,11 +29,10 @@ public class XJTaskStatePresenter extends XJTaskStateContract.Presenter {
                 .subscribe(new Consumer<BAP5CommonEntity<String>>() {
                     @Override
                     public void accept(BAP5CommonEntity<String> commonEntity) throws Exception {
-                        if(commonEntity.success){
-                            getView().updateTaskStateSuccess();
-                        }
-                        else{
-                            getView().updateTaskStateFailed(commonEntity.msg);
+                        if (commonEntity.success) {
+                            XJTaskStatePresenter.this.getView().updateTaskStateSuccess();
+                        } else {
+                            XJTaskStatePresenter.this.getView().updateTaskStateFailed(commonEntity.msg);
                         }
                     }
                 }));
