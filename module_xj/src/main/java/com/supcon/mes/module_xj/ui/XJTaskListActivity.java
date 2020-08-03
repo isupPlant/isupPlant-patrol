@@ -165,8 +165,10 @@ public class XJTaskListActivity extends BaseRefreshRecyclerActivity<XJTaskGroupE
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        if (mXJTaskGroupAdapter.getXJTaskEntity()!=null&&mXJTaskGroupAdapter.getXJTaskEntity().size()>0){
-            SharedPreferencesUtils.setParam(context, Constant.SPKey.XJ_TASKS_CACHE+dateFilter+taskStatusPosition, GsonUtil.gsonString(mXJTaskGroupAdapter.getXJTaskEntity()));
+        if (mXJTaskEntities!=null&&mXJTaskEntities.size()>0){
+            SharedPreferencesUtils.setParam(context, Constant.SPKey.XJ_TASKS_CACHE+dateFilter+taskStatusPosition, GsonUtil.gsonString(mXJTaskEntities));
+        }else{
+            SharedPreferencesUtils.setParam(context, Constant.SPKey.XJ_TASKS_CACHE+dateFilter+taskStatusPosition, "");
         }
         EventBus.getDefault().unregister(this);
     }
@@ -211,11 +213,11 @@ public class XJTaskListActivity extends BaseRefreshRecyclerActivity<XJTaskGroupE
                     }
                 });
 
-        if(mXJTaskEntities.size() == 0){
-            refreshListController.refreshBegin();
-        } else{
+        if (mXJTaskEntities!=null&&mXJTaskEntities.size()>0){
             createTaskGroups(mXJTaskEntities);
         }
+        refreshListController.refreshBegin();
+
 
     }
 

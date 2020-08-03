@@ -34,6 +34,8 @@ import com.supcon.mes.middleware.constant.Constant;
 import com.supcon.mes.middleware.controller.SystemCodeJsonController;
 import com.supcon.mes.middleware.model.bean.xj.XJAreaEntity;
 import com.supcon.mes.middleware.model.bean.xj.XJAreaEntityDao;
+import com.supcon.mes.middleware.model.bean.xj.XJWorkEntity;
+import com.supcon.mes.middleware.model.bean.xj.XJWorkEntityDao;
 import com.supcon.mes.middleware.model.event.RefreshEvent;
 import com.supcon.mes.middleware.model.inter.SystemCode;
 import com.supcon.mes.middleware.util.SBTUtil;
@@ -113,7 +115,6 @@ public class XJTaskDetailActivity extends BaseControllerActivity implements XJTa
     RelativeLayout xjTaskDetailParent;
 
     private XJTaskEntity mXJTaskEntity;
-
     private XJAreaAdapter mXJAreaAdapter;
 
     private ScanDriverController driverController;
@@ -336,12 +337,28 @@ public class XJTaskDetailActivity extends BaseControllerActivity implements XJTa
 
             mXJTaskEntity.areas = areaEntities;
 
+            //过滤没有巡检项的巡检区域，不显示
+            List<Integer> noAreaList=new ArrayList<>();
+            for (int i=0;i< mXJTaskEntity.areas.size();i++){
+                List<XJWorkEntity> xjWorkEntities = SupPlantApplication.dao().getXJWorkEntityDao().queryBuilder()
+                        .where(XJWorkEntityDao.Properties.AreaLongId.eq(mXJTaskEntity.areas.get(i).id))
+                        .where(XJWorkEntityDao.Properties.Ip.eq(SupPlantApplication.getIp()))
+                        .orderAsc(XJWorkEntityDao.Properties.Sort)
+                        .list();
+                  if(xjWorkEntities==null || xjWorkEntities.size()==0){
+                    noAreaList.add(i);
+                }
+            }
+            for (int d:noAreaList){
+                mXJTaskEntity.areas.remove(d);
+            }
         }
 
 
         if(mXJTaskEntity.areas == null || mXJTaskEntity.areas.size() == 0){
 
             ToastUtils.show(context, getString(R.string.xj_area_empty_warning));
+
         }
 
         mXJAreaAdapter = new XJAreaAdapter(context);
@@ -369,7 +386,8 @@ public class XJTaskDetailActivity extends BaseControllerActivity implements XJTa
                 }
 
                 if(mXJTaskEntity.areas==null || mXJTaskEntity.areas.size() == 0){
-                    ToastUtils.show(context, getString(R.string.xj_area_sign_warning2));
+             //       ToastUtils.show(context, getString(R.string.xj_area_sign_warning2));
+                    showDialog();
                     return;
                 }
 
@@ -390,7 +408,8 @@ public class XJTaskDetailActivity extends BaseControllerActivity implements XJTa
                     if (mXJTaskEntity.realStartTime == 0) {
 
                         if (mXJTaskEntity.areas == null || mXJTaskEntity.areas.size() == 0) {
-                            ToastUtils.show(context, getString(R.string.xj_area_sign_warning2));
+         //                   ToastUtils.show(context, getString(R.string.xj_area_sign_warning2));
+                            showDialog();
                             return;
                         }
 
@@ -407,6 +426,28 @@ public class XJTaskDetailActivity extends BaseControllerActivity implements XJTa
     }
 
 
+    public void showDialog() {
+        new CustomDialog(context)
+                .twoButtonAlertDialog(getString(R.string.xj_area_sign_warning2))
+                .bindView(com.supcon.mes.middleware.R.id.redBtn, "确定")
+                .bindView(com.supcon.mes.middleware.R.id.grayBtn, "取消")
+                .bindClickListener(com.supcon.mes.middleware.R.id.redBtn, new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v1) {
+                        com.supcon.mes.middleware.IntentRouter.go(context, Constant.AppCode.COM_DataManage);
+                        back();
+                    }
+                }, true)
+                .bindClickListener(com.supcon.mes.middleware.R.id.grayBtn, new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+
+                    }
+                }, true)
+                .show();
+
+
+    }
 
     private void showFinishDialog() {
         mXJTaskEntity.isFinished = checkAreaFinishState(mXJTaskEntity.areas);

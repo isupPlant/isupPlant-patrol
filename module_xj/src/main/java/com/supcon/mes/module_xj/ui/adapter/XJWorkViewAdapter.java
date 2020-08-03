@@ -232,6 +232,7 @@ public class XJWorkViewAdapter extends BaseListDataRecyclerViewAdapter<XJWorkEnt
 
             if(data.isRealPass && TextUtils.isEmpty(data.concluse)){
                 itemXJWorkViewResult.setText("跳检");
+                itemXJWorkViewResult.setTextColor(context.getResources().getColor(R.color.customRed));
             }
 
             setUnit(xjInputTypeEntity.unitID!=null?xjInputTypeEntity.unitID.name:"");
