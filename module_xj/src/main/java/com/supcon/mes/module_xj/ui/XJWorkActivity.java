@@ -151,6 +151,7 @@ public class XJWorkActivity extends BaseRefreshRecyclerActivity<XJWorkEntity> {
     private boolean needRefresh = false;//重录之后，需要刷新列表
 
     private TextView tempTv;
+    private ImageView viberStatusIv;
 
     @Override
     protected int getLayoutID() {
@@ -745,8 +746,9 @@ public class XJWorkActivity extends BaseRefreshRecyclerActivity<XJWorkEntity> {
                 }, true)
                 .show();
         tempTv = ((TextView) mTesto805iDialog.getDialog().findViewById(R.id.viberStatus));
+        viberStatusIv = ((ImageView) mTesto805iDialog.getDialog().findViewById(R.id.viberStatusIv));
         ((ImageView) mTesto805iDialog.getDialog().findViewById(R.id.viberStatusIv)).setImageResource(R.drawable.ic_device_connect2);
-        tempTv.setText("服务已连接");
+        tempTv.setText("服务已启动");
 
     }
 
