@@ -57,13 +57,14 @@
         />
     <com.supcon.mes.mbap.view.CustomTextView
         android:layout_width="match_parent"
-        android:layout_height="@dimen/dp_50"
+        android:layout_height="@dimen/dp_60"
         android:padding="@dimen/dp_10"
-        android:minHeight="@dimen/dp_50"
         android:id="@+id/temperatureVal"
         android:tag="temperatureVal"
         app:key="温度："
         app:key_width="@dimen/dp_100"
+        app:content_size="13"
+        app:max_lines="3"
         app:content_hint="0.0℃"
         />
     <LinearLayout

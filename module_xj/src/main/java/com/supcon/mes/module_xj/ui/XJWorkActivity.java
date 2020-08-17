@@ -165,7 +165,11 @@ public class XJWorkActivity extends BaseRefreshRecyclerActivity<XJWorkEntity> im
     private boolean needRefresh = false;//重录之后，需要刷新列表
 
     private TextView tempTv;
+
     private XJTaskEntity mXJTaskEntity;
+
+    private ImageView viberStatusIv;
+
 
     List<String> deviceNumber=new ArrayList<>();
     @Override
@@ -799,7 +803,6 @@ public class XJWorkActivity extends BaseRefreshRecyclerActivity<XJWorkEntity> im
         }
 
     }
-
     private void showTesto805iDialog(int position, XJWorkEntity xjWorkItemEntity) {
         thermometervalue = null;
         mTesto805iDialog = new CustomDialog(context);
@@ -824,11 +827,11 @@ public class XJWorkActivity extends BaseRefreshRecyclerActivity<XJWorkEntity> im
                 }, true)
                 .show();
         tempTv = ((TextView) mTesto805iDialog.getDialog().findViewById(R.id.viberStatus));
+        viberStatusIv = ((ImageView) mTesto805iDialog.getDialog().findViewById(R.id.viberStatusIv));
         ((ImageView) mTesto805iDialog.getDialog().findViewById(R.id.viberStatusIv)).setImageResource(R.drawable.ic_device_connect2);
-        tempTv.setText("服务已连接");
+        tempTv.setText("服务已启动");
 
     }
-
     private void showAICDialog(int position, XJWorkEntity xjWorkItemEntity, boolean isTempTest) {
 
 
