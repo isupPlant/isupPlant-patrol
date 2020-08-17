@@ -2,10 +2,12 @@ package com.supcon.mes.module_xj.model.network;
 
 import com.app.annotation.apt.ApiFactory;
 import com.supcon.mes.middleware.model.bean.BAP5CommonEntity;
+import com.supcon.mes.middleware.model.bean.BAP5CommonListEntity;
 import com.supcon.mes.middleware.model.bean.CommonBAPListEntity;
 import com.supcon.mes.middleware.model.bean.CommonListEntity;
 import com.supcon.mes.module_xj.model.bean.DeviceDCSEntity;
 import com.supcon.mes.module_xj.model.bean.GetLocationSystemSetEntity;
+import com.supcon.mes.module_xj.model.bean.LSXJRouterEntity;
 import com.supcon.mes.module_xj.model.bean.XJTaskEntity;
 
 import java.util.List;
@@ -76,5 +78,15 @@ public interface NetworkAPI {
      */
     @POST("/msService/TagManagement/readTagsSync")
     Flowable<CommonListEntity<DeviceDCSEntity>> getDeviceDCSParam(@Body Map<String, Object> pageMap);
+
+
+
+    /**
+     * 设备id获取巡检路线
+     * @param
+     * @return
+     */
+    @POST("/msService/EAM/workGroup/getRoutListByEamId")
+    Flowable<BAP5CommonListEntity<LSXJRouterEntity>> getRouteList(@Body Map<String, Object> params);
 
 }
