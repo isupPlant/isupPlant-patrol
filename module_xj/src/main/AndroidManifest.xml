@@ -75,5 +75,6 @@
             android:windowSoftInputMode="adjustPan|stateAlwaysHidden"
             />
         <service android:name="com.supcon.mes.testo_805i.controller.InfraredService"/>
+        <service android:name="com.supcon.mes.module_xj.service.RealTimeUploadLoactionService" />
     </application>
 </manifest>

@@ -21,7 +21,6 @@ import com.app.annotation.apt.Router;
 import com.jakewharton.rxbinding2.view.RxView;
 import com.supcon.common.view.App;
 import com.supcon.common.view.base.activity.BaseControllerActivity;
-import com.supcon.common.view.listener.OnItemChildViewClickListener;
 import com.supcon.common.view.util.LogUtil;
 import com.supcon.common.view.util.SharedPreferencesUtils;
 import com.supcon.common.view.util.ToastUtils;
@@ -32,6 +31,7 @@ import com.supcon.mes.mbap.view.CustomDialog;
 import com.supcon.mes.middleware.SupPlantApplication;
 import com.supcon.mes.middleware.constant.Constant;
 import com.supcon.mes.middleware.controller.SystemCodeJsonController;
+import com.supcon.mes.middleware.model.bean.BAP5CommonEntity;
 import com.supcon.mes.middleware.model.bean.xj.XJAreaEntity;
 import com.supcon.mes.middleware.model.bean.xj.XJAreaEntityDao;
 import com.supcon.mes.middleware.model.bean.xj.XJWorkEntity;
@@ -47,10 +47,13 @@ import com.supcon.mes.module_scan.util.scanCode.CodeUtlis;
 import com.supcon.mes.module_xj.IntentRouter;
 import com.supcon.mes.module_xj.R;
 import com.supcon.mes.module_xj.controller.XJLocalTaskController;
+import com.supcon.mes.module_xj.model.api.XJUpdateStatusAPI;
 import com.supcon.mes.module_xj.model.bean.XJTaskEntity;
 import com.supcon.mes.module_xj.model.contract.XJTaskSubmitContract;
+import com.supcon.mes.module_xj.model.contract.XJUpdateStatusContract;
 import com.supcon.mes.module_xj.model.event.XJAreaRefreshEvent;
 import com.supcon.mes.module_xj.presenter.XJTaskSubmitPresenter;
+import com.supcon.mes.module_xj.presenter.XJUpdateTaskStatusPresenter;
 import com.supcon.mes.module_xj.ui.adapter.XJAreaAdapter;
 import com.supcon.mes.nfc.model.bean.NFCEntity;
 import com.supcon.mes.sb2.model.event.BarcodeEvent;
@@ -83,12 +86,12 @@ import static com.supcon.mes.module_xj.ui.XJTaskListActivity.XJ_TASK_STAFF_KEY;
  */
 @Router(Constant.Router.XJ_TASK_DETAIL)
 @Controller(value = {SystemCodeJsonController.class, XJLocalTaskController.class})
-@Presenter(value = {XJTaskSubmitPresenter.class})
+@Presenter(value = {XJTaskSubmitPresenter.class, XJUpdateTaskStatusPresenter.class})
 @SystemCode(entityCodes = {
         Constant.SystemCode.PATROL_signInType,
         Constant.SystemCode.PATROL_passReason
         })
-public class XJTaskDetailActivity extends BaseControllerActivity implements XJTaskSubmitContract.View {
+public class XJTaskDetailActivity extends BaseControllerActivity implements XJTaskSubmitContract.View, XJUpdateStatusContract.View {
 
     @BindByTag("xjTaskDetailRouteName")
     TextView xjTaskDetailRouteName;
@@ -349,9 +352,9 @@ public class XJTaskDetailActivity extends BaseControllerActivity implements XJTa
                     noAreaList.add(i);
                 }
             }
-            for (int d:noAreaList){
-                mXJTaskEntity.areas.remove(d);
-            }
+//            for (int d:noAreaList){
+//                mXJTaskEntity.areas.remove(d);
+//            }
         }
 
 
@@ -418,6 +421,8 @@ public class XJTaskDetailActivity extends BaseControllerActivity implements XJTa
                         //开始巡检
                         xjTaskDetailTaskBtn.setBackgroundResource(R.drawable.sl_xj_task_red);
                         xjTaskDetailTaskBtn.setText(getString(R.string.xj_task_end));
+
+                       presenterRouter.create(XJUpdateStatusAPI.class).updateXJTaskStatus(mXJTaskEntity.id,"PATROL_taskState/running");
                     } else {
                         showFinishDialog();
                     }
@@ -559,7 +564,7 @@ public class XJTaskDetailActivity extends BaseControllerActivity implements XJTa
         Bundle bundle = new Bundle();
         Collections.sort(xjAreaEntity.works);
         bundle.putSerializable(Constant.IntentKey.XJ_AREA_ENTITY_STR, xjAreaEntity.toString());
-
+        bundle.putSerializable(Constant.IntentKey.XJ_TASK_ENTITY_STR,mXJTaskEntity.toString());
         if (xjAreaEntity.isFinished || mXJTaskEntity.isFinished) {
             bundle.putBoolean(Constant.IntentKey.XJ_IS_FROM_TASK, true);
             bundle.putBoolean(Constant.IntentKey.XJ_IS_FINISHED, mXJTaskEntity.isFinished);
@@ -647,6 +652,22 @@ public class XJTaskDetailActivity extends BaseControllerActivity implements XJTa
 
     /**
      * @param
+     * @description 更新当前巡检任务状态为进行中
+     * @author yangkai2
+     */
+
+    @Override
+    public void updateXJTaskStatusSuccess(BAP5CommonEntity entity) {
+
+    }
+
+    @Override
+    public void updateXJTaskStatusFailed(String errorMsg) {
+
+    }
+
+    /**
+     * @param
      * @description update巡检区域数据
      * @author zhangwenshuai1
      * @date 2018/6/15
@@ -677,4 +698,6 @@ public class XJTaskDetailActivity extends BaseControllerActivity implements XJTa
     public void uploadXJDataFailed(String errorMsg) {
 
     }
+
+
 }

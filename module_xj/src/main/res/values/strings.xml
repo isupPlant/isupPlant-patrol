@@ -15,6 +15,7 @@
     <string name="xj_task_total">巡检任务</string>
     <string name="xj_task_uncheck">待检</string>
     <string name="xj_task_checked">已检</string>
+    <string name="xj_task_running">进行中</string>
     <string name="xj_task_download">获取任务</string>
     <string name="xj_task_upload">上传任务</string>
     <string name="xj_task_get">获取任务</string>
@@ -59,4 +60,5 @@
     <string name="xj_work_over_all">是否完成全部巡检项？</string>
     <string name="xj_work_over">一键完成</string>
     <string name="xj_work_jump">一键跳过</string>
+    <string name="xj_upload_task">上传任务</string>
 </resources>

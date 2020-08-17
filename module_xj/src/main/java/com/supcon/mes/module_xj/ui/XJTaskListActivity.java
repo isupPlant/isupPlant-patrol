@@ -1,7 +1,6 @@
 package com.supcon.mes.module_xj.ui;
 
 import android.annotation.SuppressLint;
-import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -13,8 +12,6 @@ import com.app.annotation.BindByTag;
 import com.app.annotation.Controller;
 import com.app.annotation.Presenter;
 import com.app.annotation.apt.Router;
-import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
 import com.jakewharton.rxbinding2.view.RxView;
 import com.supcon.common.view.base.activity.BaseRefreshRecyclerActivity;
 import com.supcon.common.view.base.adapter.IListAdapter;
@@ -59,8 +56,11 @@ import com.supcon.mes.module_xj.model.bean.XJTaskGroupEntity;
 import com.supcon.mes.module_xj.model.contract.XJTaskContract;
 import com.supcon.mes.module_xj.model.event.XJTempTaskAddEvent;
 import com.supcon.mes.module_xj.presenter.XJTaskPresenter;
+import com.supcon.mes.module_xj.service.RealTimeUploadLoactionService;
 import com.supcon.mes.module_xj.ui.adapter.XJTaskGroupAdapter;
 import com.supcon.mes.module_xj.util.DateSelectListener;
+
+import com.supcon.mes.middleware.util.StartLocationUtils;
 import com.supcon.mes.sb2.config.SB2Config;
 import com.supcon.mes.sb2.controller.SB2Controller;
 
@@ -159,8 +159,9 @@ public class XJTaskListActivity extends BaseRefreshRecyclerActivity<XJTaskGroupE
 
         EventBus.getDefault().register(this);
 
-
     }
+
+
 
     @Override
     protected void onDestroy() {
@@ -171,6 +172,12 @@ public class XJTaskListActivity extends BaseRefreshRecyclerActivity<XJTaskGroupE
             SharedPreferencesUtils.setParam(context, Constant.SPKey.XJ_TASKS_CACHE+dateFilter+taskStatusPosition, "");
         }
         EventBus.getDefault().unregister(this);
+
+        StartLocationUtils.stopLocation();
+
+
+        RealTimeUploadLoactionService.stopUploadLoactionLoop(this);
+
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
@@ -447,7 +454,6 @@ public class XJTaskListActivity extends BaseRefreshRecyclerActivity<XJTaskGroupE
     protected void onResume() {
         super.onResume();
 
-
         if(needRefresh){
             createTaskGroups(mXJTaskEntities);
             needRefresh = false;
@@ -456,6 +462,9 @@ public class XJTaskListActivity extends BaseRefreshRecyclerActivity<XJTaskGroupE
             refreshListController.refreshBegin();
             isRefresh=false;
         }
+
+        StartLocationUtils.startLocation();
+        RealTimeUploadLoactionService.startUploadLoactionLoop(this);
     }
 
     private void initQueryMap() {
@@ -468,6 +477,7 @@ public class XJTaskListActivity extends BaseRefreshRecyclerActivity<XJTaskGroupE
         queryMap.put(Constant.BAPQuery.XJ_START_TIME_2, end);
 
         queryMap.put(Constant.BAPQuery.XJ_TASK_STATE, "PATROL_taskState/issued");//PATROL_taskState/notIssued
+
     }
 
     private void getXJTask(int pageNo, Map<String, Object> queryMap) {

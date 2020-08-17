@@ -3,8 +3,12 @@ package com.supcon.mes.module_xj.model.network;
 import com.app.annotation.apt.ApiFactory;
 import com.supcon.mes.middleware.model.bean.BAP5CommonEntity;
 import com.supcon.mes.middleware.model.bean.CommonBAPListEntity;
+import com.supcon.mes.middleware.model.bean.CommonListEntity;
+import com.supcon.mes.module_xj.model.bean.DeviceDCSEntity;
+import com.supcon.mes.module_xj.model.bean.GetLocationSystemSetEntity;
 import com.supcon.mes.module_xj.model.bean.XJTaskEntity;
 
+import java.util.List;
 import java.util.Map;
 
 import io.reactivex.Flowable;
@@ -47,4 +51,30 @@ public interface NetworkAPI {
      */
     @POST("/msService/PATROL/uploadTaskResult")
     Flowable<BAP5CommonEntity<String>> uploadTaskResult(@Query ("isOnLine") boolean isOnLine, @Body Map<String, Object> pageMap);
+
+    /**
+     * 上传实时定位
+     * @param pageMap
+     * @return
+     */
+    @POST("/msService/PATROL/routeMap/mapInfo/uploadLoaction")
+    Flowable<BAP5CommonEntity> uploadLoaction(@Body Map<String, Object> pageMap);
+
+
+
+    /**
+     * 更改巡检开始状态
+     * @param pageMap
+     * @return
+     */
+    @POST("/msService/PATROL/mobile/patrolTask/updatePatrolTask")
+    Flowable<BAP5CommonEntity> updateXJTaskStatus(@Body Map<String, Object> pageMap);
+
+
+    /**
+     * 获取DCS设备数据
+     */
+    @POST("/msService/TagManagement/readTagsSync")
+    Flowable<CommonListEntity<DeviceDCSEntity>> getDeviceDCSParam(@Body Map<String, Object> pageMap);
+
 }

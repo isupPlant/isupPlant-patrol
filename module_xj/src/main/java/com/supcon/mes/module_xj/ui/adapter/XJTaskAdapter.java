@@ -91,6 +91,11 @@ public class XJTaskAdapter extends BaseListDataRecyclerViewAdapter<XJTaskEntity>
                 itemTaskStatus.setText(context.getString(R.string.xj_task_uncheck));
                 itemTaskStatus.setBackgroundResource(R.drawable.sl_xj_task_red);
             }
+            if(data.taskState.id.equals("PATROL_taskState/running")){
+                itemTaskStatus.setText(context.getString(R.string.xj_task_running));
+                itemTaskStatus.setBackgroundResource(R.drawable.sl_xj_task_2ba966);
+            }
+
 
 
         }
