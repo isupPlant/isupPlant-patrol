@@ -1,7 +1,9 @@
 package com.supcon.mes.module_xj.presenter;
 
+import com.supcon.mes.middleware.model.bean.CommonBAP5ListEntity;
 import com.supcon.mes.middleware.model.bean.CommonListEntity;
 import com.supcon.mes.middleware.model.network.MiddlewareHttpClient;
+import com.supcon.mes.module_xj.model.bean.CommonDeviceDCSListEntity;
 import com.supcon.mes.module_xj.model.bean.DeviceDCSEntity;
 import com.supcon.mes.module_xj.model.contract.DeviceDCSParamQueryContract;
 import com.supcon.mes.module_xj.model.network.XJHttpClient;
@@ -25,30 +27,20 @@ public class DeviceDCSParamQueryPresenter extends DeviceDCSParamQueryContract.Pr
         map.put("tagNames",itemNumber);
         mCompositeSubscription.add(
                 XJHttpClient.getDeviceDCSParam(map)
-                        .onErrorReturn(new Function<Throwable, CommonListEntity<DeviceDCSEntity>>() {
+                        .onErrorReturn(new Function<Throwable, CommonDeviceDCSListEntity<DeviceDCSEntity>>() {
                             @Override
-                            public CommonListEntity<DeviceDCSEntity> apply(Throwable throwable) throws Exception {
-                                CommonListEntity<DeviceDCSEntity> commonListEntity = new CommonListEntity<>();
+                            public CommonDeviceDCSListEntity<DeviceDCSEntity> apply(Throwable throwable) throws Exception {
+                                CommonDeviceDCSListEntity<DeviceDCSEntity> commonListEntity = new CommonDeviceDCSListEntity<>();
                                 commonListEntity.success = false;
                                 commonListEntity.errMsg = throwable.toString();
                                 return commonListEntity;
                             }
                         })
-                        .subscribe(new Consumer<CommonListEntity<DeviceDCSEntity>>() {
-                            @Override
-                            public void accept(CommonListEntity<DeviceDCSEntity> deviceDCSEntityCommonListEntity) throws Exception {
-                                if (getView() != null) {
-                                    if (deviceDCSEntityCommonListEntity.success) {
-                                        getView().getDeviceDCSParamsSuccess(deviceDCSEntityCommonListEntity);
-                                    } else {
-                                        getView().getDeviceDCSParamsFailed(deviceDCSEntityCommonListEntity.errMsg);
-                                    }
-                                }
-                            }
-                        }, new Consumer<Throwable>() {
-                            @Override
-                            public void accept(Throwable throwable) throws Exception {
-                                getView().getDeviceDCSParamsFailed(throwable.toString());
+                        .subscribe(entity -> {
+                            if (entity.success) {
+                                getView().getDeviceDCSParamsSuccess(entity);
+                            } else {
+                                getView().getDeviceDCSParamsFailed(entity.errMsg);
                             }
                         }));
     }

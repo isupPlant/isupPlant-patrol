@@ -5,6 +5,7 @@ import com.supcon.mes.middleware.model.bean.BAP5CommonEntity;
 import com.supcon.mes.middleware.model.bean.BAP5CommonListEntity;
 import com.supcon.mes.middleware.model.bean.CommonBAPListEntity;
 import com.supcon.mes.middleware.model.bean.CommonListEntity;
+import com.supcon.mes.module_xj.model.bean.CommonDeviceDCSListEntity;
 import com.supcon.mes.module_xj.model.bean.DeviceDCSEntity;
 import com.supcon.mes.module_xj.model.bean.GetLocationSystemSetEntity;
 import com.supcon.mes.module_xj.model.bean.LSXJRouterEntity;
@@ -73,11 +74,7 @@ public interface NetworkAPI {
     Flowable<BAP5CommonEntity> updateXJTaskStatus(@Body Map<String, Object> pageMap);
 
 
-    /**
-     * 获取DCS设备数据
-     */
-    @POST("/msService/TagManagement/readTagsSync")
-    Flowable<CommonListEntity<DeviceDCSEntity>> getDeviceDCSParam(@Body Map<String, Object> pageMap);
+
 
 
 
@@ -89,4 +86,10 @@ public interface NetworkAPI {
     @POST("/msService/EAM/workGroup/getRoutListByEamId")
     Flowable<BAP5CommonListEntity<LSXJRouterEntity>> getRouteList(@Body Map<String, Object> params);
 
+
+    /**
+     * 获取DCS设备数据
+     */
+    @POST("/msService/TagManagement/readTagsSync")
+    Flowable<CommonDeviceDCSListEntity<DeviceDCSEntity>> getDeviceDCSParam(@Body Map<String, Object> pageMap);
 }

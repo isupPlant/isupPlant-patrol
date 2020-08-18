@@ -10,8 +10,8 @@ import com.supcon.common.com_http.BaseEntity;
 public class DeviceDCSEntity extends BaseEntity {
 
     public String name;
-    public String value;
-    public String quality;
+    public Long value;
+    public Long quality;
     public String timeStamp;
     public boolean result;
 
@@ -23,19 +23,19 @@ public class DeviceDCSEntity extends BaseEntity {
         this.name = name;
     }
 
-    public String getValue() {
+    public Long getValue() {
         return value;
     }
 
-    public void setValue(String value) {
+    public void setValue(Long value) {
         this.value = value;
     }
 
-    public String getQuality() {
+    public Long getQuality() {
         return quality;
     }
 
-    public void setQuality(String quality) {
+    public void setQuality(Long quality) {
         this.quality = quality;
     }
 

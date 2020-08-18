@@ -47,6 +47,7 @@ import com.supcon.mes.middleware.constant.Constant;
 import com.supcon.mes.middleware.constant.TemperatureMode;
 import com.supcon.mes.middleware.constant.VibMode;
 import com.supcon.mes.middleware.controller.SystemCodeJsonController;
+import com.supcon.mes.middleware.model.bean.CommonBAP5ListEntity;
 import com.supcon.mes.middleware.model.bean.CommonListEntity;
 import com.supcon.mes.middleware.model.bean.ObjectEntity;
 import com.supcon.mes.middleware.model.bean.PopupWindowEntity;
@@ -69,6 +70,7 @@ import com.supcon.mes.module_xj.R;
 import com.supcon.mes.module_xj.controller.XJCameraController;
 import com.supcon.mes.module_xj.model.api.DeviceDCSParamQueryAPI;
 import com.supcon.mes.module_xj.model.api.XJTaskSubmitAPI;
+import com.supcon.mes.module_xj.model.bean.CommonDeviceDCSListEntity;
 import com.supcon.mes.module_xj.model.bean.DeviceDCSEntity;
 import com.supcon.mes.module_xj.model.bean.XJTaskEntity;
 import com.supcon.mes.module_xj.model.contract.DeviceDCSParamQueryContract;
@@ -665,7 +667,7 @@ public class XJWorkActivity extends BaseRefreshRecyclerActivity<XJWorkEntity> im
 
         for (XJWorkEntity xjWorkEntity:mXJAreaEntity.works ){
             if (xjWorkEntity.itemNumber!=null&&!TextUtils.isEmpty(xjWorkEntity.itemNumber)){
-                deviceNumber.add(xjWorkEntity.itemNumber);
+                deviceNumber.add(xjWorkEntity.itemNumber.trim());
             }
         }
         if (deviceNumber.size()>0){
@@ -1355,13 +1357,16 @@ public class XJWorkActivity extends BaseRefreshRecyclerActivity<XJWorkEntity> im
     }
 
     @Override
-    public void getDeviceDCSParamsSuccess(CommonListEntity entity) {
-        List<DeviceDCSEntity> deviceDCSEntities=entity.result;
+    public void getDeviceDCSParamsSuccess(CommonDeviceDCSListEntity entity) {
+        List<DeviceDCSEntity> deviceDCSEntities = entity.data;
+        if (deviceDCSEntities.size() == 0) {
+            return;
+        }
         for (int i=0;i<deviceDCSEntities.size();i++){
-            if (!TextUtils.isEmpty(deviceDCSEntities.get(i).value)&&deviceDCSEntities.get(i).result){
+            if (deviceDCSEntities.get(i).result){
                 for (int j=0;j<mXJAreaEntity.works.size();j++){
-                    if (deviceDCSEntities.get(i).name.equals(mXJAreaEntity.works.get(j).itemNumber)){
-                        mXJAreaEntity.works.get(j).concluse=deviceDCSEntities.get(i).value;
+                    if (deviceDCSEntities.get(i).name.trim().equals(mXJAreaEntity.works.get(j).itemNumber.trim())){
+                        mXJAreaEntity.works.get(j).concluse=deviceDCSEntities.get(i).value+"";
                     }
                 }
             }
