@@ -38,7 +38,6 @@ import com.supcon.mes.mbap.utils.GsonUtil;
 import com.supcon.mes.mbap.utils.SpaceItemDecoration;
 import com.supcon.mes.mbap.utils.controllers.SinglePickController;
 import com.supcon.mes.mbap.view.CustomDialog;
-import com.supcon.mes.mbap.view.CustomImageButton;
 import com.supcon.mes.mbap.view.CustomSheetDialog;
 import com.supcon.mes.mbap.view.CustomTextView;
 import com.supcon.mes.mbap.view.CustomVerticalEditText;
@@ -47,7 +46,7 @@ import com.supcon.mes.middleware.constant.Constant;
 import com.supcon.mes.middleware.constant.TemperatureMode;
 import com.supcon.mes.middleware.constant.VibMode;
 import com.supcon.mes.middleware.controller.SystemCodeJsonController;
-import com.supcon.mes.middleware.model.bean.CommonBAP5ListEntity;
+import com.supcon.mes.middleware.model.bean.BAP5CommonListEntity;
 import com.supcon.mes.middleware.model.bean.CommonListEntity;
 import com.supcon.mes.middleware.model.bean.ObjectEntity;
 import com.supcon.mes.middleware.model.bean.PopupWindowEntity;
@@ -55,7 +54,6 @@ import com.supcon.mes.middleware.model.bean.xj.XJAreaEntity;
 import com.supcon.mes.middleware.model.bean.xj.XJInputTypeEntity;
 import com.supcon.mes.middleware.model.bean.xj.XJInputTypeEntityDao;
 import com.supcon.mes.middleware.model.bean.xj.XJWorkEntity;
-import com.supcon.mes.middleware.model.event.RefreshEvent;
 import com.supcon.mes.middleware.model.inter.SystemCode;
 import com.supcon.mes.middleware.ui.view.CustomPopupWindow;
 import com.supcon.mes.middleware.util.AnimationUtil;
@@ -64,13 +62,11 @@ import com.supcon.mes.middleware.util.PopupWindowItemHelper;
 import com.supcon.mes.middleware.util.SBTUtil;
 import com.supcon.mes.middleware.util.SnackbarHelper;
 import com.supcon.mes.middleware.util.SystemCodeManager;
-import com.supcon.mes.middleware.util.XJCacheUtil;
 import com.supcon.mes.module_xj.IntentRouter;
 import com.supcon.mes.module_xj.R;
 import com.supcon.mes.module_xj.controller.XJCameraController;
 import com.supcon.mes.module_xj.model.api.DeviceDCSParamQueryAPI;
 import com.supcon.mes.module_xj.model.api.XJTaskSubmitAPI;
-import com.supcon.mes.module_xj.model.bean.CommonDeviceDCSListEntity;
 import com.supcon.mes.module_xj.model.bean.DeviceDCSEntity;
 import com.supcon.mes.module_xj.model.bean.XJTaskEntity;
 import com.supcon.mes.module_xj.model.contract.DeviceDCSParamQueryContract;
@@ -1357,7 +1353,7 @@ public class XJWorkActivity extends BaseRefreshRecyclerActivity<XJWorkEntity> im
     }
 
     @Override
-    public void getDeviceDCSParamsSuccess(CommonDeviceDCSListEntity entity) {
+    public void getDeviceDCSParamsSuccess(BAP5CommonListEntity entity) {
         List<DeviceDCSEntity> deviceDCSEntities = entity.data;
         if (deviceDCSEntities.size() == 0) {
             return;

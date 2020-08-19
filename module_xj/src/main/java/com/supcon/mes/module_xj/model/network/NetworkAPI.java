@@ -5,13 +5,10 @@ import com.supcon.mes.middleware.model.bean.BAP5CommonEntity;
 import com.supcon.mes.middleware.model.bean.BAP5CommonListEntity;
 import com.supcon.mes.middleware.model.bean.CommonBAPListEntity;
 import com.supcon.mes.middleware.model.bean.CommonListEntity;
-import com.supcon.mes.module_xj.model.bean.CommonDeviceDCSListEntity;
 import com.supcon.mes.module_xj.model.bean.DeviceDCSEntity;
-import com.supcon.mes.module_xj.model.bean.GetLocationSystemSetEntity;
 import com.supcon.mes.module_xj.model.bean.LSXJRouterEntity;
 import com.supcon.mes.module_xj.model.bean.XJTaskEntity;
 
-import java.util.List;
 import java.util.Map;
 
 import io.reactivex.Flowable;
@@ -91,5 +88,5 @@ public interface NetworkAPI {
      * 获取DCS设备数据
      */
     @POST("/msService/TagManagement/readTagsSync")
-    Flowable<CommonDeviceDCSListEntity<DeviceDCSEntity>> getDeviceDCSParam(@Body Map<String, Object> pageMap);
+    Flowable<BAP5CommonListEntity<DeviceDCSEntity>> getDeviceDCSParam(@Body Map<String, Object> pageMap);
 }

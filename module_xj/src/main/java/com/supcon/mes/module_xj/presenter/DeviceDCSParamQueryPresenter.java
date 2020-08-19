@@ -1,9 +1,8 @@
 package com.supcon.mes.module_xj.presenter;
 
-import com.supcon.mes.middleware.model.bean.CommonBAP5ListEntity;
+import com.supcon.mes.middleware.model.bean.BAP5CommonListEntity;
+import com.supcon.mes.middleware.model.bean.CommonBAPListEntity;
 import com.supcon.mes.middleware.model.bean.CommonListEntity;
-import com.supcon.mes.middleware.model.network.MiddlewareHttpClient;
-import com.supcon.mes.module_xj.model.bean.CommonDeviceDCSListEntity;
 import com.supcon.mes.module_xj.model.bean.DeviceDCSEntity;
 import com.supcon.mes.module_xj.model.contract.DeviceDCSParamQueryContract;
 import com.supcon.mes.module_xj.model.network.XJHttpClient;
@@ -12,7 +11,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import io.reactivex.functions.Consumer;
 import io.reactivex.functions.Function;
 
 /**
@@ -27,12 +25,12 @@ public class DeviceDCSParamQueryPresenter extends DeviceDCSParamQueryContract.Pr
         map.put("tagNames",itemNumber);
         mCompositeSubscription.add(
                 XJHttpClient.getDeviceDCSParam(map)
-                        .onErrorReturn(new Function<Throwable, CommonDeviceDCSListEntity<DeviceDCSEntity>>() {
+                        .onErrorReturn(new Function<Throwable, BAP5CommonListEntity<DeviceDCSEntity>>() {
                             @Override
-                            public CommonDeviceDCSListEntity<DeviceDCSEntity> apply(Throwable throwable) throws Exception {
-                                CommonDeviceDCSListEntity<DeviceDCSEntity> commonListEntity = new CommonDeviceDCSListEntity<>();
+                            public BAP5CommonListEntity<DeviceDCSEntity> apply(Throwable throwable) throws Exception {
+                                BAP5CommonListEntity<DeviceDCSEntity> commonListEntity = new BAP5CommonListEntity<>();
                                 commonListEntity.success = false;
-                                commonListEntity.errMsg = throwable.toString();
+                                commonListEntity.msg = throwable.toString();
                                 return commonListEntity;
                             }
                         })
@@ -40,7 +38,7 @@ public class DeviceDCSParamQueryPresenter extends DeviceDCSParamQueryContract.Pr
                             if (entity.success) {
                                 getView().getDeviceDCSParamsSuccess(entity);
                             } else {
-                                getView().getDeviceDCSParamsFailed(entity.errMsg);
+                                getView().getDeviceDCSParamsFailed(entity.msg);
                             }
                         }));
     }
