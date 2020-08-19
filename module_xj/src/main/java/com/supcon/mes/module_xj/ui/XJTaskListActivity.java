@@ -476,7 +476,7 @@ public class XJTaskListActivity extends BaseRefreshRecyclerActivity<XJTaskGroupE
         queryMap.put(Constant.BAPQuery.XJ_START_TIME_1, start);
         queryMap.put(Constant.BAPQuery.XJ_START_TIME_2, end);
 
-        queryMap.put(Constant.BAPQuery.XJ_TASK_STATE, "PATROL_taskState/issued");//PATROL_taskState/notIssued
+ //       queryMap.put(Constant.BAPQuery.XJ_TASK_STATE, "PATROL_taskState/issued");//PATROL_taskState/notIssued
 
     }
 

@@ -33,7 +33,7 @@ public interface NetworkAPI {
      * @param pageMap
      * @return
      */
-    @POST("/msService/PATROL/patrolTask/potrolTask/potrolTaskList-query")
+    @POST("/msService/PATROL/patrolTask/potrolTask/mobilePotrolTaskList-query")
     Flowable<BAP5CommonEntity<CommonBAPListEntity<XJTaskEntity>>> getTaskList(@Body Map<String, Object> pageMap);
 
     /**
