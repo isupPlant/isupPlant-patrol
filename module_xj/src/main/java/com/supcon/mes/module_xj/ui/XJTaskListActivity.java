@@ -55,6 +55,7 @@ import com.supcon.mes.module_xj.model.bean.XJTaskEntity;
 import com.supcon.mes.module_xj.model.bean.XJTaskGroupEntity;
 import com.supcon.mes.module_xj.model.contract.XJTaskContract;
 import com.supcon.mes.module_xj.model.event.XJTempTaskAddEvent;
+import com.supcon.mes.module_xj.presenter.XJRunningTaskPresenter;
 import com.supcon.mes.module_xj.presenter.XJTaskPresenter;
 import com.supcon.mes.module_xj.service.RealTimeUploadLoactionService;
 import com.supcon.mes.module_xj.ui.adapter.XJTaskGroupAdapter;
@@ -91,7 +92,7 @@ import io.reactivex.schedulers.Schedulers;
         XJTaskDateFilterController.class, XJTaskStatusFilterController.class,/*顶部筛选*/
         XJTaskNoIssuedController.class, XJTaskUploadController.class,/*获取，上传*/
         XJLocalTaskController.class})
-@Presenter(value = {XJTaskPresenter.class, DeploymentPresenter.class})
+@Presenter(value = {XJRunningTaskPresenter.class, DeploymentPresenter.class})
 @SystemCode(entityCodes = {
         Constant.SystemCode.PATROL_taskState,
         Constant.SystemCode.PATROL_editType,
@@ -476,7 +477,7 @@ public class XJTaskListActivity extends BaseRefreshRecyclerActivity<XJTaskGroupE
         queryMap.put(Constant.BAPQuery.XJ_START_TIME_1, start);
         queryMap.put(Constant.BAPQuery.XJ_START_TIME_2, end);
 
- //       queryMap.put(Constant.BAPQuery.XJ_TASK_STATE, "PATROL_taskState/issued");//PATROL_taskState/notIssued
+    //    queryMap.put(Constant.BAPQuery.XJ_TASK_STATE, "PATROL_taskState/issued");//PATROL_taskState/notIssued
 
     }
 

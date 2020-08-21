@@ -26,12 +26,24 @@ import retrofit2.http.QueryMap;
 public interface NetworkAPI {
 
     /**
-     * 巡检任务列表
+     * 巡检未下发的巡检任务列表
+     * @param pageMap
+     * @return
+     */
+    @POST("/msService/PATROL/patrolTask/potrolTask/potrolTaskList-query")
+    Flowable<BAP5CommonEntity<CommonBAPListEntity<XJTaskEntity>>> getTaskList(@Body Map<String, Object> pageMap);
+
+
+    /**
+     * 获取已下发和正在进行中的巡检任务列表
+     *
+     * 由于平台接口原因，现改用两个接口区分，详细情况问杨凯，丁亚浩
+     *
      * @param pageMap
      * @return
      */
     @POST("/msService/PATROL/patrolTask/potrolTask/mobilePotrolTaskList-query")
-    Flowable<BAP5CommonEntity<CommonBAPListEntity<XJTaskEntity>>> getTaskList(@Body Map<String, Object> pageMap);
+    Flowable<BAP5CommonEntity<CommonBAPListEntity<XJTaskEntity>>> getRunningTaskList(@Body Map<String, Object> pageMap);
 
     /**
      * 批量变更巡检任务状态
