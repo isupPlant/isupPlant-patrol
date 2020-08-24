@@ -24,7 +24,6 @@ import com.supcon.common.view.base.activity.BaseControllerActivity;
 import com.supcon.common.view.util.LogUtil;
 import com.supcon.common.view.util.ToastUtils;
 import com.supcon.mes.expert_uhf.controller.ExpertUHFRFIDController;
-import com.supcon.mes.expert_uhf.helper.InventoryBuffer;
 import com.supcon.mes.mbap.utils.DateUtil;
 import com.supcon.mes.mbap.utils.GsonUtil;
 import com.supcon.mes.mbap.utils.controllers.SinglePickController;
@@ -32,8 +31,11 @@ import com.supcon.mes.mbap.view.CustomDialog;
 import com.supcon.mes.middleware.SupPlantApplication;
 import com.supcon.mes.middleware.constant.Constant;
 import com.supcon.mes.middleware.controller.SystemCodeJsonController;
+import com.supcon.mes.middleware.model.bean.BAP5CommonEntity;
 import com.supcon.mes.middleware.model.bean.xj.XJAreaEntity;
 import com.supcon.mes.middleware.model.bean.xj.XJAreaEntityDao;
+import com.supcon.mes.middleware.model.bean.xj.XJWorkEntity;
+import com.supcon.mes.middleware.model.bean.xj.XJWorkEntityDao;
 import com.supcon.mes.middleware.model.event.RefreshEvent;
 import com.supcon.mes.middleware.model.inter.SystemCode;
 import com.supcon.mes.middleware.util.SystemCodeManager;
@@ -44,10 +46,13 @@ import com.supcon.mes.module_scan.util.scanCode.CodeUtlis;
 import com.supcon.mes.module_xj.IntentRouter;
 import com.supcon.mes.module_xj.R;
 import com.supcon.mes.module_xj.controller.XJLocalTaskController;
+import com.supcon.mes.module_xj.model.api.XJUpdateStatusAPI;
 import com.supcon.mes.module_xj.model.bean.XJTaskEntity;
 import com.supcon.mes.module_xj.model.contract.XJTaskSubmitContract;
+import com.supcon.mes.module_xj.model.contract.XJUpdateStatusContract;
 import com.supcon.mes.module_xj.model.event.XJAreaRefreshEvent;
 import com.supcon.mes.module_xj.presenter.XJTaskSubmitPresenter;
+import com.supcon.mes.module_xj.presenter.XJUpdateTaskStatusPresenter;
 import com.supcon.mes.module_xj.ui.adapter.XJAreaAdapter;
 import com.supcon.mes.nfc.model.bean.NFCEntity;
 import com.supcon.mes.sb2.model.event.BarcodeEvent;
@@ -79,12 +84,14 @@ import static com.supcon.mes.module_xj.ui.XJTaskListActivity.XJ_TASK_STAFF_KEY;
 @Router(Constant.Router.XJ_TASK_DETAIL)
 @Controller(value = {SystemCodeJsonController.class, XJLocalTaskController.class,
         ExpertUHFRFIDController.class})
-@Presenter(value = {XJTaskSubmitPresenter.class})
+@Presenter(value = {XJTaskSubmitPresenter.class, XJUpdateTaskStatusPresenter.class})
 @SystemCode(entityCodes = {
         Constant.SystemCode.PATROL_signInType,
         Constant.SystemCode.PATROL_passReason
 })
-public class XJTaskDetailActivity extends BaseControllerActivity implements XJTaskSubmitContract.View {
+public class XJTaskDetailActivity extends BaseControllerActivity
+        implements XJTaskSubmitContract.View,
+        XJUpdateStatusContract.View {
 
     @BindByTag("xjTaskDetailRouteName")
     TextView xjTaskDetailRouteName;
@@ -116,6 +123,7 @@ public class XJTaskDetailActivity extends BaseControllerActivity implements XJTa
     private EM55UHFRFIDHelper em55UHFRFIDHelper;
     private ExpertUHFRFIDController mExpertUHFRFIDController;
     private int enterPosition = -1;
+    private SoundHelper mSoundHelper = new SoundHelper();
 
     @Override
     protected int getLayoutID() {
@@ -235,7 +243,7 @@ public class XJTaskDetailActivity extends BaseControllerActivity implements XJTa
         }
 
     }
-    private SoundHelper mSoundHelper = new SoundHelper();
+
     @Override
     protected void onResume() {
         super.onResume();
@@ -341,12 +349,28 @@ public class XJTaskDetailActivity extends BaseControllerActivity implements XJTa
 
             mXJTaskEntity.areas = areaEntities;
 
+            //过滤没有巡检项的巡检区域，不显示
+            List<Integer> noAreaList = new ArrayList<>();
+            for (int i = 0; i < mXJTaskEntity.areas.size(); i++) {
+                List<XJWorkEntity> xjWorkEntities = SupPlantApplication.dao().getXJWorkEntityDao().queryBuilder()
+                        .where(XJWorkEntityDao.Properties.AreaLongId.eq(mXJTaskEntity.areas.get(i).id))
+                        .where(XJWorkEntityDao.Properties.Ip.eq(SupPlantApplication.getIp()))
+                        .orderAsc(XJWorkEntityDao.Properties.Sort)
+                        .list();
+                if (xjWorkEntities == null || xjWorkEntities.size() == 0) {
+                    noAreaList.add(i);
+                }
+            }
+//            for (int d:noAreaList){
+//                mXJTaskEntity.areas.remove(d);
+//            }
         }
 
 
         if (mXJTaskEntity.areas == null || mXJTaskEntity.areas.size() == 0) {
 
             ToastUtils.show(context, getString(R.string.xj_area_empty_warning));
+
         }
 
         mXJAreaAdapter = new XJAreaAdapter(context);
@@ -376,6 +400,7 @@ public class XJTaskDetailActivity extends BaseControllerActivity implements XJTa
 
                 if (mXJTaskEntity.areas == null || mXJTaskEntity.areas.size() == 0) {
                     ToastUtils.show(context, getString(R.string.xj_area_sign_warning2));
+                    showDialog();
                     return;
                 }
 
@@ -386,29 +411,56 @@ public class XJTaskDetailActivity extends BaseControllerActivity implements XJTa
                 }
 
             });
-        }
 
 
-        RxView.clicks(xjTaskDetailTaskBtn)
-                .throttleFirst(200, TimeUnit.MILLISECONDS)
-                .subscribe(o -> {
-                    if (mXJTaskEntity.realStartTime == 0) {
+            RxView.clicks(xjTaskDetailTaskBtn)
+                    .throttleFirst(200, TimeUnit.MILLISECONDS)
+                    .subscribe(o -> {
+                        if (mXJTaskEntity.realStartTime == 0) {
 
-                        if (mXJTaskEntity.areas == null || mXJTaskEntity.areas.size() == 0) {
-                            ToastUtils.show(context, getString(R.string.xj_area_sign_warning2));
-                            return;
+                            if (mXJTaskEntity.areas == null || mXJTaskEntity.areas.size() == 0) {
+                                //                   ToastUtils.show(context, getString(R.string.xj_area_sign_warning2));
+                                showDialog();
+                                return;
+                            }
+
+                            mXJTaskEntity.realStartTime = System.currentTimeMillis();
+                            XJCacheUtil.putString(mXJTaskEntity.tableNo, mXJTaskEntity.toString());
+                            //开始巡检
+                            xjTaskDetailTaskBtn.setBackgroundResource(R.drawable.sl_xj_task_red);
+                            xjTaskDetailTaskBtn.setText(getString(R.string.xj_task_end));
+
+                            presenterRouter.create(XJUpdateStatusAPI.class).updateXJTaskStatus(mXJTaskEntity.id, "PATROL_taskState/running");
+                        } else {
+                            showFinishDialog();
                         }
 
-                        mXJTaskEntity.realStartTime = System.currentTimeMillis();
-                        XJCacheUtil.putString(mXJTaskEntity.tableNo, mXJTaskEntity.toString());
-                        //开始巡检
-                        xjTaskDetailTaskBtn.setBackgroundResource(R.drawable.sl_xj_task_red);
-                        xjTaskDetailTaskBtn.setText(getString(R.string.xj_task_end));
-                    } else {
-                        showFinishDialog();
-                    }
+                    });
+        }
+    }
 
-                });
+
+    public void showDialog() {
+        new CustomDialog(context)
+                .twoButtonAlertDialog(getString(R.string.xj_area_sign_warning2))
+                .bindView(com.supcon.mes.middleware.R.id.redBtn, "确定")
+                .bindView(com.supcon.mes.middleware.R.id.grayBtn, "取消")
+                .bindClickListener(com.supcon.mes.middleware.R.id.redBtn, new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v1) {
+                        com.supcon.mes.middleware.IntentRouter.go(context, Constant.AppCode.COM_DataManage);
+                        back();
+                    }
+                }, true)
+                .bindClickListener(com.supcon.mes.middleware.R.id.grayBtn, new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+
+                    }
+                }, true)
+                .show();
+
+
     }
 
     private void showFinishDialog() {
@@ -440,7 +492,7 @@ public class XJTaskDetailActivity extends BaseControllerActivity implements XJTa
         }
 
         for (XJAreaEntity xjAreaEntity : areaEntities) {
-            if (!xjAreaEntity.isFinished&&xjAreaEntity.getTotalNum(mXJTaskEntity.exceptinWorkIds)>0) {
+            if (!xjAreaEntity.isFinished && xjAreaEntity.getTotalNum(mXJTaskEntity.exceptinWorkIds) > 0) {
                 return false;
             }
         }
@@ -520,6 +572,7 @@ public class XJTaskDetailActivity extends BaseControllerActivity implements XJTa
         Collections.sort(xjAreaEntity.works);
         bundle.putSerializable(Constant.IntentKey.XJ_AREA_ENTITY_STR, xjAreaEntity.toString());
         bundle.putString(Constant.IntentKey.XJ_AREA_EXCEPTION_IDS, mXJTaskEntity.exceptinWorkIds);
+        bundle.putSerializable(Constant.IntentKey.XJ_TASK_ENTITY_STR, mXJTaskEntity.toString());
         if (xjAreaEntity.isFinished || mXJTaskEntity.isFinished) {
             bundle.putBoolean(Constant.IntentKey.XJ_IS_FROM_TASK, true);
             bundle.putBoolean(Constant.IntentKey.XJ_IS_FINISHED, mXJTaskEntity.isFinished);
@@ -596,7 +649,7 @@ public class XJTaskDetailActivity extends BaseControllerActivity implements XJTa
             if (code.equals(areaEntity.signCode)) {
                 updateXJAreaEntity(areaEntity);//update数据
                 LogUtil.i("BarcodeEvent1", code);
-                if(enterPosition!=index) {
+                if (enterPosition != index) {
                     doGoArea(areaEntity);  //跳转
                     enterPosition = index;
                 }
@@ -604,6 +657,22 @@ public class XJTaskDetailActivity extends BaseControllerActivity implements XJTa
             }
             index++;
         }
+    }
+
+    /**
+     * @param
+     * @description 更新当前巡检任务状态为进行中
+     * @author yangkai2
+     */
+
+    @Override
+    public void updateXJTaskStatusSuccess(BAP5CommonEntity entity) {
+
+    }
+
+    @Override
+    public void updateXJTaskStatusFailed(String errorMsg) {
+
     }
 
     /**
@@ -638,4 +707,6 @@ public class XJTaskDetailActivity extends BaseControllerActivity implements XJTa
     public void uploadXJDataFailed(String errorMsg) {
 
     }
+
+
 }

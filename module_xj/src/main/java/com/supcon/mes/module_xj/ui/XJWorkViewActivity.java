@@ -136,12 +136,12 @@ public class XJWorkViewActivity extends BaseRefreshRecyclerActivity<XJWorkEntity
     protected void initView() {
         super.initView();
         StatusBarUtils.setWindowStatusBarColor(this, R.color.themeColor);
-        if(isFromTask){
-            titleText.setText(getString(R.string.xj_work_view));
-        }
-        else {
+//        if(isFromTask){
+//            titleText.setText(getString(R.string.xj_work_view));
+//        }
+//        else {
             titleText.setText(getString(R.string.xj_work_finish));
-        }
+//        }
         contentView.setLayoutManager(new LinearLayoutManager(context));
         contentView.addItemDecoration(new SpaceItemDecoration(DisplayUtil.dip2px(5, context)));
         contentView.setAdapter(mXJWorkItemAdapter);

@@ -1,6 +1,7 @@
 package com.supcon.mes.module_xj_temp.ui;
 
 import android.annotation.SuppressLint;
+import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
@@ -13,7 +14,7 @@ import com.app.annotation.apt.Router;
 import com.jakewharton.rxbinding2.view.RxView;
 import com.supcon.common.view.base.activity.BaseControllerActivity;
 import com.supcon.common.view.listener.OnChildViewClickListener;
-import com.supcon.common.view.listener.OnItemChildViewClickListener;
+import com.supcon.common.view.util.SharedPreferencesUtils;
 import com.supcon.common.view.util.StatusBarUtils;
 import com.supcon.common.view.util.ToastUtils;
 import com.supcon.mes.mbap.constant.ViewAction;
@@ -24,12 +25,11 @@ import com.supcon.mes.mbap.view.CustomImageButton;
 import com.supcon.mes.mbap.view.CustomTextView;
 import com.supcon.mes.middleware.SupPlantApplication;
 import com.supcon.mes.middleware.constant.Constant;
-import com.supcon.mes.middleware.model.bean.Area;
-import com.supcon.mes.middleware.model.bean.SystemCodeEntity;
 import com.supcon.mes.middleware.model.bean.xj.XJAreaEntity;
 import com.supcon.mes.middleware.model.bean.xj.XJAreaEntityDao;
 import com.supcon.mes.middleware.model.bean.xj.XJRouteEntity;
-import com.supcon.mes.middleware.model.event.RefreshEvent;
+import com.supcon.mes.middleware.model.bean.xj.XJWorkEntity;
+import com.supcon.mes.middleware.model.bean.xj.XJWorkEntityDao;
 import com.supcon.mes.middleware.model.event.SelectDataEvent;
 import com.supcon.mes.middleware.model.listener.DateSelectListener;
 import com.supcon.mes.middleware.util.SystemCodeManager;
@@ -80,6 +80,7 @@ public class XJTempTaskActivity extends BaseControllerActivity {
 
     private XJTempAreaAdapter mXJTempAreaAdapter;
     private XJTaskEntity mXJTaskEntity;
+    private long eamId;
 
     @Override
     protected int getLayoutID() {
@@ -89,6 +90,7 @@ public class XJTempTaskActivity extends BaseControllerActivity {
     @Override
     protected void onInit() {
         super.onInit();
+        eamId = getIntent().getLongExtra(Constant.IntentKey.SBDA_ONLINE_EAMID, -1);
         mXJTaskEntity = new XJTaskEntity();
         mXJTaskEntity.areas = new ArrayList<>();
         mXJTaskEntity.isTemp = true;
@@ -103,25 +105,60 @@ public class XJTempTaskActivity extends BaseControllerActivity {
 
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onDataSelect(SelectDataEvent event) {
-        if("selectRoute".equals(event.getSelectTag())){
+        if ("selectRoute".equals(event.getSelectTag())) {
             mXJTaskEntity.workRoute = (XJRouteEntity) event.getEntity();
             mXJTaskEntity.patrolType = SystemCodeManager.getInstance().getSystemCodeEntity(mXJTaskEntity.workRoute.patrolType.id);
 //            mXJTaskEntity.workRoute.name = mXJTaskEntity.workRoute.name+"Temp";
-            mXJTaskEntity.tableNo = "Temp"+new Date().getTime();
+            mXJTaskEntity.tableNo = "Temp" + new Date().getTime();
             mXJTaskEntity.staffName = SupPlantApplication.getAccountInfo().staffName;
 
-            xjTempTaskRouteSelect.setContent(mXJTaskEntity.workRoute.name+getResources().getString(R.string.xj_temp_task));
-
+            xjTempTaskRouteSelect.setContent(mXJTaskEntity.workRoute.name + getResources().getString(R.string.xj_temp_task));
             List<XJAreaEntity> areaEntities = SupPlantApplication.dao().getXJAreaEntityDao().queryBuilder()
                     .where(XJAreaEntityDao.Properties.WorkRouteId.eq(mXJTaskEntity.workRoute.id))
                     .where(XJAreaEntityDao.Properties.Valid.eq(true))
                     .where(XJAreaEntityDao.Properties.Ip.eq(SupPlantApplication.getIp()))
                     .list();
 
-            mXJTaskEntity.areas.addAll(areaEntities);
+            List<XJAreaEntity> xjAreaData = null;
+            //过滤设备相关巡检区域
+            if (eamId != -1) {
+                xjAreaData = getDeviceXJData(areaEntities);
+            } else {
+                xjAreaData = areaEntities;
+            }
+            mXJTaskEntity.areas.clear();
+            mXJTaskEntity.areas.addAll(xjAreaData);
             mXJTempAreaAdapter.setList(mXJTaskEntity.areas);
             mXJTempAreaAdapter.notifyDataSetChanged();
         }
+    }
+
+    /**
+     * 获取设备巡检项，巡检区域
+     *
+     * @param areaEntities
+     * @return
+     */
+    @SuppressLint("CheckResult")
+    private List<XJAreaEntity> getDeviceXJData(List<XJAreaEntity> areaEntities) {
+        List<XJAreaEntity> deviceAreaEntity = new ArrayList<>();
+        for (int i = 0; i < areaEntities.size(); i++) {
+            List<XJWorkEntity> deviceWork = new ArrayList<>();
+            List<XJWorkEntity> works = SupPlantApplication.dao().getXJWorkEntityDao().queryBuilder()
+                    .where(XJWorkEntityDao.Properties.AreaLongId.eq(areaEntities.get(i).id))
+                    .where(XJWorkEntityDao.Properties.Ip.eq(SupPlantApplication.getIp()))
+                    .orderAsc(XJWorkEntityDao.Properties.Sort)
+                    .list();
+            for (int j = 0; j < works.size(); j++) {
+                if (works.get(j).eamId != null && works.get(j).eamId.id != null && works.get(j).eamId.id == eamId) {
+                    deviceWork.add(works.get(j));
+                }
+            }
+            if (deviceWork.size() > 0) {
+                deviceAreaEntity.add(areaEntities.get(i));
+            }
+        }
+        return deviceAreaEntity;
     }
 
     @Override
@@ -144,7 +181,7 @@ public class XJTempTaskActivity extends BaseControllerActivity {
         super.initListener();
 
         RxView.clicks(leftBtn)
-                .throttleFirst(200 , TimeUnit.MILLISECONDS)
+                .throttleFirst(200, TimeUnit.MILLISECONDS)
                 .subscribe(new Consumer<Object>() {
 
                     @Override
@@ -154,35 +191,35 @@ public class XJTempTaskActivity extends BaseControllerActivity {
                 });
 
         RxView.clicks(rightBtn)
-                .throttleFirst(200 , TimeUnit.MILLISECONDS)
+                .throttleFirst(200, TimeUnit.MILLISECONDS)
                 .subscribe(new Consumer<Object>() {
 
                     @Override
                     public void accept(Object o) throws Exception {
-                        if(mXJTaskEntity.workRoute == null){
+                        if (mXJTaskEntity.workRoute == null) {
                             ToastUtils.show(context, "请选择巡检线路");
                             return;
                         }
 
-                        if(mXJTaskEntity.startTime == 0||mXJTaskEntity.endTime == 0){
+                        if (mXJTaskEntity.startTime == 0 || mXJTaskEntity.endTime == 0) {
                             ToastUtils.show(context, "请选择巡检开始和结束时间");
                             return;
                         }
-                        boolean isHaveAreas=false;
-                        for(XJAreaEntity xjAreaEntity:mXJTaskEntity.areas){
-                            if (xjAreaEntity.isChecked){
-                                isHaveAreas=true;
+                        boolean isHaveAreas = false;
+                        for (XJAreaEntity xjAreaEntity : mXJTaskEntity.areas) {
+                            if (xjAreaEntity.isChecked) {
+                                isHaveAreas = true;
                             }
                         }
-                        if(mXJTaskEntity.areas == null || mXJTaskEntity.areas.size() == 0||!isHaveAreas){
+                        if (mXJTaskEntity.areas == null || mXJTaskEntity.areas.size() == 0 || !isHaveAreas) {
                             ToastUtils.show(context, "请选择巡检区域");
                             return;
                         }
 
-                        for(int i = mXJTaskEntity.areas.size()-1; i>=0; i--){
+                        for (int i = mXJTaskEntity.areas.size() - 1; i >= 0; i--) {
 
                             XJAreaEntity xjAreaEntity = mXJTaskEntity.areas.get(i);
-                            if(!xjAreaEntity.isChecked){
+                            if (!xjAreaEntity.isChecked) {
                                 mXJTaskEntity.areas.remove(i);
                             }
 
@@ -195,7 +232,7 @@ public class XJTempTaskActivity extends BaseControllerActivity {
                 });
 
         RxView.clicks(xjTempTaskTimeSelect)
-                .throttleFirst(200 , TimeUnit.MILLISECONDS)
+                .throttleFirst(200, TimeUnit.MILLISECONDS)
                 .subscribe(new Consumer<Object>() {
 
                     @Override
@@ -207,11 +244,10 @@ public class XJTempTaskActivity extends BaseControllerActivity {
         xjTempTaskTimeSelect.setOnChildViewClickListener(new OnChildViewClickListener() {
             @Override
             public void onChildViewClick(View childView, int action, Object obj) {
-                if(action == ViewAction.CONTENT_CLEAN.value()){
+                if (action == ViewAction.CONTENT_CLEAN.value()) {
                     mXJTaskEntity.startTime = 0;
                     mXJTaskEntity.endTime = 0;
-                }
-                else{
+                } else {
                     getController(XJTempTimeController.class).showCustomDialog();
                 }
             }
@@ -220,15 +256,16 @@ public class XJTempTaskActivity extends BaseControllerActivity {
         xjTempTaskRouteSelect.setOnChildViewClickListener(new OnChildViewClickListener() {
             @Override
             public void onChildViewClick(View childView, int action, Object obj) {
-                if(action == ViewAction.CONTENT_CLEAN.value()){
+                if (action == ViewAction.CONTENT_CLEAN.value()) {
                     mXJTaskEntity.workRoute = null;
                     mXJTaskEntity.patrolType = null;
                     mXJTaskEntity.tableNo = null;
                     mXJTaskEntity.areas.clear();
                     mXJTempAreaAdapter.notifyDataSetChanged();
-                }
-                else{
-                    IntentRouter.go(context, Constant.Router.XJ_ROUTE_LIST);
+                } else {
+                    Bundle bundle = new Bundle();
+                    bundle.putLong(Constant.IntentKey.SBDA_ONLINE_EAMID, eamId);
+                    IntentRouter.go(context, Constant.Router.XJ_ROUTE_LIST, bundle);
                 }
             }
         });
@@ -237,27 +274,25 @@ public class XJTempTaskActivity extends BaseControllerActivity {
             @Override
             public void onDateSelect(String start, String end) {
 
-                if(TextUtils.isEmpty(start)){
+                if (TextUtils.isEmpty(start)) {
                     mXJTaskEntity.startTime = 0;
-                }
-                else{
+                } else {
                     mXJTaskEntity.startTime = DateUtil.dateFormat(start, "yyyy-MM-dd HH:mm:ss");
                 }
 
-                if(TextUtils.isEmpty(end)){
+                if (TextUtils.isEmpty(end)) {
                     mXJTaskEntity.endTime = 0;
-                }
-                else{
+                } else {
                     mXJTaskEntity.endTime = DateUtil.dateFormat(end, "yyyy-MM-dd HH:mm:ss");
                 }
 
 
-                if (!TextUtils.isEmpty(start)&&!TextUtils.isEmpty(end)) {
+                if (!TextUtils.isEmpty(start) && !TextUtils.isEmpty(end)) {
                     StringBuilder stringBuilder = new StringBuilder(start);
                     stringBuilder.append("--");
                     stringBuilder.append(end);
                     xjTempTaskTimeSelect.setContent(stringBuilder.toString());
-                }else{
+                } else {
                     xjTempTaskTimeSelect.setContent("");
                 }
 
@@ -277,12 +312,13 @@ public class XJTempTaskActivity extends BaseControllerActivity {
     public void onBackPressed() {
 
         new CustomDialog(context)
-                .twoButtonAlertDialog(mXJTaskEntity.areas!=null? getString(R.string.xj_temp_task_exit_warning) : getString(R.string.xj_temp_task_exit_warning2))
-                .bindView(R.id.grayBtn,"留下")
-                .bindView(R.id.redBtn,"离开")
-                .bindClickListener(R.id.grayBtn, v -> {}, true)
+                .twoButtonAlertDialog(mXJTaskEntity.areas != null ? getString(R.string.xj_temp_task_exit_warning) : getString(R.string.xj_temp_task_exit_warning2))
+                .bindView(R.id.grayBtn, "留下")
+                .bindView(R.id.redBtn, "离开")
+                .bindClickListener(R.id.grayBtn, v -> {
+                }, true)
                 .bindClickListener(R.id.redBtn, v -> super.onBackPressed()
-                , true)
+                        , true)
                 .show();
 
     }
