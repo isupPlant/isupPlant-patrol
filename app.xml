@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<appList>
+    <app>
+        <code>MPS_Patrol</code>
+        <name>巡检管理</name>
+        <appType>base_AppType/02</appType>
+        <screenType>SCREEN_TYPE/03</screenType>
+        <moduleCode>PATROL_1.0.0</moduleCode>
+        <url></url>
+        <appIcon></appIcon>
+        <powerFlag>true</powerFlag>
+        <menuCode>PATROL_1.0.0_patrolTask_potrolTaskList</menuCode>
+        <isHidden>false</isHidden>
+        <sort>6</sort>
+        <cid>1000</cid>
+        <remark>巡检管理</remark>
+    </app>
+</appList>
