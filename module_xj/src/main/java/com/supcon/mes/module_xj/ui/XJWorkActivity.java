@@ -106,7 +106,7 @@ import io.reactivex.schedulers.Schedulers;
  */
 @Router(Constant.Router.XJ_WORK_ITEM)
 @Controller(value = {TestoController.class, SystemCodeJsonController.class, XJCameraController.class})
-@Presenter({XJTaskSubmitPresenter.class, DeviceDCSParamQueryPresenter.class})
+@Presenter({ DeviceDCSParamQueryPresenter.class})
 @SystemCode(entityCodes = {
 //        Constant.SystemCode.PATROL_editType,
 //        Constant.SystemCode.PATROL_valueType,
@@ -114,7 +114,7 @@ import io.reactivex.schedulers.Schedulers;
         Constant.SystemCode.PATROL_realValue
 
 })
-public class XJWorkActivity extends BaseRefreshRecyclerActivity<XJWorkEntity> implements  XJTaskSubmitContract.View, DeviceDCSParamQueryContract.View {
+public class XJWorkActivity extends BaseRefreshRecyclerActivity<XJWorkEntity> implements  DeviceDCSParamQueryContract.View {
 
     @BindByTag("titleTextMiddle")
     TextView titleTextMiddle;
@@ -278,7 +278,6 @@ public class XJWorkActivity extends BaseRefreshRecyclerActivity<XJWorkEntity> im
 
     private void initPopupWindowData() {
         Map<String, Integer> map = new HashMap<>();
-        map.put(context.getString(R.string.xj_upload_task), R.drawable.ic_xj_work_upload);
         map.put(context.getString(R.string.xj_work_over), R.drawable.ic_xj_work_finish);
         map.put(context.getString(R.string.xj_work_jump), R.drawable.ic_xj_work_skip);
         mPopupWindowEntityList = PopupWindowItemHelper.initPopupWindowData(map);
@@ -311,6 +310,7 @@ public class XJWorkActivity extends BaseRefreshRecyclerActivity<XJWorkEntity> im
                     public void accept(Object o) throws Exception {
                         Bundle bundle = new Bundle();
                         bundle.putSerializable(Constant.IntentKey.XJ_AREA_ENTITY_STR, mXJAreaEntity.toString());
+                        bundle.putSerializable(Constant.IntentKey.XJ_TASK_ENTITY_STR,mXJTaskEntity.toString());
                         IntentRouter.go(context, Constant.Router.XJ_WORK_ITEM_VIEW, bundle);
                     }
                 });
@@ -401,52 +401,12 @@ public class XJWorkActivity extends BaseRefreshRecyclerActivity<XJWorkEntity> im
                 mCustomPopupWindow.dismiss();
                 showAllJumpDialog();
                 break;
-            case "上传任务":
-                mCustomPopupWindow.dismiss();
-                showFinishDialog();
-                break;
             default:
         }
     }
 
-    private void showFinishDialog() {
-        new CustomDialog(context)
-                .twoButtonAlertDialog(checkAreaFinishState()? getString(R.string.xj_task_finish_warning2) : getString(R.string.xj_task_finish_warning1))
-                .bindClickListener(R.id.grayBtn, v -> {
-                }, true)
-                .bindClickListener(R.id.redBtn, v -> {
-                    //将本区域数据变成已完成
-                    for(XJWorkEntity xjWorkEntity : mXJAreaEntity.works){
-                       xjWorkEntity.isFinished=true;
-                    }
-                    //拼接单个区域上传数据
-                    mXJTaskEntity.areas.clear();
-                    mXJTaskEntity.areas.add(mXJAreaEntity);
-                    List<XJTaskEntity> xjTaskEntityList=new ArrayList<>();
-                    xjTaskEntityList.add(mXJTaskEntity);
-                    presenterRouter.create(XJTaskSubmitAPI.class).uploadFile(xjTaskEntityList, true);
-                    onLoading(getString(R.string.xj_task_uploading));
-                }, true)
-                .show();
-    }
 
-    private boolean checkAreaFinishState(){
-        int finishNum = 0;
-        for(XJWorkEntity xjWorkEntity : mXJAreaEntity.works){
-            if (xjWorkEntity.isFinished){
-                finishNum++;
-            }
-        }
-        mXJAreaEntity.finishNum = finishNum;
-        if(mXJAreaEntity.finishNum == mXJAreaEntity.works.size()){
-            mXJAreaEntity.isFinished = true;
-            return true;
-        }
-        else{
-            mXJAreaEntity.isFinished = false;
-            return false;
-        }
-    }
+
 
 
     boolean isOneKeyJump = false;
@@ -1318,39 +1278,6 @@ public class XJWorkActivity extends BaseRefreshRecyclerActivity<XJWorkEntity> im
 
     }
 
-
-    @Override
-    public void uploadFileSuccess(String path) {
-
-        LogUtil.d(""+path);
-
-        if(TextUtils.isEmpty(path)){
-            onLoadFailed("巡检数据上传失败！");
-            return;
-        }
-
-        Map<String, Object> queryMap = new HashMap<>();
-        queryMap.put("filePath", path.replace("\\", "/"));
-        queryMap.put("uploadTaskResultDTOs",new ArrayList<>());
-        presenterRouter.create(XJTaskSubmitAPI.class).uploadXJData(false, queryMap);
-    }
-
-
-    @Override
-    public void uploadFileFailed(String errorMsg) {
-        onLoadFailed(ErrorMsgHelper.msgParse(errorMsg));
-    }
-
-    @Override
-    public void uploadXJDataSuccess() {
-        onLoadSuccess();
-        onBackPressed();
-    }
-
-    @Override
-    public void uploadXJDataFailed(String errorMsg) {
-        onLoadFailed(ErrorMsgHelper.msgParse(errorMsg));
-    }
 
     @Override
     public void getDeviceDCSParamsSuccess(BAP5CommonListEntity entity) {

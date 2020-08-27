@@ -3,6 +3,7 @@ package com.supcon.mes.module_xj.ui;
 import android.annotation.SuppressLint;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.text.TextUtils;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
@@ -12,12 +13,14 @@ import android.widget.TextView;
 
 import com.app.annotation.BindByTag;
 import com.app.annotation.Controller;
+import com.app.annotation.Presenter;
 import com.app.annotation.apt.Router;
 import com.jakewharton.rxbinding2.view.RxView;
 import com.supcon.common.view.base.activity.BaseRefreshRecyclerActivity;
 import com.supcon.common.view.base.adapter.IListAdapter;
 import com.supcon.common.view.listener.OnItemChildViewClickListener;
 import com.supcon.common.view.util.DisplayUtil;
+import com.supcon.common.view.util.LogUtil;
 import com.supcon.common.view.util.StatusBarUtils;
 import com.supcon.common.view.util.ToastUtils;
 import com.supcon.mes.mbap.utils.GsonUtil;
@@ -28,18 +31,25 @@ import com.supcon.mes.middleware.constant.Constant;
 import com.supcon.mes.middleware.model.bean.ObjectEntity;
 import com.supcon.mes.middleware.model.bean.xj.XJAreaEntity;
 import com.supcon.mes.middleware.model.bean.xj.XJWorkEntity;
+import com.supcon.mes.middleware.util.ErrorMsgHelper;
 import com.supcon.mes.middleware.util.SystemCodeManager;
 import com.supcon.mes.module_xj.R;
 import com.supcon.mes.module_xj.controller.XJCameraController;
+import com.supcon.mes.module_xj.model.api.XJTaskSubmitAPI;
+import com.supcon.mes.module_xj.model.bean.XJTaskEntity;
+import com.supcon.mes.module_xj.model.contract.XJTaskSubmitContract;
 import com.supcon.mes.module_xj.model.event.XJAreaRefreshEvent;
 import com.supcon.mes.module_xj.model.event.XJWorkRefreshEvent;
+import com.supcon.mes.module_xj.presenter.XJTaskSubmitPresenter;
 import com.supcon.mes.module_xj.ui.adapter.XJWorkViewAdapter;
 import com.supcon.mes.testo_805i.controller.TestoController;
 
 import org.greenrobot.eventbus.EventBus;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 import io.reactivex.Flowable;
@@ -55,7 +65,8 @@ import io.reactivex.schedulers.Schedulers;
  */
 @Router(Constant.Router.XJ_WORK_ITEM_VIEW)
 @Controller(value = {TestoController.class, XJCameraController.class})
-public class XJWorkViewActivity extends BaseRefreshRecyclerActivity<XJWorkEntity> {
+@Presenter({XJTaskSubmitPresenter.class})
+public class XJWorkViewActivity extends BaseRefreshRecyclerActivity<XJWorkEntity> implements XJTaskSubmitContract.View {
 
     @BindByTag("titleText")
     TextView titleText;
@@ -80,7 +91,7 @@ public class XJWorkViewActivity extends BaseRefreshRecyclerActivity<XJWorkEntity
     List<String> deviceNames = new ArrayList<>();
     private List<XJWorkEntity> mWorkEntities = new ArrayList<>();
     private boolean isFromTask, isXJFinished;
-
+    private XJTaskEntity mXJTaskEntity;
     @Override
     protected int getLayoutID() {
         return R.layout.ac_xj_work_view;
@@ -89,11 +100,16 @@ public class XJWorkViewActivity extends BaseRefreshRecyclerActivity<XJWorkEntity
     @Override
     protected void onInit() {
         super.onInit();
+
         String xjAreaEntityStr = getIntent().getStringExtra(Constant.IntentKey.XJ_AREA_ENTITY_STR);
         isFromTask = getIntent().getBooleanExtra(Constant.IntentKey.XJ_IS_FROM_TASK, false);
         isXJFinished = getIntent().getBooleanExtra(Constant.IntentKey.XJ_IS_FINISHED, false);
         if(xjAreaEntityStr!=null){
             mXJAreaEntity = GsonUtil.gsonToBean(xjAreaEntityStr, XJAreaEntity.class);
+        }
+        String taskStr = getIntent().getStringExtra(Constant.IntentKey.XJ_TASK_ENTITY_STR);
+        if(!TextUtils.isEmpty(taskStr)){
+            mXJTaskEntity = GsonUtil.gsonToBean(taskStr, XJTaskEntity.class);
         }
 
         refreshListController.setPullDownRefreshEnabled(false);
@@ -136,6 +152,8 @@ public class XJWorkViewActivity extends BaseRefreshRecyclerActivity<XJWorkEntity
 //        else {
             titleText.setText(getString(R.string.xj_work_finish));
 //        }
+        rightBtn.setVisibility(View.VISIBLE);
+        rightBtn.setImageResource(R.drawable.ic_xj_work_upload);
         contentView.setLayoutManager(new LinearLayoutManager(context));
         contentView.addItemDecoration(new SpaceItemDecoration(DisplayUtil.dip2px(5, context)));
         contentView.setAdapter(mXJWorkItemAdapter);
@@ -159,7 +177,14 @@ public class XJWorkViewActivity extends BaseRefreshRecyclerActivity<XJWorkEntity
                         onBackPressed();
                     }
                 });
-
+        RxView.clicks(rightBtn)
+                .throttleFirst(200, TimeUnit.MILLISECONDS)
+                .subscribe(new Consumer<Object>() {
+                    @Override
+                    public void accept(Object o) throws Exception {
+                        showFinishDialog();
+                    }
+                });
 
         mXJWorkItemAdapter.setOnItemChildViewClickListener(new OnItemChildViewClickListener() {
             @Override
@@ -222,6 +247,26 @@ public class XJWorkViewActivity extends BaseRefreshRecyclerActivity<XJWorkEntity
             }
         });
 
+    }
+    private void showFinishDialog() {
+        new CustomDialog(context)
+                .twoButtonAlertDialog("确定上传该区域任务？")
+                .bindClickListener(R.id.grayBtn, v -> {
+                }, true)
+                .bindClickListener(R.id.redBtn, v -> {
+                    //将本区域数据变成已完成
+                    for(XJWorkEntity xjWorkEntity : mXJAreaEntity.works){
+                        xjWorkEntity.isFinished=true;
+                    }
+                    //拼接单个区域上传数据
+                    mXJTaskEntity.areas.clear();
+                    mXJTaskEntity.areas.add(mXJAreaEntity);
+                    List<XJTaskEntity> xjTaskEntityList=new ArrayList<>();
+                    xjTaskEntityList.add(mXJTaskEntity);
+                    presenterRouter.create(XJTaskSubmitAPI.class).uploadFile(xjTaskEntityList, true);
+                    onLoading(getString(R.string.xj_task_uploading));
+                }, true)
+                .show();
     }
 
     private void redoWork(XJWorkEntity xjWorkEntity, int position) {
@@ -411,4 +456,38 @@ public class XJWorkViewActivity extends BaseRefreshRecyclerActivity<XJWorkEntity
                 });
 
     }
+
+
+    @Override
+    public void uploadFileSuccess(String path) {
+
+        LogUtil.d(""+path);
+
+        if(TextUtils.isEmpty(path)){
+            onLoadFailed("巡检数据上传失败！");
+            return;
+        }
+
+        Map<String, Object> queryMap = new HashMap<>();
+        queryMap.put("filePath", path.replace("\\", "/"));
+        queryMap.put("uploadTaskResultDTOs",new ArrayList<>());
+        presenterRouter.create(XJTaskSubmitAPI.class).uploadXJData(false, queryMap);
+    }
+
+
+    @Override
+    public void uploadFileFailed(String errorMsg) {
+        onLoadFailed(ErrorMsgHelper.msgParse(errorMsg));
+    }
+
+    @Override
+    public void uploadXJDataSuccess() {
+        onLoadSuccess("上传成功");
+    }
+
+    @Override
+    public void uploadXJDataFailed(String errorMsg) {
+        onLoadFailed(ErrorMsgHelper.msgParse(errorMsg));
+    }
+
 }
