@@ -19,7 +19,7 @@
             android:id="@+id/xjRouteName"
             android:tag="xjRouteName"
             android:lines="1"
-            android:text="化工巡检线路1"
+            android:text="@string/xj_patrol_item_router_name"
             android:textColor="#333333"
             android:textSize="14sp"
             android:drawableLeft="@drawable/ic_xj_task_route"

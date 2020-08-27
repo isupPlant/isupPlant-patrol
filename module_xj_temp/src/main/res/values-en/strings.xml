@@ -4,4 +4,14 @@
 	<string name="xj_temp_task">TempTask</string>
 	<string name="xj_temp_task_exit_warning">A task is modified, quit it anyway？</string>
 	<string name="xj_temp_task_exit_warning2">Are you sure to leave？</string>
+	<string name="xj_patrol_selete_start_time">Please select the start time of the inspection</string>
+	<string name="xj_patrol_selete_end_time">Please select the end time of the inspection</string>
+	<string name="xj_patrol_new_xj">Add temporary inspection</string>
+	<string name="xj_patrol_selete_router">Please select the inspection route</string>
+	<string name="xj_patrol_selete_start_end_time">Please select the start and end time of the inspection</string>
+	<string name="xj_patrol_xj_area">Please select inspection area</string>
+	<string name="xj_patrol_stay">Stay</string>
+	<string name="xj_patrol_go">go away</string>
+	<string name="xj_patrol_selete_time">Select start time-select end time</string>
+	<string name="xj_patrol_xj_qy">Inspection area</string>
 </resources>

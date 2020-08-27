@@ -165,7 +165,7 @@ public class XJTempTaskActivity extends BaseControllerActivity {
     protected void initView() {
         super.initView();
         StatusBarUtils.setWindowStatusBarColor(this, R.color.themeColor);
-        titleText.setText("新增临时巡检");
+        titleText.setText(context.getResources().getString(R.string.xj_patrol_new_xj));
         rightBtn.setImageResource(R.drawable.sl_top_submit);
         rightBtn.setVisibility(View.VISIBLE);
 
@@ -197,12 +197,12 @@ public class XJTempTaskActivity extends BaseControllerActivity {
                     @Override
                     public void accept(Object o) throws Exception {
                         if (mXJTaskEntity.workRoute == null) {
-                            ToastUtils.show(context, "请选择巡检线路");
+                            ToastUtils.show(context, context.getResources().getString(R.string.xj_patrol_selete_router));
                             return;
                         }
 
                         if (mXJTaskEntity.startTime == 0 || mXJTaskEntity.endTime == 0) {
-                            ToastUtils.show(context, "请选择巡检开始和结束时间");
+                            ToastUtils.show(context, context.getResources().getString(R.string.xj_patrol_selete_start_end_time));
                             return;
                         }
                         boolean isHaveAreas = false;
@@ -212,7 +212,7 @@ public class XJTempTaskActivity extends BaseControllerActivity {
                             }
                         }
                         if (mXJTaskEntity.areas == null || mXJTaskEntity.areas.size() == 0 || !isHaveAreas) {
-                            ToastUtils.show(context, "请选择巡检区域");
+                            ToastUtils.show(context, context.getResources().getString(R.string.xj_patrol_xj_area));
                             return;
                         }
 
@@ -313,8 +313,8 @@ public class XJTempTaskActivity extends BaseControllerActivity {
 
         new CustomDialog(context)
                 .twoButtonAlertDialog(mXJTaskEntity.areas != null ? getString(R.string.xj_temp_task_exit_warning) : getString(R.string.xj_temp_task_exit_warning2))
-                .bindView(R.id.grayBtn, "留下")
-                .bindView(R.id.redBtn, "离开")
+                .bindView(R.id.grayBtn, context.getResources().getString(R.string.xj_patrol_stay))
+                .bindView(R.id.redBtn, context.getResources().getString(R.string.xj_patrol_go))
                 .bindClickListener(R.id.grayBtn, v -> {
                 }, true)
                 .bindClickListener(R.id.redBtn, v -> super.onBackPressed()

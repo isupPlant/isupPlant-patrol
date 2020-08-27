@@ -250,7 +250,7 @@ public class XJWorkViewActivity extends BaseRefreshRecyclerActivity<XJWorkEntity
     }
     private void showFinishDialog() {
         new CustomDialog(context)
-                .twoButtonAlertDialog("确定上传该区域任务？")
+                .twoButtonAlertDialog(context.getResources().getString(R.string.xj_patrol_upload_task))
                 .bindClickListener(R.id.grayBtn, v -> {
                 }, true)
                 .bindClickListener(R.id.redBtn, v -> {
@@ -464,7 +464,7 @@ public class XJWorkViewActivity extends BaseRefreshRecyclerActivity<XJWorkEntity
         LogUtil.d(""+path);
 
         if(TextUtils.isEmpty(path)){
-            onLoadFailed("巡检数据上传失败！");
+            onLoadFailed(context.getResources().getString(R.string.xj_patrol_upload));
             return;
         }
 
@@ -482,7 +482,7 @@ public class XJWorkViewActivity extends BaseRefreshRecyclerActivity<XJWorkEntity
 
     @Override
     public void uploadXJDataSuccess() {
-        onLoadSuccess("上传成功");
+        onLoadSuccess(context.getResources().getString(R.string.xj_patrol_upload_succeed));
     }
 
     @Override

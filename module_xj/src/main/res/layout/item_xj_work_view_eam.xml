@@ -23,7 +23,7 @@
         android:layout_height="30dp"
         android:textColor="@color/xjTitleColor"
         android:textSize="@dimen/fontSize_16sp"
-        android:text="设备11"
+        android:text="@string/xj_patrol_device_name"
         android:gravity="center_vertical"
         android:id="@+id/itemXJWorkViewEamName"
         android:layout_toRightOf="@+id/itemXJWorkViewEamNum"

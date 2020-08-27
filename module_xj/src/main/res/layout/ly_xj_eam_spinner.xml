@@ -15,7 +15,7 @@
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
         android:textColor="@color/xjTextColor"
-        android:text="设备"
+        android:text="@string/xj_patrol_deivce_key"
         android:textSize="16sp"
         android:layout_marginLeft="@dimen/dp_5"
         android:gravity="center"

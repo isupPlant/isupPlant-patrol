@@ -109,7 +109,7 @@ public class XJWorkViewAdapter extends BaseListDataRecyclerViewAdapter<XJWorkEnt
                 public void onClick(View v) {
                     XJWorkEntity xjWorkItemEntity = getItem(getAdapterPosition());
                     if (xjWorkItemEntity.eamId == null || xjWorkItemEntity.eamId.id == null) {
-                        ToastUtils.show(context, "无设备详情可查看！");
+                        ToastUtils.show(context, context.getResources().getString(R.string.xj_patrol_no_device_look));
                         return;
                     }
 //                    Bundle bundle = new Bundle();
@@ -231,7 +231,7 @@ public class XJWorkViewAdapter extends BaseListDataRecyclerViewAdapter<XJWorkEnt
             itemXJWorkViewResult.setText(data.concluse);
 
             if(data.isRealPass && TextUtils.isEmpty(data.concluse)){
-                itemXJWorkViewResult.setText("跳检");
+                itemXJWorkViewResult.setText(context.getResources().getString(R.string.xj_patrol_jump_check));
                 itemXJWorkViewResult.setTextColor(context.getResources().getColor(R.color.customRed));
             }
 

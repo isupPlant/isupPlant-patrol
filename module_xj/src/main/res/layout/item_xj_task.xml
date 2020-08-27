@@ -19,7 +19,7 @@
         android:layout_height="25dp"
         android:layout_marginLeft="5dp"
         android:layout_marginRight="@dimen/dp_5"
-        android:text="待检"
+        android:text="@string/xj_patrol_item_status"
         android:id="@+id/itemTaskStatus"
         android:layout_gravity="center_vertical"
         android:gravity="center"

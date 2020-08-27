@@ -140,7 +140,7 @@
             android:layout_height="wrap_content"
             android:layout_below="@+id/itemXJWorkViewPics"
             app:max_lines="99"
-            app:text="备注"
+            app:text="@string/xj_patrol_remark"
             app:text_size="14"
             app:text_height="0dp"
             app:content_color="@color/textColorlightblack"

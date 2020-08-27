@@ -93,7 +93,7 @@ public class XJRouteListActivity extends BaseRefreshRecyclerActivity implements 
         StatusBarUtils.setWindowStatusBarColor(this, R.color.themeColor);
         contentView.setLayoutManager(new LinearLayoutManager(context));
         contentView.addItemDecoration(new SpaceItemDecoration(1));
-        titleText.setText("巡检路线选择");
+        titleText.setText(context.getResources().getString(R.string.xj_patrol_route_selete));
     }
 
     @SuppressLint("CheckResult")

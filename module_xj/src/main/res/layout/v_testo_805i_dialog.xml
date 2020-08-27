@@ -15,7 +15,7 @@
         android:padding="@dimen/dp_10"
         android:id="@+id/temperatureVal"
         android:tag="temperatureVal"
-        app:key="温度："
+        app:key="@string/xj_patrol_temp"
         app:key_width="80dp"
         app:content_hint="0.0℃"
         />
@@ -29,7 +29,7 @@
             android:layout_height="match_parent"
             android:layout_weight="1"
             android:background="@color/red"
-            android:text="开启服务"
+            android:text="@string/xj_patrol_start_service"
             android:textColor="@color/white"
             android:id="@+id/startBtn"
             android:tag="startBtn"/>
@@ -38,7 +38,7 @@
             android:layout_height="match_parent"
             android:layout_weight="1"
             android:background="@color/blue"
-            android:text="确定"
+            android:text="@string/xj_patrol_sure"
             android:textColor="@color/white"
             android:id="@+id/okBtn"
             android:tag="okBtn"/>

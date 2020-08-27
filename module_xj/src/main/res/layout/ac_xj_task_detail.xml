@@ -27,7 +27,7 @@
                 android:id="@+id/xjTaskDetailRouteName"
                 android:tag="xjTaskDetailRouteName"
                 android:lines="1"
-                android:text="化工巡检线路1"
+                android:text="@string/xj_patrol_router_name"
                 android:textColor="#333333"
                 android:textSize="14sp"
                 android:drawableLeft="@drawable/ic_xj_task_route"
@@ -44,7 +44,7 @@
                 android:background="@drawable/sh_xj_red_stroke"
                 android:layout_toRightOf="@+id/xjTaskDetailRouteName"
                 android:layout_marginLeft="@dimen/dp_10"
-                android:text="待检"
+                android:text="@string/xj_patrol_status"
                 android:gravity="center"
                 />
           <RelativeLayout
@@ -70,7 +70,7 @@
                 android:layout_width="70dp"
                 android:layout_height="26dp"
                 android:id="@+id/xjTaskDetailTaskBtn"
-                android:text="开始"
+                android:text="@string/xj_patrol_start"
                 android:layout_alignParentRight="true"
                 android:background="@drawable/sl_xj_task_blue"
                 android:textColor="@color/white"

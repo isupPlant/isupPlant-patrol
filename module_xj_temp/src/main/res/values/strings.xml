@@ -4,4 +4,14 @@
     <string name="xj_temp_task">临时巡检</string>
     <string name="xj_temp_task_exit_warning">已选择巡检内容，是否取消任务？</string>
     <string name="xj_temp_task_exit_warning2">确定离开？</string>
+    <string name="xj_patrol_selete_start_time">请选择巡检开始时间</string>
+    <string name="xj_patrol_selete_end_time">请选择巡检结束时间</string>
+    <string name="xj_patrol_new_xj">新增临时巡检</string>
+    <string name="xj_patrol_selete_router">请选择巡检线路</string>
+    <string name="xj_patrol_selete_start_end_time">请选择巡检开始和结束时间</string>
+    <string name="xj_patrol_xj_area">请选择巡检区域</string>
+    <string name="xj_patrol_stay">留下</string>
+    <string name="xj_patrol_go">离开</string>
+    <string name="xj_patrol_selete_time">选择开始时间——选择结束时间</string>
+    <string name="xj_patrol_xj_qy">巡检区域</string>
 </resources>

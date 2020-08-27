@@ -215,9 +215,9 @@ public class XJTaskDetailActivity extends BaseControllerActivity implements XJTa
                                 return;
                             }
                             em55UHFRFIDHelper.inventoryStart();
-                            ToastUtils.show(context, "超高频初始化成功！");
+                            ToastUtils.show(context, context.getResources().getString(R.string.xj_patrol_uhf_succeed));
                         } else {
-                            ToastUtils.show(context, "超高频初始化失败！");
+                            ToastUtils.show(context, context.getResources().getString(R.string.xj_patrol_uhf_fail));
                         }
                     }
                 });
@@ -434,8 +434,8 @@ public class XJTaskDetailActivity extends BaseControllerActivity implements XJTa
     public void showDialog() {
         new CustomDialog(context)
                 .twoButtonAlertDialog(getString(R.string.xj_area_sign_warning2))
-                .bindView(com.supcon.mes.middleware.R.id.redBtn, "确定")
-                .bindView(com.supcon.mes.middleware.R.id.grayBtn, "取消")
+                .bindView(com.supcon.mes.middleware.R.id.redBtn, context.getResources().getString(R.string.xj_patrol_sure))
+                .bindView(com.supcon.mes.middleware.R.id.grayBtn, context.getResources().getString(R.string.xj_patrol_cancel))
                 .bindClickListener(com.supcon.mes.middleware.R.id.redBtn, new View.OnClickListener() {
                     @Override
                     public void onClick(View v1) {
@@ -502,7 +502,7 @@ public class XJTaskDetailActivity extends BaseControllerActivity implements XJTa
             goArea(xjAreaEntity);
         } else {
             if (signTypeInfoMap.size() <= 0) {
-                ToastUtils.show(context,"签到原因为空，请退出页面重新加载");
+                ToastUtils.show(context,context.getResources().getString(R.string.xj_patrol_reason));
                 return;
             }
 

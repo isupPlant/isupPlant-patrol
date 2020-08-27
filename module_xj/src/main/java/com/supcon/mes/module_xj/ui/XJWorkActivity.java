@@ -769,7 +769,7 @@ public class XJWorkActivity extends BaseRefreshRecyclerActivity<XJWorkEntity> im
                     @Override
                     public void onClick(View v) {
                         CustomTextView temperatureVal = mTesto805iDialog.getDialog().findViewById(R.id.temperatureVal);
-                        temperatureVal.setContent("正在初始化，请确保设备打开（黄灯闪烁）;绿灯即可开启测温");
+                        temperatureVal.setContent(context.getResources().getString(R.string.xj_patrol_open_device_hint));
                         getController(TestoController.class).startService();
                     }
                 }, false)
@@ -787,7 +787,7 @@ public class XJWorkActivity extends BaseRefreshRecyclerActivity<XJWorkEntity> im
         tempTv = ((TextView) mTesto805iDialog.getDialog().findViewById(R.id.viberStatus));
         viberStatusIv = ((ImageView) mTesto805iDialog.getDialog().findViewById(R.id.viberStatusIv));
         ((ImageView) mTesto805iDialog.getDialog().findViewById(R.id.viberStatusIv)).setImageResource(R.drawable.ic_device_connect2);
-        tempTv.setText("服务已启动");
+        tempTv.setText(context.getResources().getString(R.string.xjj_patrol_service_start));
 
     }
     private void showAICDialog(int position, XJWorkEntity xjWorkItemEntity, boolean isTempTest) {
@@ -874,7 +874,7 @@ public class XJWorkActivity extends BaseRefreshRecyclerActivity<XJWorkEntity> im
                                 }else {
                                     sb.append("[").append(xjWorkItemEntity.eamId.name).append("]");
                                 }
-                                sb.append("巡检内容“" + xjWorkItemEntity.content + "”需要填写结果");
+                                sb.append(context.getResources().getString(R.string.xj_patrol_xj_content) + xjWorkItemEntity.content + context.getResources().getString(R.string.xj_patrol_input_result));
 //                                ToastUtils.show(context,  sb.toString());
                                 msg = sb.toString();
                             }
@@ -885,7 +885,7 @@ public class XJWorkActivity extends BaseRefreshRecyclerActivity<XJWorkEntity> im
                                 }else {
                                     sb.append("[").append(xjWorkItemEntity.eamId.name).append("]");
                                 }
-                                sb.append("巡检内容“" + xjWorkItemEntity.content + "”需要拍照");
+                                sb.append(context.getResources().getString(R.string.xj_patrol_xj_content) + xjWorkItemEntity.content + context.getResources().getString(R.string.xj_patrol_take_photo));
 //                                ToastUtils.show(context,  sb.toString());
                                 msg = sb.toString();
                             }
@@ -929,7 +929,7 @@ public class XJWorkActivity extends BaseRefreshRecyclerActivity<XJWorkEntity> im
 //                                    mXJAreaEntity.isFinished = true;
 //                                    finish();
 
-                                    onLoadSuccessAndExit("操作完成", new OnLoaderFinishListener() {
+                                    onLoadSuccessAndExit(context.getResources().getString(R.string.xj_patrol_over), new OnLoaderFinishListener() {
                                         @Override
                                         public void onLoaderFinished() {
                                             finish();
@@ -946,7 +946,7 @@ public class XJWorkActivity extends BaseRefreshRecyclerActivity<XJWorkEntity> im
 
 
                             } catch (Exception e) {
-                                onLoadFailed("完成操作失败！" + e.getMessage());
+                                onLoadFailed(context.getResources().getString(R.string.xj_patrol_operater_fail) + e.getMessage());
                                 e.printStackTrace();
                             } finally {
 
@@ -1030,7 +1030,7 @@ public class XJWorkActivity extends BaseRefreshRecyclerActivity<XJWorkEntity> im
                     public void run() throws Exception {
 
                         if(workItemEntities.size()==0){
-                            ToastUtils.show(context, "没有可以跳过的巡检项！");
+                            ToastUtils.show(context, context.getResources().getString(R.string.xj_patrol_jump_xj));
                         }
                         else{
                             showAllSkipReasonPicker(workItemEntities);
@@ -1133,7 +1133,7 @@ public class XJWorkActivity extends BaseRefreshRecyclerActivity<XJWorkEntity> im
                 where(XJInputTypeEntityDao.Properties.Id.eq(xjWorkItemEntity.inputStandardId.id)).unique();
 
         if (xjInputTypeEntity.candidateValue == null || xjInputTypeEntity.candidateValue.isEmpty()){
-            SnackbarHelper.showError(rootView,"无结果候选值");
+            SnackbarHelper.showError(rootView,context.getResources().getString(R.string.xj_patrol_no_result));
             return;
         }
 
@@ -1260,9 +1260,9 @@ public class XJWorkActivity extends BaseRefreshRecyclerActivity<XJWorkEntity> im
 
         String tag = event.tag;
         if ("设备就绪，可按下测温".equals(tag)) {
-            tempTv.setText("设备就绪，可按下测温按钮");
+            tempTv.setText(context.getResources().getString(R.string.xj_patrol_device_operate));
         } else if ("正在测温".equals(tag)) {
-            if (!"正在测温".equals(tempTv.getText().toString())) tempTv.setText(tag);
+            if (!context.getResources().getString(R.string.xj_patrol_temperature).equals(tempTv.getText().toString())) tempTv.setText(tag);
         }
         if (TextUtils.isEmpty(event.tem))
             return;

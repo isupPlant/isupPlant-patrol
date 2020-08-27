@@ -22,7 +22,7 @@
         android:layout_height="30dp"
         android:textColor="@color/xjTitleColor"
         android:textSize="@dimen/fontSize_14sp"
-        android:text="区域巡检"
+        android:text="@string/xj_patrol_xj_local"
         android:gravity="center_vertical"
         android:id="@+id/itemXJWorkEamName"
         android:layout_toRightOf="@+id/itemXJWorkEamNum"

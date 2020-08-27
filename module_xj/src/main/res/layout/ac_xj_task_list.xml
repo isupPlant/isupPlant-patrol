@@ -24,7 +24,7 @@
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:text="获取任务"
+                android:text="@string/xj_patrol_get_task"
                 android:gravity="center"
                 android:textColor="@color/sl_xj_blue_text"
                 android:textSize="13sp"
@@ -58,7 +58,7 @@
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:text="上传任务"
+                android:text="@string/xj_task_upload"
                 android:gravity="center"
                 android:textColor="@color/sl_xj_blue_text"
                 android:textSize="13sp"

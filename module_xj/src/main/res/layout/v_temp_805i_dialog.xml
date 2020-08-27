@@ -28,7 +28,7 @@
                 android:layout_height="match_parent"
                 android:textSize="15sp"
                 android:textColor="#222222"
-                android:text="测温仪状态:"
+                android:text="@string/xj_patrol_cw_status"
                 android:gravity="center_vertical"
                 />
             <TextView
@@ -61,7 +61,7 @@
         android:padding="@dimen/dp_10"
         android:id="@+id/temperatureVal"
         android:tag="temperatureVal"
-        app:key="温度："
+        app:key="@string/xj_patrol_temp"
         app:key_width="@dimen/dp_100"
         app:content_size="13"
         app:max_lines="3"
@@ -78,7 +78,7 @@
             android:layout_width="@dimen/dp_80"
             android:layout_height="@dimen/dp_30"
             android:background="@null"
-            android:text="开启服务"
+            android:text="@string/xj_patrol_start_service"
             android:textColor="#2799c9"
             android:id="@+id/startBtn"
             android:tag="startBtn"/>
@@ -86,7 +86,7 @@
             android:layout_width="@dimen/dp_80"
             android:layout_height="@dimen/dp_30"
             android:background="@null"
-            android:text="关闭"
+            android:text="@string/xj_patrol_close"
             android:textColor="#2799c9"
             android:id="@+id/okBtn"
             android:tag="okBtn"/>

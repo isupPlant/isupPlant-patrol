@@ -131,12 +131,12 @@ public class XJTempTimeController extends BaseViewController {
                     .bindClickListener(R.id.customTimeViewOkBtn, v -> {
 
                         if (TextUtils.isEmpty(customDateStart)) {
-                            ToastUtils.show(context,"请选择巡检开始时间");
+                            ToastUtils.show(context,context.getResources().getString(com.supcon.mes.module_xj_temp.R.string.xj_patrol_selete_start_time));
                             return;
                         }
 
                         if (TextUtils.isEmpty(customDateEnd)) {
-                            ToastUtils.show(context, "请选择巡检结束时间");
+                            ToastUtils.show(context, context.getResources().getString(com.supcon.mes.module_xj_temp.R.string.xj_patrol_selete_end_time));
                             return;
                         }
 

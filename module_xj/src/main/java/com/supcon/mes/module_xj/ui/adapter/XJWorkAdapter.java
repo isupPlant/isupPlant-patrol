@@ -183,7 +183,7 @@ public class XJWorkAdapter extends BaseListDataRecyclerViewAdapter<XJWorkEntity>
                 public void onClick(View v) {
                     XJWorkEntity xjWorkItemEntity = getItem(getAdapterPosition());
                     if (xjWorkItemEntity.eamId == null || xjWorkItemEntity.eamId.id == null) {
-                        ToastUtils.show(context, "无设备详情可查看！");
+                        ToastUtils.show(context, context.getResources().getString(R.string.xj_patrol_no_device_look));
                         return;
                     }
 //                    Bundle bundle = new Bundle();
@@ -285,7 +285,7 @@ public class XJWorkAdapter extends BaseListDataRecyclerViewAdapter<XJWorkEntity>
             mXJCameraController.init(Constant.IMAGE_SAVE_XJPATH, "xjRecord");
 
 //            itemXJWorkPics.setSheetEntity(new String[]{"拍摄照片", "拍摄短视频"});
-            itemXJWorkPics.setTile("请选择获取照片的方式");
+            itemXJWorkPics.setTile(context.getResources().getString(R.string.xj_patrol_give_photo_method));
 
         }
 
@@ -354,7 +354,7 @@ public class XJWorkAdapter extends BaseListDataRecyclerViewAdapter<XJWorkEntity>
                                         if ("-".equals(charSequence.toString())) {
                                             return;
                                         }
-                                        ToastUtils.show(context, "请输入数字类型");
+                                        ToastUtils.show(context, context.getResources().getString(R.string.xj_patrol_number_type));
                                     } else {
 
 //                                            if (charSequence.toString().indexOf(".") > 0) {
@@ -419,7 +419,7 @@ public class XJWorkAdapter extends BaseListDataRecyclerViewAdapter<XJWorkEntity>
 
                     if (motionEvent.getAction() == MotionEvent.ACTION_DOWN) {
                         if (!sb2ThermometerHelper.startOrEnd(true)) {
-                            ToastUtils.show(context, "设备启动测温异常，请检查设备配置测温模块");
+                            ToastUtils.show(context, context.getResources().getString(R.string.xj_patrol_device_hint));
                         } else {
                             //TODO  createSuccess
                         }
@@ -691,19 +691,19 @@ public class XJWorkAdapter extends BaseListDataRecyclerViewAdapter<XJWorkEntity>
 
                 if (data.isThermometric) {  //要求测温
                     itemXJWorkResultInput.setEnabled(false);
-                    itemXJWorkResultInput.setHint("测温值");
+                    itemXJWorkResultInput.setHint(context.getResources().getString(R.string.xj_patrol_temp_value));
 
                     itemXJWorkBtnLayout.setVisibility(View.VISIBLE);
                     itemXJWorkTempBtn.setVisibility(View.VISIBLE);
 
                 } else if (data.isSeismic) {
                     itemXJWorkResultInput.setEnabled(false);
-                    itemXJWorkResultInput.setHint("测振值");
+                    itemXJWorkResultInput.setHint(context.getResources().getString(R.string.xj_patrol_shock_value));
                     itemXJWorkBtnLayout.setVisibility(View.VISIBLE);
                     itemXJWorkVibBtn.setVisibility(View.VISIBLE);
                 } else {
                     itemXJWorkResultInput.setEnabled(true);
-                    itemXJWorkResultInput.setHint("请输入检查结果");
+                    itemXJWorkResultInput.setHint(context.getResources().getString(R.string.xj_patrol_check));
                 }
 
 
@@ -729,10 +729,10 @@ public class XJWorkAdapter extends BaseListDataRecyclerViewAdapter<XJWorkEntity>
                         value = "";
                     }
 
-                    itemXJWorkResultInput.setHint("请输入数值");
+                    itemXJWorkResultInput.setHint(context.getResources().getString(R.string.xj_patrol_number));
                 } else {
                     if ("PATROL_valueType/char".equals(xjInputTypeEntity.valType.id)){
-                        itemXJWorkResultInput.setHint("请输入文本");
+                        itemXJWorkResultInput.setHint(context.getResources().getString(R.string.xj_patrol_input_text));
                     }
                     if (!TextUtils.isEmpty(data.defaultVal) && TextUtils.isEmpty(data.concluse)) {
                         value = data.defaultVal;
@@ -937,13 +937,13 @@ public class XJWorkAdapter extends BaseListDataRecyclerViewAdapter<XJWorkEntity>
                 if ("-".equals(charSequence)) {
                     return false;
                 }
-                ToastUtils.show(context, "请输入数字类型");
+                ToastUtils.show(context, context.getResources().getString(R.string.xj_patrol_number_type));
             } else {
 
                 if (charSequence.indexOf(".") > 0) {
                     if (xjInputTypeEntity.decimalPlace != null) {
                         if (charSequence.substring(charSequence.indexOf(".") + 1).length() > Integer.parseInt(xjInputTypeEntity.decimalPlace)) {
-                            ToastUtils.show(context, "结果将四舍五入保留" + xjInputTypeEntity.decimalPlace + "位");
+                            ToastUtils.show(context, context.getResources().getString(R.string.xj_patrol_result) + xjInputTypeEntity.decimalPlace + context.getResources().getString(R.string.xj_patrol_local));
                         }
                     }
                 }
@@ -1086,7 +1086,7 @@ public class XJWorkAdapter extends BaseListDataRecyclerViewAdapter<XJWorkEntity>
             Pattern pattern = Pattern.compile(regExp);
             Matcher matcher = pattern.matcher(xjWorkItemEntity.normalRange);
             if (!Str2NumUtil.isDoubleOrFloat(matcher.replaceAll(""))) {
-                ToastUtils.show(context, "正常范围转化数字异常！");
+                ToastUtils.show(context, context.getResources().getString(R.string.xj_patrol_range));
                 return false;
             }
             double num = Double.parseDouble(matcher.replaceAll(""));

@@ -438,7 +438,7 @@ public class XJTaskUploadActivity extends BaseRefreshRecyclerActivity<XJTaskGrou
         LogUtil.d(""+path);
 
         if(TextUtils.isEmpty(path)){
-            onLoadFailed("巡检数据上传失败！");
+            onLoadFailed(context.getResources().getString(R.string.xj_patrol_upload));
             return;
         }
 
