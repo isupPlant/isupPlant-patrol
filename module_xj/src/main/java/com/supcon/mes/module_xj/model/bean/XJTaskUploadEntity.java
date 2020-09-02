@@ -113,6 +113,11 @@ import java.util.Map;
       potrolTask.taskState = new StringIdEntity(taskStateId);
       potrolTask.completeStaff = new ObjectEntity(SupPlantApplication.getAccountInfo().staffId);
        potrolTask.isTemp = xjTaskEntity.isTemp;
+       if (xjTaskEntity.workRoute!=null){
+           potrolTask.workRoute=xjTaskEntity.workRoute;
+       }
+       potrolTask.startTime= xjTaskEntity.startTime;
+       potrolTask.endTime= xjTaskEntity.endTime;
        if (!potrolTask.isTemp){
            potrolTask.tableInfoId = xjTaskEntity.tableInfoId;
            potrolTask.id = xjTaskEntity.id;
@@ -160,6 +165,9 @@ import java.util.Map;
     List<XJAreaUploadEntity> workAreas;
     List<XJWorkUploadEntity> workItems;
 
+
+
+
     class PotrolTask extends BaseEntity{
 
        public Long id;
@@ -167,6 +175,10 @@ import java.util.Map;
        public long tableInfoId;
        public ObjectEntity completeStaff;
        public boolean isTemp;
+       public XJRouteEntity workRoute;
+       public Long startTime;
+       public Long endTime;
+
     }
 
 

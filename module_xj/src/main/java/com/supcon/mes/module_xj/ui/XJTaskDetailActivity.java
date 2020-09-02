@@ -421,8 +421,9 @@ public class XJTaskDetailActivity extends BaseControllerActivity implements XJTa
                         //开始巡检
                         xjTaskDetailTaskBtn.setBackgroundResource(R.drawable.sl_xj_task_red);
                         xjTaskDetailTaskBtn.setText(getString(R.string.xj_task_end));
-
-                       presenterRouter.create(XJUpdateStatusAPI.class).updateXJTaskStatus(mXJTaskEntity.id,"PATROL_taskState/running");
+                        if(mXJTaskEntity.id!=null){//临时巡检不需要上传任务状态
+                            presenterRouter.create(XJUpdateStatusAPI.class).updateXJTaskStatus(mXJTaskEntity.id,"PATROL_taskState/running");
+                        }
                     } else {
                         showFinishDialog();
                     }
