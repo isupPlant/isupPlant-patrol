@@ -4,7 +4,6 @@ import android.annotation.SuppressLint;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.telephony.emergency.EmergencyNumber;
 import android.text.TextUtils;
 import android.view.View;
 import android.widget.TextView;
@@ -16,8 +15,6 @@ import com.app.annotation.apt.Router;
 import com.jakewharton.rxbinding2.view.RxView;
 import com.supcon.common.view.base.activity.BaseRefreshRecyclerActivity;
 import com.supcon.common.view.base.adapter.IListAdapter;
-import com.supcon.common.view.listener.OnItemChildViewClickListener;
-import com.supcon.common.view.listener.OnRefreshListener;
 import com.supcon.common.view.util.DisplayUtil;
 import com.supcon.common.view.util.LogUtil;
 import com.supcon.common.view.util.SharedPreferencesUtils;
@@ -37,11 +34,11 @@ import com.supcon.mes.middleware.model.bean.DeploymentEntity;
 import com.supcon.mes.middleware.model.contract.DeploymentContract;
 import com.supcon.mes.middleware.model.event.RefreshEvent;
 import com.supcon.mes.middleware.model.inter.SystemCode;
-
 import com.supcon.mes.middleware.model.listener.OnAPIResultListener;
 import com.supcon.mes.middleware.model.listener.OnSuccessListener;
 import com.supcon.mes.middleware.presenter.DeploymentPresenter;
 import com.supcon.mes.middleware.util.SBTUtil;
+import com.supcon.mes.middleware.util.StartLocationUtils;
 import com.supcon.mes.middleware.util.TimeUtil;
 import com.supcon.mes.middleware.util.XJCacheUtil;
 import com.supcon.mes.module_xj.IntentRouter;
@@ -57,12 +54,8 @@ import com.supcon.mes.module_xj.model.bean.XJTaskGroupEntity;
 import com.supcon.mes.module_xj.model.contract.XJTaskContract;
 import com.supcon.mes.module_xj.model.event.XJTempTaskAddEvent;
 import com.supcon.mes.module_xj.presenter.XJRunningTaskPresenter;
-import com.supcon.mes.module_xj.presenter.XJTaskPresenter;
 import com.supcon.mes.module_xj.service.RealTimeUploadLoactionService;
 import com.supcon.mes.module_xj.ui.adapter.XJTaskGroupAdapter;
-import com.supcon.mes.module_xj.util.DateSelectListener;
-
-import com.supcon.mes.middleware.util.StartLocationUtils;
 import com.supcon.mes.sb2.config.SB2Config;
 import com.supcon.mes.sb2.controller.SB2Controller;
 
@@ -79,9 +72,6 @@ import java.util.concurrent.TimeUnit;
 
 import io.reactivex.Flowable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
-import io.reactivex.functions.Action;
-import io.reactivex.functions.Consumer;
-import io.reactivex.functions.Predicate;
 import io.reactivex.schedulers.Schedulers;
 
 /**
@@ -107,56 +97,42 @@ import io.reactivex.schedulers.Schedulers;
 })
 public class XJTaskListActivity extends BaseRefreshRecyclerActivity<XJTaskGroupEntity> implements XJTaskContract.View, DeploymentContract.View {
 
+    public static final String XJ_TASK_STAFF_KEY = "PATROL_1_0_0_patrolTask_mobilePotrolTaskList_LISTPT_ASSO_bbeae76a_3694_4dc2_90f0_95fcfe8d0484";
     @BindByTag("titleText")
     TextView titleText;
-
     @BindByTag("contentView")
     RecyclerView contentView;
-
     @BindByTag("leftBtn")
     CustomImageButton leftBtn;
-
     @BindByTag("rightBtn")
     CustomImageButton rightBtn;
-
     @BindByTag("xjTaskGetTaskBtn")
     TextView xjTaskGetTaskBtn;
-
     @BindByTag("xjTaskGetTaskNum")
     TextView xjTaskGetTaskNum;
-
     @BindByTag("xjTaskUploadTaskBtn")
     TextView xjTaskUploadTaskBtn;
-
     @BindByTag("xjTaskUploadTaskNum")
     TextView xjTaskUploadTaskNum;
-
     private Map<String, Object> queryMap = new HashMap<>();
-
-//    public static final String  XJ_TASK_STAFF_KEY = "PATROL_1_0_0_patrolTask_potrolTaskList_LISTPT_ASSO_3a556662_35fb_4884_a6ab_1aff5d055ac7";
-    public static final String  XJ_TASK_STAFF_KEY = "PATROL_1_0_0_patrolTask_mobilePotrolTaskList_LISTPT_ASSO_bbeae76a_3694_4dc2_90f0_95fcfe8d0484";
-
     private XJTaskGroupAdapter mXJTaskGroupAdapter;
 
     private int taskStatusPosition = 0;
     private List<XJTaskEntity> mXJTaskEntities = new ArrayList<>();
-    private long deploymentId ;
+    private long deploymentId;
     private boolean needRefresh = false;
-    private  boolean isRefresh=false;
-    private String dateFilter="今天";
+    private boolean isRefresh = false;
+    private String dateFilter = "今天";
+
     @Override
     protected void onInit() {
         super.onInit();
         refreshListController.setAutoPullDownRefresh(false);
         refreshListController.setPullDownRefreshEnabled(true);
 
-//        String activityRouter = getIntent().getStringExtra(Constant.IntentKey.ACTIVITY_ROUTER);
-//        if(!TextUtils.isEmpty(activityRouter)){
-//            SupPlantApplication.exitMain();
-//        }
-        String taskCache =  SharedPreferencesUtils.getParam(context, Constant.SPKey.XJ_TASKS_CACHE+dateFilter+taskStatusPosition, "");
+        String taskCache = SharedPreferencesUtils.getParam(context, Constant.SPKey.XJ_TASKS_CACHE + dateFilter + taskStatusPosition, "");
 
-        if(!TextUtils.isEmpty(taskCache)){
+        if (!TextUtils.isEmpty(taskCache)) {
             mXJTaskEntities.addAll(GsonUtil.jsonToList(taskCache, XJTaskEntity.class));
         }
 
@@ -165,14 +141,13 @@ public class XJTaskListActivity extends BaseRefreshRecyclerActivity<XJTaskGroupE
     }
 
 
-
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        if (mXJTaskEntities!=null&&mXJTaskEntities.size()>0){
-            SharedPreferencesUtils.setParam(context, Constant.SPKey.XJ_TASKS_CACHE+dateFilter+taskStatusPosition, GsonUtil.gsonString(mXJTaskEntities));
-        }else{
-            SharedPreferencesUtils.setParam(context, Constant.SPKey.XJ_TASKS_CACHE+dateFilter+taskStatusPosition, "");
+        if (mXJTaskEntities != null && mXJTaskEntities.size() > 0) {
+            SharedPreferencesUtils.setParam(context, Constant.SPKey.XJ_TASKS_CACHE + dateFilter + taskStatusPosition, GsonUtil.gsonString(mXJTaskEntities));
+        } else {
+            SharedPreferencesUtils.setParam(context, Constant.SPKey.XJ_TASKS_CACHE + dateFilter + taskStatusPosition, "");
         }
         EventBus.getDefault().unregister(this);
 
@@ -185,7 +160,7 @@ public class XJTaskListActivity extends BaseRefreshRecyclerActivity<XJTaskGroupE
 
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onRefresh(RefreshEvent refreshEvent) {
-        isRefresh=true;
+        isRefresh = true;
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
@@ -200,30 +175,23 @@ public class XJTaskListActivity extends BaseRefreshRecyclerActivity<XJTaskGroupE
         super.initData();
 
         Flowable.timer(200, TimeUnit.MILLISECONDS)
-                .subscribe(new Consumer<Long>() {
-                    @Override
-                    public void accept(Long aLong) throws Exception {
-                        int code = 0;
-//                        if(SBTUtil.isSBT()){
-//                            code|= SB2Config.BARCORD;
-//                        }
+                .subscribe(aLong -> {
+                    int code = 0;
 
-                        if(SharedPreferencesUtils.getParam(context, Constant.SPKey.TEMP_MODE, 0) == TemperatureMode.SBT.getCode() && SBTUtil.isSupportTemp()){
-                            code |= SB2Config.TEMPERATURE;
-                        }
-
-                        if(SharedPreferencesUtils.getParam(context, Constant.SPKey.UHF_ENABLE, false) && SBTUtil.isSupportUHF()){
-                            code |= SB2Config.UHF;
-                        }
-
-
-                        SB2Controller sb2Controller = new SB2Controller(context);
-                        sb2Controller.setConfigCode(code);
-                        registerController(SB2Controller.class.getSimpleName(), sb2Controller);
+                    if (SharedPreferencesUtils.getParam(context, Constant.SPKey.TEMP_MODE, 0) == TemperatureMode.SBT.getCode() && SBTUtil.isSupportTemp()) {
+                        code |= SB2Config.TEMPERATURE;
                     }
+
+                    if (SharedPreferencesUtils.getParam(context, Constant.SPKey.UHF_ENABLE, false) && SBTUtil.isSupportUHF()) {
+                        code |= SB2Config.UHF;
+                    }
+
+                    SB2Controller sb2Controller = new SB2Controller(context);
+                    sb2Controller.setConfigCode(code);
+                    registerController(SB2Controller.class.getSimpleName(), sb2Controller);
                 });
 
-        if (mXJTaskEntities!=null&&mXJTaskEntities.size()>0){
+        if (mXJTaskEntities != null && mXJTaskEntities.size() > 0) {
             createTaskGroups(mXJTaskEntities);
         }
         refreshListController.refreshBegin();
@@ -260,18 +228,13 @@ public class XJTaskListActivity extends BaseRefreshRecyclerActivity<XJTaskGroupE
         super.initListener();
 
         getController(CheckUserPermissionController.class)
-                .checkUserPermission(SupPlantApplication.getUserName(),"PATROL_1.0.0_patrolTask_tempTaskList","start_ml5tgr8")
-                .setSuccessListener(new OnSuccessListener<Boolean>() {
-                    @Override
-                    public void onSuccess(Boolean result) {
-                        if (result){
-                            rightBtn.setVisibility(View.VISIBLE);
-                            presenterRouter.create(DeploymentAPI.class).getCurrentDeployment("tempTaskWF");
-
-                        }
+                .checkUserPermission(SupPlantApplication.getUserName(), "PATROL_1.0.0_patrolTask_tempTaskList", "start_ml5tgr8")
+                .setSuccessListener((OnSuccessListener<Boolean>) result -> {
+                    if (result) {
+                        rightBtn.setVisibility(View.VISIBLE);
+                        presenterRouter.create(DeploymentAPI.class).getCurrentDeployment("tempTaskWF");
                     }
                 });
-
 
 
         leftBtn.setOnClickListener(v -> onBackPressed());
@@ -279,13 +242,10 @@ public class XJTaskListActivity extends BaseRefreshRecyclerActivity<XJTaskGroupE
 
         RxView.clicks(rightBtn)
                 .throttleFirst(200, TimeUnit.MILLISECONDS)
-                .subscribe(new Consumer<Object>() {
-                    @Override
-                    public void accept(Object o) throws Exception {
-                        Bundle bundle = new Bundle();
-                        bundle.putLong(Constant.IntentKey.DEPLOYMENT_ID, deploymentId);
-                        IntentRouter.go(context, Constant.AppCode.MPS_TempPatrol, bundle);
-                    }
+                .subscribe(o -> {
+                    Bundle bundle = new Bundle();
+                    bundle.putLong(Constant.IntentKey.DEPLOYMENT_ID, deploymentId);
+                    IntentRouter.go(context, Constant.AppCode.MPS_TempPatrol, bundle);
                 });
 
         initQueryMap();
@@ -309,77 +269,52 @@ public class XJTaskListActivity extends BaseRefreshRecyclerActivity<XJTaskGroupE
 //            }
 //        });
 
-        refreshListController.setOnRefreshListener(new OnRefreshListener() {
-            @Override
-            public void onRefresh() {
-
-                if(taskStatusPosition == 0){
-                    getXJTask(1, queryMap);
-                }
-                else if(taskStatusPosition == 2){
-                    getCheckedTasks();
-                }
-                else{
-                    getXJTask(1, queryMap);
-                }
+        refreshListController.setOnRefreshListener(() -> {
+            if (taskStatusPosition == 0) {
+                getXJTask(1, queryMap);
+            } else if (taskStatusPosition == 2) {
+                getCheckedTasks();
+            } else {
+                getXJTask(1, queryMap);
             }
         });
 
 
         RxView.clicks(xjTaskGetTaskBtn)
                 .throttleFirst(200, TimeUnit.MILLISECONDS)
-                .subscribe(new Consumer<Object>() {
-                    @Override
-                    public void accept(Object o) throws Exception {
-                        IntentRouter.go(context, Constant.Router.XJ_TASK_GET);
-                    }
-                });
+                .subscribe(o -> IntentRouter.go(context, Constant.Router.XJ_TASK_GET));
 
         RxView.clicks(xjTaskUploadTaskBtn)
                 .throttleFirst(200, TimeUnit.MILLISECONDS)
-                .subscribe(new Consumer<Object>() {
-                    @Override
-                    public void accept(Object o) throws Exception {
-                        IntentRouter.go(context, Constant.Router.XJ_TASK_UPLOAD);
-                    }
-                });
+                .subscribe(o -> IntentRouter.go(context, Constant.Router.XJ_TASK_UPLOAD));
 
-        getController(XJTaskDateFilterController.class).setDateSelectListener(new DateSelectListener() {
-            @Override
-            public void onDateSelect(String start, String end,String filter) {
-                LogUtil.d("start:"+start);
-                LogUtil.d("end:"+end);
-                dateFilter=filter;
-                //如果缓存中有先从缓存中取出显示
-                String taskCache =  SharedPreferencesUtils.getParam(context, Constant.SPKey.XJ_TASKS_CACHE+dateFilter+taskStatusPosition, "");
-                mXJTaskEntities.clear();
-                if(!TextUtils.isEmpty(taskCache)){
-                    mXJTaskEntities.addAll(GsonUtil.jsonToList(taskCache, XJTaskEntity.class));
-                }
-
-                if(TextUtils.isEmpty(start) || TextUtils.isEmpty(end)){
-                    queryMap.remove(Constant.BAPQuery.XJ_START_TIME_1);
-                    queryMap.remove(Constant.BAPQuery.XJ_START_TIME_2);
-                }
-                else {
-
-                    queryMap.put(Constant.BAPQuery.XJ_START_TIME_1, start);
-                    queryMap.put(Constant.BAPQuery.XJ_START_TIME_2, end);
-                }
-                refreshListController.refreshBegin();
+        getController(XJTaskDateFilterController.class).setDateSelectListener((start, end, filter) -> {
+            LogUtil.d("start:" + start);
+            LogUtil.d("end:" + end);
+            dateFilter = filter;
+            //如果缓存中有先从缓存中取出显示
+            String taskCache = SharedPreferencesUtils.getParam(context, Constant.SPKey.XJ_TASKS_CACHE + dateFilter + taskStatusPosition, "");
+            mXJTaskEntities.clear();
+            if (!TextUtils.isEmpty(taskCache)) {
+                mXJTaskEntities.addAll(GsonUtil.jsonToList(taskCache, XJTaskEntity.class));
             }
+
+            if (TextUtils.isEmpty(start) || TextUtils.isEmpty(end)) {
+                queryMap.remove(Constant.BAPQuery.XJ_START_TIME_1);
+                queryMap.remove(Constant.BAPQuery.XJ_START_TIME_2);
+            } else {
+
+                queryMap.put(Constant.BAPQuery.XJ_START_TIME_1, start);
+                queryMap.put(Constant.BAPQuery.XJ_START_TIME_2, end);
+            }
+            refreshListController.refreshBegin();
         });
 
 
-        getController(XJTaskStatusFilterController.class).setOnSuccessListener(new OnSuccessListener<Integer>() {
-            @Override
-            public void onSuccess(Integer result) {
-                LogUtil.d("result:"+result);
-
-                taskStatusPosition = result;
-                refreshListController.refreshBegin();
-
-            }
+        getController(XJTaskStatusFilterController.class).setOnSuccessListener(result -> {
+            LogUtil.d("result:" + result);
+            taskStatusPosition = result;
+            refreshListController.refreshBegin();
         });
 
         getController(XJTaskNoIssuedController.class).setOnResultListener(new OnAPIResultListener<Integer>() {
@@ -390,11 +325,10 @@ public class XJTaskListActivity extends BaseRefreshRecyclerActivity<XJTaskGroupE
 
             @Override
             public void onSuccess(Integer result) {
-                if(result!=null && result!=0){
+                if (result != null && result != 0) {
                     xjTaskGetTaskNum.setVisibility(View.VISIBLE);
                     xjTaskGetTaskNum.setText(String.valueOf(result));
-                }
-                else{
+                } else {
                     xjTaskGetTaskNum.setVisibility(View.GONE);
                     xjTaskGetTaskNum.setText("");
                 }
@@ -409,45 +343,39 @@ public class XJTaskListActivity extends BaseRefreshRecyclerActivity<XJTaskGroupE
 
             @Override
             public void onSuccess(Integer result) {
-                if(result!=null && result!=0){
+                if (result != null && result != 0) {
                     xjTaskUploadTaskNum.setVisibility(View.VISIBLE);
                     xjTaskUploadTaskNum.setText(String.valueOf(result));
-                }
-                else{
+                } else {
                     xjTaskUploadTaskNum.setVisibility(View.GONE);
                     xjTaskUploadTaskNum.setText("");
                 }
             }
         });
 
-        mXJTaskGroupAdapter.setOnItemChildViewClickListener(new OnItemChildViewClickListener() {
-            @Override
-            public void onItemChildViewClick(View childView, int position, int action, Object obj) {
-                XJTaskEntity xjTaskEntity = (XJTaskEntity) obj;
+        mXJTaskGroupAdapter.setOnItemChildViewClickListener((childView, position, action, obj) -> {
+            XJTaskEntity xjTaskEntity = (XJTaskEntity) obj;
 
-                if(xjTaskEntity == null){
-                    return;
-                }
-
-                Bundle bundle = new Bundle();
-                if(XJCacheUtil.check(context, xjTaskEntity.tableNo)){//检查本地缓存
-                    bundle.putString(Constant.IntentKey.XJ_TASK_ENTITY_STR, XJCacheUtil.getString(xjTaskEntity.tableNo));
-                }
-                else{
-                    bundle.putString(Constant.IntentKey.XJ_TASK_ENTITY_STR, xjTaskEntity.toString());
-                }
-                IntentRouter.go(context, Constant.Router.XJ_TASK_DETAIL, bundle);
+            if (xjTaskEntity == null) {
+                return;
             }
+
+            Bundle bundle = new Bundle();
+            if (XJCacheUtil.check(context, xjTaskEntity.tableNo)) {//检查本地缓存
+                bundle.putString(Constant.IntentKey.XJ_TASK_ENTITY_STR, XJCacheUtil.getString(xjTaskEntity.tableNo));
+            } else {
+                bundle.putString(Constant.IntentKey.XJ_TASK_ENTITY_STR, xjTaskEntity.toString());
+            }
+            IntentRouter.go(context, Constant.Router.XJ_TASK_DETAIL, bundle);
         });
     }
 
     private void getCheckedTasks() {
 
         List<XJTaskEntity> taskEntities = getController(XJTaskUploadController.class).getUploadTasks();
-        if(taskEntities!=null && taskEntities.size()!=0){
+        if (taskEntities != null && taskEntities.size() != 0) {
             createTaskGroups(taskEntities);
-        }
-        else{
+        } else {
             refreshListController.refreshComplete(null);
         }
 
@@ -457,13 +385,13 @@ public class XJTaskListActivity extends BaseRefreshRecyclerActivity<XJTaskGroupE
     protected void onResume() {
         super.onResume();
 
-        if(needRefresh){
+        if (needRefresh) {
             createTaskGroups(mXJTaskEntities);
             needRefresh = false;
         }
-        if (isRefresh){
+        if (isRefresh) {
             refreshListController.refreshBegin();
-            isRefresh=false;
+            isRefresh = false;
         }
 
         StartLocationUtils.startLocation();
@@ -471,7 +399,7 @@ public class XJTaskListActivity extends BaseRefreshRecyclerActivity<XJTaskGroupE
     }
 
     private void initQueryMap() {
-        String[] dates= TimeUtil.getTimePeriod(Constant.Date.TODAY);
+        String[] dates = TimeUtil.getTimePeriod(Constant.Date.TODAY);
 
         String start = dates[0];
         String end = dates[1];
@@ -479,7 +407,7 @@ public class XJTaskListActivity extends BaseRefreshRecyclerActivity<XJTaskGroupE
         queryMap.put(Constant.BAPQuery.XJ_START_TIME_1, start);
         queryMap.put(Constant.BAPQuery.XJ_START_TIME_2, end);
 
-    //    queryMap.put(Constant.BAPQuery.XJ_TASK_STATE, "PATROL_taskState/issued");//PATROL_taskState/notIssued
+        //    queryMap.put(Constant.BAPQuery.XJ_TASK_STATE, "PATROL_taskState/issued");//PATROL_taskState/notIssued
 
     }
 
@@ -494,45 +422,44 @@ public class XJTaskListActivity extends BaseRefreshRecyclerActivity<XJTaskGroupE
 
         List<XJTaskEntity> taskEntities = entity.result;
 
-        if(taskEntities==null){
+        if (taskEntities == null) {
 
             refreshListController.refreshComplete(null);
 
             return;
         }
 
-        LogUtil.e("ciruy",entity.toString());
-        if(entity.pageNo == 1){
+        LogUtil.e("ciruy", entity.toString());
+        if (entity.pageNo == 1) {
             mXJTaskEntities.clear();
             mXJTaskEntities.addAll(getXJTempTasks());
         }
 
 
         mXJTaskEntities.addAll(taskEntities);
-        if(entity.hasNext){
+        if (entity.hasNext) {
             getXJTask(entity.nextPage, queryMap);
-        }
-        else{
+        } else {
             createTaskGroups(mXJTaskEntities);
         }
     }
 
-    private List<XJTaskEntity> getXJTempTasks(){
+    private List<XJTaskEntity> getXJTempTasks() {
         List<XJTaskEntity> tempTaskEntities = new ArrayList<>();
         List<String> tempTasks = XJCacheUtil.getTempTasks(context);
-        for(String s : tempTasks){
+        for (String s : tempTasks) {
             XJTaskEntity xjTaskEntity = GsonUtil.gsonToBean(XJCacheUtil.getString(s.replace(".0", "")), XJTaskEntity.class);
-          if (taskStatusPosition==0){
-              tempTaskEntities.add(xjTaskEntity);
-          }else if (taskStatusPosition==1){
-              if (!xjTaskEntity.isFinished){
-                  tempTaskEntities.add(xjTaskEntity);
-              }
-          }else if(taskStatusPosition==2){
-              if (xjTaskEntity.isFinished){
-                  tempTaskEntities.add(xjTaskEntity);
-              }
-          }
+            if (taskStatusPosition == 0) {
+                tempTaskEntities.add(xjTaskEntity);
+            } else if (taskStatusPosition == 1) {
+                if (!xjTaskEntity.isFinished) {
+                    tempTaskEntities.add(xjTaskEntity);
+                }
+            } else if (taskStatusPosition == 2) {
+                if (xjTaskEntity.isFinished) {
+                    tempTaskEntities.add(xjTaskEntity);
+                }
+            }
 
         }
 
@@ -548,23 +475,21 @@ public class XJTaskListActivity extends BaseRefreshRecyclerActivity<XJTaskGroupE
                 .subscribeOn(Schedulers.newThread())
                 .filter(xjTaskEntity -> {
 
-                    if(xjTaskEntity.workRoute == null){
+                    if (xjTaskEntity.workRoute == null) {
                         return false;
                     }
-                    XJTaskEntity  taskEntity = getController(XJLocalTaskController.class).getLocalTask(xjTaskEntity.tableNo);
-                    if(taskStatusPosition == 1 && taskEntity!=null && taskEntity.isFinished){//待检过滤
+                    XJTaskEntity taskEntity = getController(XJLocalTaskController.class).getLocalTask(xjTaskEntity.tableNo);
+                    if (taskStatusPosition == 1 && taskEntity != null && taskEntity.isFinished) {//待检过滤
                         return false;
                     }
 
-                    String key = xjTaskEntity.workRoute.code+""+ DateUtil.dateFormat(xjTaskEntity.startTime);
+                    String key = xjTaskEntity.workRoute.code + "" + DateUtil.dateFormat(xjTaskEntity.startTime);
 
-                    if(xjTaskEntity.isTemp){
+                    if (xjTaskEntity.isTemp) {
                         List<XJTaskEntity> xjTaskEntities = new ArrayList<>();
                         xjTaskEntities.add(xjTaskEntity);
                         taskMap.put(xjTaskEntity.tableNo, xjTaskEntities);
-                    }
-
-                    else if(!taskMap.containsKey(key)){
+                    } else if (!taskMap.containsKey(key)) {
                         taskMap.put(key, new ArrayList<>());
                     }
 
@@ -573,11 +498,11 @@ public class XJTaskListActivity extends BaseRefreshRecyclerActivity<XJTaskGroupE
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(xjTaskEntity -> {
 
-                    if(XJCacheUtil.check(context, xjTaskEntity.tableNo)){
+                    if (XJCacheUtil.check(context, xjTaskEntity.tableNo)) {
 
                         XJTaskEntity taskEntity = getController(XJLocalTaskController.class).getLocalTask(xjTaskEntity.tableNo);
 
-                        if(taskEntity!=null){
+                        if (taskEntity != null) {
 
                             xjTaskEntity = taskEntity;
                         }
@@ -585,8 +510,8 @@ public class XJTaskListActivity extends BaseRefreshRecyclerActivity<XJTaskGroupE
 
                     }
 
-                    if(!xjTaskEntity.isTemp){
-                        String key = xjTaskEntity.workRoute.code+""+ DateUtil.dateFormat(xjTaskEntity.startTime);
+                    if (!xjTaskEntity.isTemp) {
+                        String key = xjTaskEntity.workRoute.code + "" + DateUtil.dateFormat(xjTaskEntity.startTime);
                         List<XJTaskEntity> tasks = taskMap.get(key);
                         tasks.add(0, xjTaskEntity);
                     }
@@ -594,11 +519,11 @@ public class XJTaskListActivity extends BaseRefreshRecyclerActivity<XJTaskGroupE
 
                 }, () -> {
 
-                    for(String key: taskMap.keySet()){
+                    for (String key : taskMap.keySet()) {
 
                         XJTaskGroupEntity xjTaskGroupEntity = new XJTaskGroupEntity();
                         List<XJTaskEntity> xjTaskEntities = taskMap.get(key);
-                        if(xjTaskEntities == null || xjTaskEntities.size() == 0){
+                        if (xjTaskEntities == null || xjTaskEntities.size() == 0) {
                             continue;
                         }
 
@@ -606,20 +531,19 @@ public class XJTaskListActivity extends BaseRefreshRecyclerActivity<XJTaskGroupE
 
                         XJTaskEntity taskEntity = xjTaskEntities.get(0);
 
-                        if(taskEntity.attrMap != null && taskEntity.attrMap.containsKey(XJ_TASK_STAFF_KEY)){
+                        if (taskEntity.attrMap != null && taskEntity.attrMap.containsKey(XJ_TASK_STAFF_KEY)) {
                             xjTaskGroupEntity.staffName = (String) xjTaskEntities.get(0).attrMap.get(XJ_TASK_STAFF_KEY);
-                        }
-                        else if(taskEntity.isTemp){
+                        } else if (taskEntity.isTemp) {
                             xjTaskGroupEntity.staffName = taskEntity.staffName;
                         }
 
                         xjTaskGroupEntity.date = taskEntity.startTime;
 
-                        if(taskEntity.workRoute!=null){
+                        if (taskEntity.workRoute != null) {
                             xjTaskGroupEntity.name = taskEntity.workRoute.name;
                         }
 
-                        if(taskEntity.patrolType!=null){
+                        if (taskEntity.patrolType != null) {
                             xjTaskGroupEntity.typeValue = taskEntity.patrolType.value;
                         }
 
@@ -627,13 +551,8 @@ public class XJTaskListActivity extends BaseRefreshRecyclerActivity<XJTaskGroupE
                         xjTaskGroupEntities.add(xjTaskGroupEntity);
                     }
                     refreshListController.refreshComplete(xjTaskGroupEntities);
-
                 });
-
-
-
     }
-
 
     @Override
     public void getTaskListFailed(String errorMsg) {
@@ -642,7 +561,7 @@ public class XJTaskListActivity extends BaseRefreshRecyclerActivity<XJTaskGroupE
 
     @Override
     public void getCurrentDeploymentSuccess(DeploymentEntity entity) {
-        LogUtil.d("getCurrentDeploymentSuccess:"+entity.toString());
+        LogUtil.d("getCurrentDeploymentSuccess:" + entity.toString());
         deploymentId = entity.id;
     }
 
