@@ -55,6 +55,7 @@ import com.supcon.mes.module_xj.model.contract.XJTaskContract;
 import com.supcon.mes.module_xj.model.event.XJTempTaskAddEvent;
 import com.supcon.mes.module_xj.presenter.XJTaskPresenter;
 import com.supcon.mes.module_xj.ui.adapter.XJTaskGroupAdapter;
+import com.supcon.mes.module_xj.util.BundleSaveUtil;
 import com.supcon.mes.sb2.config.SB2Config;
 import com.supcon.mes.sb2.controller.SB2Controller;
 
@@ -379,9 +380,11 @@ public class XJTaskListActivity extends BaseRefreshRecyclerActivity<XJTaskGroupE
 
             Bundle bundle = new Bundle();
             if (XJCacheUtil.check(context, xjTaskEntity.tableNo)) {//检查本地缓存
-                bundle.putString(Constant.IntentKey.XJ_TASK_ENTITY_STR, XJCacheUtil.getString(xjTaskEntity.tableNo));
+//                bundle.putString(Constant.IntentKey.XJ_TASK_ENTITY_STR, XJCacheUtil.getString(xjTaskEntity.tableNo));
+                BundleSaveUtil.instance.put(Constant.IntentKey.XJ_TASK_ENTITY_STR, XJCacheUtil.getString(xjTaskEntity.tableNo));
             } else {
-                bundle.putString(Constant.IntentKey.XJ_TASK_ENTITY_STR, xjTaskEntity.toString());
+//                bundle.putString(Constant.IntentKey.XJ_TASK_ENTITY_STR, xjTaskEntity.toString());
+                BundleSaveUtil.instance.put(Constant.IntentKey.XJ_TASK_ENTITY_STR, xjTaskEntity.toString());
             }
             IntentRouter.go(context, Constant.Router.XJ_TASK_DETAIL, bundle);
         });

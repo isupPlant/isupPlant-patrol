@@ -59,4 +59,7 @@
     <string name="xj_work_over_all">是否完成全部巡检项？</string>
     <string name="xj_work_over">一键完成</string>
     <string name="xj_work_jump">一键跳过</string>
+    <string name="xj_patrol_upload_task">确定上传该区域任务？</string>
+    <string name="xj_patrol_upload">巡检数据上传失败！</string>
+    <string name="xj_patrol_upload_succeed">上传成功</string>
 </resources>

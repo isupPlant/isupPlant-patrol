@@ -33,12 +33,10 @@ import com.supcon.mes.aic_vib.util.DecimalFormatUtil;
 import com.supcon.mes.mbap.view.CustomEditText;
 import com.supcon.mes.mbap.view.CustomGalleryView;
 import com.supcon.mes.mbap.view.CustomSpinner;
-import com.supcon.mes.mbap.view.CustomTextView;
 import com.supcon.mes.middleware.SupPlantApplication;
 import com.supcon.mes.middleware.constant.Constant;
 import com.supcon.mes.middleware.constant.TemperatureMode;
 import com.supcon.mes.middleware.constant.VibMode;
-import com.supcon.mes.middleware.model.bean.AccountInfo;
 import com.supcon.mes.middleware.model.bean.xj.XJInputTypeEntity;
 import com.supcon.mes.middleware.model.bean.xj.XJInputTypeEntityDao;
 import com.supcon.mes.middleware.model.bean.xj.XJWorkEntity;
@@ -65,7 +63,6 @@ import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import io.reactivex.Flowable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.functions.Consumer;
 
@@ -638,6 +635,7 @@ public class XJWorkAdapter extends BaseListDataRecyclerViewAdapter<XJWorkEntity>
         @Override
         protected void update(XJWorkEntity data) {
             mXJCameraController.addListener(itemXJWorkPics, getAdapterPosition(), XJWorkAdapter.this);
+            LogUtil.e("InputType"+SupPlantApplication.dao().getXJInputTypeEntityDao().loadAll());
             XJInputTypeEntity xjInputTypeEntity = SupPlantApplication.dao().getXJInputTypeEntityDao().queryBuilder()
                     .where(XJInputTypeEntityDao.Properties.Ip.eq(SupPlantApplication.getIp()))
                     .where(XJInputTypeEntityDao.Properties.Id.eq(data.inputStandardId.id)).unique();

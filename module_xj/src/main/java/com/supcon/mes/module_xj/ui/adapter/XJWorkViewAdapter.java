@@ -15,9 +15,7 @@ import com.supcon.common.view.base.adapter.BaseListDataRecyclerViewAdapter;
 import com.supcon.common.view.base.adapter.viewholder.BaseRecyclerViewHolder;
 import com.supcon.common.view.listener.OnChildViewClickListener;
 import com.supcon.common.view.util.ToastUtils;
-import com.supcon.common.view.view.custom.ICustomView;
 import com.supcon.mes.mbap.view.CustomGalleryView;
-import com.supcon.mes.mbap.view.CustomTextView;
 import com.supcon.mes.mbap.view.CustomVerticalTextView;
 import com.supcon.mes.middleware.SupPlantApplication;
 import com.supcon.mes.middleware.constant.Constant;
@@ -26,7 +24,6 @@ import com.supcon.mes.middleware.model.bean.xj.XJInputTypeEntityDao;
 import com.supcon.mes.middleware.model.bean.xj.XJWorkEntity;
 import com.supcon.mes.module_xj.R;
 import com.supcon.mes.module_xj.controller.XJCameraController;
-import com.supcon.mes.module_xj.ui.XJWorkActivity;
 import com.supcon.mes.module_xj.ui.XJWorkViewActivity;
 import com.supcon.mes.module_xj.util.FaultPicHelper;
 
@@ -234,7 +231,9 @@ public class XJWorkViewAdapter extends BaseListDataRecyclerViewAdapter<XJWorkEnt
                 itemXJWorkViewResult.setText("跳检");
             }
 
+            if(xjInputTypeEntity!=null)
             setUnit(xjInputTypeEntity.unitID!=null?xjInputTypeEntity.unitID.name:"");
+            else setUnit("");
 
             itemXJWorkViewConclusion.setText(data.conclusionName);
 

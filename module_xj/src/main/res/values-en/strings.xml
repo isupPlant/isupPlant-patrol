@@ -59,4 +59,7 @@
 	<string name="xj_work_over_all">Whether to complete all the inspection items？</string>
 	<string name="xj_work_over">A key to complete</string>
 	<string name="xj_work_jump">A key to skip</string>
+	<string name="xj_patrol_upload_task">Confirm to upload tasks in this area？</string>
+	<string name="xj_patrol_upload">Failed to upload inspection data！</string>
+	<string name="xj_patrol_upload_succeed">Upload successfully</string>
 </resources>

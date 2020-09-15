@@ -5,7 +5,6 @@ import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
-import android.util.Pair;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
@@ -21,7 +20,6 @@ import com.app.annotation.apt.Router;
 import com.jakewharton.rxbinding2.view.RxView;
 import com.jakewharton.rxbinding2.widget.RxTextView;
 import com.mes.supcon.expert_ewg01p.controller.ExpertController;
-import com.mes.supcon.expert_ewg01p.model.OnRunResult;
 import com.supcon.common.view.base.activity.BaseRefreshRecyclerActivity;
 import com.supcon.common.view.base.adapter.IListAdapter;
 import com.supcon.common.view.util.DisplayUtil;
@@ -29,7 +27,6 @@ import com.supcon.common.view.util.LogUtil;
 import com.supcon.common.view.util.SharedPreferencesUtils;
 import com.supcon.common.view.util.StatusBarUtils;
 import com.supcon.common.view.util.ToastUtils;
-import com.supcon.common.view.view.loader.base.OnLoaderFinishListener;
 import com.supcon.mes.aic_vib.controller.AICVibController;
 import com.supcon.mes.aic_vib.controller.AICVibServiceController;
 import com.supcon.mes.aic_vib.service.AICVibService;
@@ -63,10 +60,12 @@ import com.supcon.mes.middleware.util.SystemCodeManager;
 import com.supcon.mes.module_xj.IntentRouter;
 import com.supcon.mes.module_xj.R;
 import com.supcon.mes.module_xj.controller.XJCameraController;
+import com.supcon.mes.module_xj.model.bean.XJTaskEntity;
 import com.supcon.mes.module_xj.model.event.WorkItemLocationEvent;
 import com.supcon.mes.module_xj.model.event.XJAreaRefreshEvent;
 import com.supcon.mes.module_xj.model.event.XJWorkRefreshEvent;
 import com.supcon.mes.module_xj.ui.adapter.XJWorkAdapter;
+import com.supcon.mes.module_xj.util.BundleSaveUtil;
 import com.supcon.mes.mogu_viber.controller.MGViberController;
 import com.supcon.mes.sb2.model.event.ThermometerEvent;
 import com.supcon.mes.testo_805i.controller.InfraredEvent;
@@ -149,6 +148,7 @@ public class XJWorkActivity extends BaseRefreshRecyclerActivity<XJWorkEntity> {
     private TextView tempTv;
     private List<String> exceptionIds = new ArrayList<>();
     String exceptionIdsStr;
+    private XJTaskEntity mXJTaskEntity;
     @Override
     protected int getLayoutID() {
         return R.layout.ac_xj_work;
@@ -158,14 +158,22 @@ public class XJWorkActivity extends BaseRefreshRecyclerActivity<XJWorkEntity> {
     protected void onInit() {
         super.onInit();
         EventBus.getDefault().register(this);
-        String xjAreaEntityStr = getIntent().getStringExtra(Constant.IntentKey.XJ_AREA_ENTITY_STR);
-        exceptionIdsStr = getIntent().getStringExtra(Constant.IntentKey.XJ_AREA_EXCEPTION_IDS);
+//        String xjAreaEntityStr = getIntent().getStringExtra(Constant.IntentKey.XJ_AREA_ENTITY_STR);
+        String xjAreaEntityStr = BundleSaveUtil.instance.getValue(Constant.IntentKey.XJ_AREA_ENTITY_STR);
+//        exceptionIdsStr = getIntent().getStringExtra(Constant.IntentKey.XJ_AREA_EXCEPTION_IDS);
+        exceptionIdsStr = BundleSaveUtil.instance.getValue(Constant.IntentKey.XJ_AREA_EXCEPTION_IDS);
         if (!TextUtils.isEmpty(exceptionIdsStr))
             exceptionIds = Arrays.asList(exceptionIdsStr.split(","));
         if (xjAreaEntityStr != null) {
             mXJAreaEntity = GsonUtil.gsonToBean(xjAreaEntityStr, XJAreaEntity.class);
         }
 
+//        String taskStr = getIntent().getStringExtra(Constant.IntentKey.XJ_TASK_ENTITY_STR);
+        String taskStr = BundleSaveUtil.instance.getValue(Constant.IntentKey.XJ_TASK_ENTITY_STR);
+
+        if (!TextUtils.isEmpty(taskStr)) {
+            mXJTaskEntity = GsonUtil.gsonToBean(taskStr, XJTaskEntity.class);
+        }
         refreshListController.setPullDownRefreshEnabled(false);
         refreshListController.setAutoPullDownRefresh(false);
 
@@ -291,7 +299,12 @@ public class XJWorkActivity extends BaseRefreshRecyclerActivity<XJWorkEntity> {
                 .throttleFirst(200, TimeUnit.MILLISECONDS)
                 .subscribe(o -> {
                     Bundle bundle = new Bundle();
-                    bundle.putSerializable(Constant.IntentKey.XJ_AREA_ENTITY_STR, mXJAreaEntity.toString());
+
+                    BundleSaveUtil.instance
+                            .put(Constant.IntentKey.XJ_AREA_ENTITY_STR, mXJAreaEntity.toString())
+                            .put(Constant.IntentKey.XJ_TASK_ENTITY_STR, mXJTaskEntity.toString());
+//                    bundle.putSerializable(Constant.IntentKey.XJ_AREA_ENTITY_STR, mXJAreaEntity.toString());
+//                    bundle.putSerializable(Constant.IntentKey.XJ_TASK_ENTITY_STR,mXJTaskEntity.toString());
                     IntentRouter.go(context, Constant.Router.XJ_WORK_ITEM_VIEW, bundle);
                 });
 
@@ -521,6 +534,8 @@ public class XJWorkActivity extends BaseRefreshRecyclerActivity<XJWorkEntity> {
                         mWorkEntities.addAll(noEamWorks);
                     }
 
+                    LogUtil.e("deviceNames"+deviceNames.toString());
+                    LogUtil.e("workEntities"+mWorkEntities.toString());
                     if (deviceNames.size() == 0) {
                         ((ViewGroup) eamSpinner.getParent()).setVisibility(View.GONE);
                         refreshListController.refreshComplete(mWorkEntities);

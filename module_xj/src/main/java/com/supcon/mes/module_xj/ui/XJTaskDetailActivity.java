@@ -7,7 +7,6 @@ import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
-import android.util.Pair;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
@@ -24,7 +23,6 @@ import com.supcon.common.view.base.activity.BaseControllerActivity;
 import com.supcon.common.view.util.LogUtil;
 import com.supcon.common.view.util.ToastUtils;
 import com.supcon.mes.expert_uhf.controller.ExpertUHFRFIDController;
-import com.supcon.mes.expert_uhf.helper.InventoryBuffer;
 import com.supcon.mes.mbap.utils.DateUtil;
 import com.supcon.mes.mbap.utils.GsonUtil;
 import com.supcon.mes.mbap.utils.controllers.SinglePickController;
@@ -35,6 +33,7 @@ import com.supcon.mes.middleware.controller.SystemCodeJsonController;
 import com.supcon.mes.middleware.model.bean.xj.XJAreaEntity;
 import com.supcon.mes.middleware.model.bean.xj.XJAreaEntityDao;
 import com.supcon.mes.middleware.model.event.RefreshEvent;
+import com.supcon.mes.middleware.model.inter.IMap;
 import com.supcon.mes.middleware.model.inter.SystemCode;
 import com.supcon.mes.middleware.util.SystemCodeManager;
 import com.supcon.mes.middleware.util.XJCacheUtil;
@@ -49,6 +48,7 @@ import com.supcon.mes.module_xj.model.contract.XJTaskSubmitContract;
 import com.supcon.mes.module_xj.model.event.XJAreaRefreshEvent;
 import com.supcon.mes.module_xj.presenter.XJTaskSubmitPresenter;
 import com.supcon.mes.module_xj.ui.adapter.XJAreaAdapter;
+import com.supcon.mes.module_xj.util.BundleSaveUtil;
 import com.supcon.mes.nfc.model.bean.NFCEntity;
 import com.supcon.mes.sb2.model.event.BarcodeEvent;
 import com.supcon.mes.sb2.model.event.SB2AttachEvent;
@@ -84,7 +84,8 @@ import static com.supcon.mes.module_xj.ui.XJTaskListActivity.XJ_TASK_STAFF_KEY;
         Constant.SystemCode.PATROL_signInType,
         Constant.SystemCode.PATROL_passReason
 })
-public class XJTaskDetailActivity extends BaseControllerActivity implements XJTaskSubmitContract.View {
+public class XJTaskDetailActivity extends BaseControllerActivity implements XJTaskSubmitContract.View
+        , IMap {
 
     @BindByTag("xjTaskDetailRouteName")
     TextView xjTaskDetailRouteName;
@@ -116,6 +117,7 @@ public class XJTaskDetailActivity extends BaseControllerActivity implements XJTa
     private EM55UHFRFIDHelper em55UHFRFIDHelper;
     private ExpertUHFRFIDController mExpertUHFRFIDController;
     private int enterPosition = -1;
+    private SoundHelper mSoundHelper = new SoundHelper();
 
     @Override
     protected int getLayoutID() {
@@ -151,8 +153,8 @@ public class XJTaskDetailActivity extends BaseControllerActivity implements XJTa
             }
         });
 
-        String taskStr = getIntent().getStringExtra(Constant.IntentKey.XJ_TASK_ENTITY_STR);
-
+//        String taskStr = getIntent().getStringExtra(Constant.IntentKey.XJ_TASK_ENTITY_STR);
+        String taskStr = BundleSaveUtil.instance.getValue(Constant.IntentKey.XJ_TASK_ENTITY_STR);
 
         if (!TextUtils.isEmpty(taskStr)) {
             mXJTaskEntity = GsonUtil.gsonToBean(taskStr, XJTaskEntity.class);
@@ -235,7 +237,7 @@ public class XJTaskDetailActivity extends BaseControllerActivity implements XJTa
         }
 
     }
-    private SoundHelper mSoundHelper = new SoundHelper();
+
     @Override
     protected void onResume() {
         super.onResume();
@@ -440,7 +442,7 @@ public class XJTaskDetailActivity extends BaseControllerActivity implements XJTa
         }
 
         for (XJAreaEntity xjAreaEntity : areaEntities) {
-            if (!xjAreaEntity.isFinished&&xjAreaEntity.getTotalNum(mXJTaskEntity.exceptinWorkIds)>0) {
+            if (!xjAreaEntity.isFinished && xjAreaEntity.getTotalNum(mXJTaskEntity.exceptinWorkIds) > 0) {
                 return false;
             }
         }
@@ -518,8 +520,14 @@ public class XJTaskDetailActivity extends BaseControllerActivity implements XJTa
     private void doGoArea(XJAreaEntity xjAreaEntity) {
         Bundle bundle = new Bundle();
         Collections.sort(xjAreaEntity.works);
-        bundle.putSerializable(Constant.IntentKey.XJ_AREA_ENTITY_STR, xjAreaEntity.toString());
-        bundle.putString(Constant.IntentKey.XJ_AREA_EXCEPTION_IDS, mXJTaskEntity.exceptinWorkIds);
+        BundleSaveUtil.instance
+                .put(Constant.IntentKey.XJ_AREA_ENTITY_STR, xjAreaEntity.toString())
+                .put(Constant.IntentKey.XJ_TASK_ENTITY_STR, mXJTaskEntity.toString())
+                .put(Constant.IntentKey.XJ_AREA_EXCEPTION_IDS, mXJTaskEntity.exceptinWorkIds);
+        bundle.putBoolean(Constant.IntentKey.BUNDLE_TEMP_SAVE, true);
+//        bundle.putSerializable(Constant.IntentKey.XJ_AREA_ENTITY_STR, xjAreaEntity.toString());
+//        bundle.putSerializable(Constant.IntentKey.XJ_TASK_ENTITY_STR,mXJTaskEntity.toString());
+//        bundle.putString(Constant.IntentKey.XJ_AREA_EXCEPTION_IDS, mXJTaskEntity.exceptinWorkIds);
         if (xjAreaEntity.isFinished || mXJTaskEntity.isFinished) {
             bundle.putBoolean(Constant.IntentKey.XJ_IS_FROM_TASK, true);
             bundle.putBoolean(Constant.IntentKey.XJ_IS_FINISHED, mXJTaskEntity.isFinished);
@@ -596,7 +604,7 @@ public class XJTaskDetailActivity extends BaseControllerActivity implements XJTa
             if (code.equals(areaEntity.signCode)) {
                 updateXJAreaEntity(areaEntity);//update数据
                 LogUtil.i("BarcodeEvent1", code);
-                if(enterPosition!=index) {
+                if (enterPosition != index) {
                     doGoArea(areaEntity);  //跳转
                     enterPosition = index;
                 }
