@@ -33,12 +33,10 @@ import com.supcon.mes.aic_vib.util.DecimalFormatUtil;
 import com.supcon.mes.mbap.view.CustomEditText;
 import com.supcon.mes.mbap.view.CustomGalleryView;
 import com.supcon.mes.mbap.view.CustomSpinner;
-import com.supcon.mes.mbap.view.CustomTextView;
 import com.supcon.mes.middleware.SupPlantApplication;
 import com.supcon.mes.middleware.constant.Constant;
 import com.supcon.mes.middleware.constant.TemperatureMode;
 import com.supcon.mes.middleware.constant.VibMode;
-import com.supcon.mes.middleware.model.bean.AccountInfo;
 import com.supcon.mes.middleware.model.bean.xj.XJInputTypeEntity;
 import com.supcon.mes.middleware.model.bean.xj.XJInputTypeEntityDao;
 import com.supcon.mes.middleware.model.bean.xj.XJWorkEntity;
@@ -65,9 +63,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import io.reactivex.Flowable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
-import io.reactivex.functions.Consumer;
 
 /**
  * Created by wangshizhan on 2020/4/16
@@ -75,7 +71,7 @@ import io.reactivex.functions.Consumer;
  */
 public class XJWorkAdapter extends BaseListDataRecyclerViewAdapter<XJWorkEntity> {
 
-    SB2ThermometerHelper sb2ThermometerHelper;
+    private SB2ThermometerHelper sb2ThermometerHelper;
 
     private Map<String, String> realValueMap;
     private List<String> realValues = new ArrayList<>();
@@ -84,14 +80,10 @@ public class XJWorkAdapter extends BaseListDataRecyclerViewAdapter<XJWorkEntity>
         super(context);
     }
 
-    public XJWorkAdapter(Context context, List<XJWorkEntity> list) {
-        super(context, list);
-    }
 
+    public void setConclusions(Map<String, String> realValueMap) {
 
-    public void setConclusions(Map<String, String> realValueMap){
-
-        if(realValueMap == null){
+        if (realValueMap == null) {
             return;
         }
 
@@ -102,8 +94,8 @@ public class XJWorkAdapter extends BaseListDataRecyclerViewAdapter<XJWorkEntity>
     @Override
     protected BaseRecyclerViewHolder<XJWorkEntity> getViewHolder(int viewType) {
 
-        if(viewType == 0){
-            return new XJWorkItemEamViewholder(context, parent);
+        if (viewType == 0) {
+            return new XJWorkItemEamViewHolder(context, parent);
         }
         return new XJWorkItemContentViewholder(context, parent);
     }
@@ -111,7 +103,7 @@ public class XJWorkAdapter extends BaseListDataRecyclerViewAdapter<XJWorkEntity>
 
     @Override
     public int getItemViewType(int position, XJWorkEntity xjWorkEntity) {
-        return TextUtils.isEmpty(xjWorkEntity.content)?0:1;
+        return TextUtils.isEmpty(xjWorkEntity.content) ? 0 : 1;
     }
 
     /**
@@ -123,7 +115,7 @@ public class XJWorkAdapter extends BaseListDataRecyclerViewAdapter<XJWorkEntity>
         sb2ThermometerHelper = SB2ThermometerHelper.getInstance();
     }
 
-    class XJWorkItemEamViewholder extends BaseRecyclerViewHolder<XJWorkEntity>{
+    class XJWorkItemEamViewHolder extends BaseRecyclerViewHolder<XJWorkEntity> {
 
         @BindByTag("itemXJWorkEamNum")
         TextView itemXJWorkEamNum;
@@ -137,10 +129,7 @@ public class XJWorkAdapter extends BaseListDataRecyclerViewAdapter<XJWorkEntity>
         @BindByTag("itemXJWorkFinish")
         ImageView itemXJWorkFinish;
 
-        @BindByTag("itemWorkEamParamsList")
-        RecyclerView itemWorkEamParamsList;//位号信息后面开发
-
-        public XJWorkItemEamViewholder(Context context, ViewGroup parent) {
+        public XJWorkItemEamViewHolder(Context context, ViewGroup parent) {
             super(context, parent);
         }
 
@@ -149,68 +138,40 @@ public class XJWorkAdapter extends BaseListDataRecyclerViewAdapter<XJWorkEntity>
             return R.layout.item_xj_work_eam;
         }
 
-
-        @Override
-        protected void initView() {
-            super.initView();
-//            itemWorkEamParamsList.setLayoutManager(new LinearLayoutManager(context));
-        }
-
         @SuppressLint("CheckResult")
         @Override
         protected void initListener() {
             super.initListener();
             RxView.clicks(itemXJWorkSkip)
                     .throttleFirst(200, TimeUnit.MILLISECONDS)
-                    .subscribe(new Consumer<Object>() {
-                        @Override
-                        public void accept(Object o) throws Exception {
-                            onItemChildViewClick(itemXJWorkSkip, 0, getItem(getAdapterPosition()));
-                        }
-                    });
+                    .subscribe(o -> onItemChildViewClick(itemXJWorkSkip, 0, getItem(getAdapterPosition())));
 
             RxView.clicks(itemXJWorkFinish)
                     .throttleFirst(200, TimeUnit.MILLISECONDS)
-                    .subscribe(new Consumer<Object>() {
-                        @Override
-                        public void accept(Object o) throws Exception {
-                            onItemChildViewClick(itemXJWorkFinish, 0, getItem(getAdapterPosition()));
-                        }
-                    });
+                    .subscribe(o -> onItemChildViewClick(itemXJWorkFinish, 0, getItem(getAdapterPosition())));
 
-            itemXJWorkEamName.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    XJWorkEntity xjWorkItemEntity = getItem(getAdapterPosition());
-                    if (xjWorkItemEntity.eamId == null || xjWorkItemEntity.eamId.id == null) {
-                        ToastUtils.show(context, context.getResources().getString(R.string.xj_patrol_no_device_look));
-                        return;
-                    }
+            itemXJWorkEamName.setOnClickListener(v -> {
+                XJWorkEntity xjWorkItemEntity = getItem(getAdapterPosition());
+                if (xjWorkItemEntity.eamId == null || xjWorkItemEntity.eamId.id == null) {
+                    ToastUtils.show(context, context.getResources().getString(R.string.xj_patrol_no_device_look));
+                }
 //                    Bundle bundle = new Bundle();
 //                    bundle.putLong(Constant.IntentKey.SBDA_ENTITY_ID,  xjWorkItemEntity.eamId.id);
 //                    IntentRouter.go(context, Constant.Router.SBDA_VIEW, bundle);
-                }
             });
-
 
 
         }
 
+        @SuppressLint("DefaultLocale")
         @Override
         protected void update(XJWorkEntity data) {
-
-            itemXJWorkEamNum.setText("" + data.eamNum);
+            itemXJWorkEamNum.setText(String.format("%d", data.eamNum));
             itemXJWorkEamName.setText(data.eamName);
-
         }
     }
 
     class XJWorkItemContentViewholder extends BaseRecyclerViewHolder<XJWorkEntity> implements OnChildViewClickListener {
-
-
-        @BindByTag("itemXJWorkFlag")
-        ImageView itemXJWorkFlag;
-
         @BindByTag("itemXJWorkContent")
         CustomPopTextView itemXJWorkContent;
 
@@ -244,12 +205,8 @@ public class XJWorkAdapter extends BaseListDataRecyclerViewAdapter<XJWorkEntity>
         @BindByTag("itemXJWorkTempBtn")
         Button itemXJWorkTempBtn;
 
-        @BindByTag("itemXJWorkResultLayout")
-        LinearLayout itemXJWorkResultLayout;
-
         @BindByTag("itemXJWorkMoreLayout")
         RelativeLayout itemXJWorkMoreLayout;
-
 
         @BindByTag("itemXJWorkPics")
         CustomGalleryView itemXJWorkPics;
@@ -318,7 +275,7 @@ public class XJWorkAdapter extends BaseListDataRecyclerViewAdapter<XJWorkEntity>
 
                         XJWorkEntity xjWorkItemEntity = getItem(getAdapterPosition());
 
-                        if(xjWorkItemEntity == null){
+                        if (xjWorkItemEntity == null) {
                             return;
                         }
 
@@ -330,8 +287,7 @@ public class XJWorkAdapter extends BaseListDataRecyclerViewAdapter<XJWorkEntity>
                         if (TextUtils.isEmpty(charSequence)) {
                             if (xjWorkItemEntity != null)
                                 xjWorkItemEntity.concluse = "";
-                        }
-                        else {
+                        } else {
                             if ("PATROL_valueType/number".equals(xjInputTypeEntity.valType.id) && "PATROL_editType/input".equals(xjInputTypeEntity.editType.id)) {  //值类型判断：字符/数字
 
                                 if (xjWorkItemEntity.isAutoJudge) {
@@ -347,8 +303,7 @@ public class XJWorkAdapter extends BaseListDataRecyclerViewAdapter<XJWorkEntity>
                                         }
 
                                     }
-                                }
-                                else {
+                                } else {
 
                                     if (!charSequence.toString().matches("^-?[0.0-9]+$") || charSequence.toString().indexOf(".") == 0) {
                                         if ("-".equals(charSequence.toString())) {
@@ -368,19 +323,17 @@ public class XJWorkAdapter extends BaseListDataRecyclerViewAdapter<XJWorkEntity>
                                         BigDecimal bigDecimal = new BigDecimal(charSequence.toString());
                                         if (xjInputTypeEntity.decimalPlace != null) {
                                             result = bigDecimal.setScale(Integer.parseInt(xjInputTypeEntity.decimalPlace), BigDecimal.ROUND_HALF_UP).toString();
-                                        }
-                                        else{
+                                        } else {
                                             result = charSequence.toString();
                                         }
 
 
-                                        if(result.equals(xjWorkItemEntity.concluse)){
+                                        if (result.equals(xjWorkItemEntity.concluse)) {
 
-                                        }
-                                        else{
+                                        } else {
                                             xjWorkItemEntity.concluse = result;
                                             itemXJWorkResultInput.setContent(result);
-                                            if(!TextUtils.isEmpty(result))
+                                            if (!TextUtils.isEmpty(result))
                                                 itemXJWorkResultInput.editText().setSelection(result.length());
 //                                            Flowable.timer(200, TimeUnit.MILLISECONDS)
 //                                                    .observeOn(AndroidSchedulers.mainThread())
@@ -397,8 +350,7 @@ public class XJWorkAdapter extends BaseListDataRecyclerViewAdapter<XJWorkEntity>
                                     }
                                 }
 
-                            }
-                            else {
+                            } else {
                                 xjWorkItemEntity.concluse = charSequence.toString();
                             }
                         }
@@ -409,7 +361,7 @@ public class XJWorkAdapter extends BaseListDataRecyclerViewAdapter<XJWorkEntity>
 
             int tempMode = SharedPreferencesUtils.getParam(context, Constant.SPKey.TEMP_MODE, 0);
             //触发测温
-            if (SBTUtil.isSupportTemp() && tempMode <= 1 && sb2ThermometerHelper!=null) {
+            if (SBTUtil.isSupportTemp() && tempMode <= 1 && sb2ThermometerHelper != null) {
                 itemXJWorkTempBtn.setOnTouchListener((v, motionEvent) -> {
 
                     if (SharedPreferencesUtils.getParam(context, Constant.SPKey.TEMP_MODE, 0) == TemperatureMode.NULL.getCode()) {
@@ -437,56 +389,37 @@ public class XJWorkAdapter extends BaseListDataRecyclerViewAdapter<XJWorkEntity>
             //测温
             RxView.clicks(itemXJWorkTempBtn)
                     .throttleFirst(300, TimeUnit.MILLISECONDS)
-                    .subscribe(new Consumer<Object>() {
-                        @Override
-                        public void accept(Object o) throws Exception {
+                    .subscribe(o -> {
 
-                            int tempMode = SharedPreferencesUtils.getParam(context, Constant.SPKey.TEMP_MODE, 0);
-                            if(tempMode == 0){
-                                ToastUtils.show(context, context.getString(R.string.xj_work_temp_test_warning));
-                                return;
-                            }
-
-                            onItemChildViewClick(itemXJWorkTempBtn, 0, getItem(getAdapterPosition()));
+                        int tempMode1 = SharedPreferencesUtils.getParam(context, Constant.SPKey.TEMP_MODE, 0);
+                        if (tempMode1 == 0) {
+                            ToastUtils.show(context, context.getString(R.string.xj_work_temp_test_warning));
+                            return;
                         }
+
+                        onItemChildViewClick(itemXJWorkTempBtn, 0, getItem(getAdapterPosition()));
                     });
 
             //测振
             RxView.clicks(itemXJWorkVibBtn)
                     .throttleFirst(300, TimeUnit.MILLISECONDS)
-                    .subscribe(new Consumer<Object>() {
-                        @Override
-                        public void accept(Object o) throws Exception {
+                    .subscribe(o -> {
 
-                            if (SharedPreferencesUtils.getParam(context, Constant.SPKey.VIB_MODE, 0) == VibMode.NULL.getCode()) {
-                                ToastUtils.show(context, context.getString(R.string.xj_work_vib_test_warning));
-                                return;
-                            }
-
-                            onItemChildViewClick(itemXJWorkVibBtn, 0, getItem(getAdapterPosition()));
+                        if (SharedPreferencesUtils.getParam(context, Constant.SPKey.VIB_MODE, 0) == VibMode.NULL.getCode()) {
+                            ToastUtils.show(context, context.getString(R.string.xj_work_vib_test_warning));
+                            return;
                         }
+
+                        onItemChildViewClick(itemXJWorkVibBtn, 0, getItem(getAdapterPosition()));
                     });
 
             RxView.clicks(itemXJWorkFold)
                     .throttleFirst(200, TimeUnit.MILLISECONDS)
-                    .subscribe(new Consumer<Object>() {
-                        @Override
-                        public void accept(Object o) throws Exception {
-
-                            toggleFoldView();
-
-
-                        }
-                    });
+                    .subscribe(o -> toggleFoldView());
 
             RxView.clicks(itemXJWorkCameraBtn)
                     .throttleFirst(200, TimeUnit.MILLISECONDS)
-                    .subscribe(new Consumer<Object>() {
-                        @Override
-                        public void accept(Object o) throws Exception {
-                            itemXJWorkPics.findViewById(R.id.customCameraIv).performClick();
-                        }
-                    });
+                    .subscribe(o -> itemXJWorkPics.findViewById(R.id.customCameraIv).performClick());
 
 
             itemXJWorkResultSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
@@ -495,14 +428,13 @@ public class XJWorkAdapter extends BaseListDataRecyclerViewAdapter<XJWorkEntity>
                     XJWorkEntity xjWorkItemEntity = getItem(getAdapterPosition());
 
                     String value = (String) itemXJWorkResultSpinner.getSelectedItem();
-                    if( xjWorkItemEntity == null){
+                    if (xjWorkItemEntity == null) {
                         return;
                     }
 
-                    if("空".equals(value) || TextUtils.isEmpty(value)){
+                    if ("空".equals(value) || TextUtils.isEmpty(value)) {
                         xjWorkItemEntity.concluse = "";
-                    }
-                    else{
+                    } else {
                         xjWorkItemEntity.concluse = value;
                     }
 
@@ -521,24 +453,23 @@ public class XJWorkAdapter extends BaseListDataRecyclerViewAdapter<XJWorkEntity>
                 public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                     XJWorkEntity xjWorkItemEntity = getItem(getAdapterPosition());
                     String value = (String) itemXJWorkConclusionSpinner.getSelectedItem();
-                    if(TextUtils.isEmpty(value) || xjWorkItemEntity == null){
+                    if (TextUtils.isEmpty(value) || xjWorkItemEntity == null) {
                         return;
                     }
 
-                    TextView tv = (TextView)view;
+                    TextView tv = (TextView) view;
 
                     tv.setTextColor(context.getResources().getColor(R.color.textColorlightblack));
 
                     xjWorkItemEntity.conclusionName = value;
-                    if (realValueMap.get("PATROL_realValue/normal").equals(xjWorkItemEntity.conclusionName)){
+                    if (realValueMap.get("PATROL_realValue/normal").equals(xjWorkItemEntity.conclusionName)) {
                         xjWorkItemEntity.conclusionID = "PATROL_realValue/normal";
                         if (xjWorkItemEntity.isAutoJudge) {
                             setSpinnerState(itemXJWorkConclusionSpinner, 9);
                         } else {
                             setSpinnerState(itemXJWorkConclusionSpinner, 0);
                         }
-                    }
-                    else if(realValueMap.get("PATROL_realValue/abnormal").equals(xjWorkItemEntity.conclusionName)){
+                    } else if (realValueMap.get("PATROL_realValue/abnormal").equals(xjWorkItemEntity.conclusionName)) {
                         xjWorkItemEntity.conclusionID = "PATROL_realValue/abnormal";
                         if (xjWorkItemEntity.isAutoJudge) {
                             setSpinnerState(itemXJWorkConclusionSpinner, 9);
@@ -547,8 +478,7 @@ public class XJWorkAdapter extends BaseListDataRecyclerViewAdapter<XJWorkEntity>
 
                         }
                         tv.setTextColor(context.getResources().getColor(R.color.customRed));
-                    }
-                    else if(realValueMap.get("PATROL_realValue/doubtful").equals(xjWorkItemEntity.conclusionName)){
+                    } else if (realValueMap.get("PATROL_realValue/doubtful").equals(xjWorkItemEntity.conclusionName)) {
                         xjWorkItemEntity.conclusionID = "PATROL_realValue/doubtful";
                         if (xjWorkItemEntity.isAutoJudge) {
                             setSpinnerState(itemXJWorkConclusionSpinner, 9);
@@ -568,43 +498,29 @@ public class XJWorkAdapter extends BaseListDataRecyclerViewAdapter<XJWorkEntity>
                 }
             });
 
-            itemXJWorkResultSwitch.setOnChildViewClickListener(new OnChildViewClickListener() {
-                @Override
-                public void onChildViewClick(View childView, int action, Object obj) {
-                    LogUtil.d(""+obj);
+            itemXJWorkResultSwitch.setOnChildViewClickListener((childView, action, obj) -> {
+                String result = (String) obj;
+                XJWorkEntity xjWorkEntity = getItem(getAdapterPosition());
 
-                    String result = (String) obj;
-                    XJWorkEntity xjWorkEntity = getItem(getAdapterPosition());
-
-                    if("空".equals(result) || TextUtils.isEmpty(result)){
-                        xjWorkEntity.concluse = "";
-                    }
-                    else{
-                        xjWorkEntity.concluse = result;
-                    }
-
-                    autoJudge(xjWorkEntity);
+                if ("空".equals(result) || TextUtils.isEmpty(result)) {
+                    xjWorkEntity.concluse = "";
+                } else {
+                    xjWorkEntity.concluse = result;
                 }
+
+                autoJudge(xjWorkEntity);
             });
 
-            itemXJWorkResultMultiSelect.setOnChildViewClickListener(new OnChildViewClickListener() {
-                @Override
-                public void onChildViewClick(View childView, int action, Object obj) {
-                    LogUtil.d(""+obj);
-                    XJWorkEntity xjWorkEntity = getItem(getAdapterPosition());
-                    onItemChildViewClick(itemXJWorkResultMultiSelect, 0, xjWorkEntity);
-                }
+            itemXJWorkResultMultiSelect.setOnChildViewClickListener((childView, action, obj) -> {
+                LogUtil.d("" + obj);
+                XJWorkEntity xjWorkEntity = getItem(getAdapterPosition());
+                onItemChildViewClick(itemXJWorkResultMultiSelect, 0, xjWorkEntity);
             });
 
 
             RxView.clicks(itemXJWorkPicMoreView)
                     .throttleFirst(200, TimeUnit.MILLISECONDS)
-                    .subscribe(new Consumer<Object>() {
-                        @Override
-                        public void accept(Object o) throws Exception {
-                            mXJCameraController.viewPic(itemXJWorkPics, itemXJWorkPics.getGalleryAdapter().getList(), 0);
-                        }
-                    });
+                    .subscribe(o -> mXJCameraController.viewPic(itemXJWorkPics, itemXJWorkPics.getGalleryAdapter().getList(), 0));
 
         }
 
@@ -612,18 +528,17 @@ public class XJWorkAdapter extends BaseListDataRecyclerViewAdapter<XJWorkEntity>
 
             XJWorkEntity xjWorkEntity = getItem(getAdapterPosition());
             xjWorkEntity.isFold = !xjWorkEntity.isFold;
-            if(xjWorkEntity.isFold){
+            if (xjWorkEntity.isFold) {
                 itemXJWorkMoreLayout.setVisibility(View.GONE);
                 itemXJWorkFold.setImageResource(R.drawable.ic_xj_work_unfold);
-            }
-            else{
+            } else {
                 itemXJWorkMoreLayout.setVisibility(View.VISIBLE);
                 itemXJWorkFold.setImageResource(R.drawable.ic_xj_work_fold);
             }
 
         }
 
-        private void autoJudge(XJWorkEntity xjWorkEntity){
+        private void autoJudge(XJWorkEntity xjWorkEntity) {
             if (xjWorkEntity.isAutoJudge && xjWorkEntity.normalRange != null && !TextUtils.isEmpty(xjWorkEntity.concluse)) {
 
                 String[] normalRangeArr = xjWorkEntity.normalRange.split(",");
@@ -643,19 +558,18 @@ public class XJWorkAdapter extends BaseListDataRecyclerViewAdapter<XJWorkEntity>
                     .where(XJInputTypeEntityDao.Properties.Id.eq(data.inputStandardId.id)).unique();
 
 
-            if(xjInputTypeEntity == null){
+            if (xjInputTypeEntity == null) {
                 ToastUtils.show(context, context.getString(R.string.xj_data_empty_warning));
-                ((Activity)context).finish();
+                ((Activity) context).finish();
                 return;
             }
 
             itemXJWorkContent.setContent(data.content);
-            Drawable drawableLeft ;
+            Drawable drawableLeft;
 
-            if(!TextUtils.isEmpty(data.realRemark)){
+            if (!TextUtils.isEmpty(data.realRemark)) {
                 drawableLeft = context.getResources().getDrawable(R.drawable.ic_xj_work_remark_fill);
-            }
-            else{
+            } else {
                 drawableLeft = context.getResources().getDrawable(R.drawable.ic_xj_work_remark);
             }
 
@@ -667,19 +581,17 @@ public class XJWorkAdapter extends BaseListDataRecyclerViewAdapter<XJWorkEntity>
             itemXJWorkTempBtn.setVisibility(View.GONE);
             itemXJWorkVibBtn.setVisibility(View.GONE);
 
-            if(data.isFold && TextUtils.isEmpty(data.xjImgName) && !data.isPhone){
+            if (data.isFold && TextUtils.isEmpty(data.xjImgName) && !data.isPhone) {
                 itemXJWorkMoreLayout.setVisibility(View.GONE);
                 itemXJWorkFold.setImageResource(R.drawable.ic_xj_work_unfold);
-            }
-            else{
+            } else {
                 data.isFold = false;
                 itemXJWorkMoreLayout.setVisibility(View.VISIBLE);
                 itemXJWorkFold.setImageResource(R.drawable.ic_xj_work_fold);
             }
 
             List<String> candidateValues = new ArrayList<>();
-            if(!TextUtils.isEmpty(xjInputTypeEntity.candidateValue)) {
-                candidateValues.add("");
+            if (!TextUtils.isEmpty(xjInputTypeEntity.candidateValue)) {
                 candidateValues.addAll(Arrays.asList(xjInputTypeEntity.candidateValue.split(",")));
             }
 
@@ -707,7 +619,7 @@ public class XJWorkAdapter extends BaseListDataRecyclerViewAdapter<XJWorkEntity>
                 }
 
 
-                setUnit(xjInputTypeEntity.unitID!=null?xjInputTypeEntity.unitID.name:"");
+                setUnit(xjInputTypeEntity.unitID != null ? xjInputTypeEntity.unitID.name : "");
 
                 String value = "";
 
@@ -731,7 +643,7 @@ public class XJWorkAdapter extends BaseListDataRecyclerViewAdapter<XJWorkEntity>
 
                     itemXJWorkResultInput.setHint(context.getResources().getString(R.string.xj_patrol_number));
                 } else {
-                    if ("PATROL_valueType/char".equals(xjInputTypeEntity.valType.id)){
+                    if ("PATROL_valueType/char".equals(xjInputTypeEntity.valType.id)) {
                         itemXJWorkResultInput.setHint(context.getResources().getString(R.string.xj_patrol_input_text));
                     }
                     if (!TextUtils.isEmpty(data.defaultVal) && TextUtils.isEmpty(data.concluse)) {
@@ -746,19 +658,17 @@ public class XJWorkAdapter extends BaseListDataRecyclerViewAdapter<XJWorkEntity>
 
                 if ("PATROL_valueType/number".equals(xjInputTypeEntity.valType.id)) {
                     itemXJWorkResultInput.setInputType(InputType.TYPE_CLASS_NUMBER | InputType.TYPE_NUMBER_FLAG_SIGNED | InputType.TYPE_NUMBER_FLAG_DECIMAL);  //支持正负浮点数、整数
-
                 } else {
                     itemXJWorkResultInput.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_FLAG_MULTI_LINE);
                 }
 
-            }
-            else if ("PATROL_editType/whether".equals(xjInputTypeEntity.editType.id)) {  //是否  单选
+            } else if ("PATROL_editType/whether".equals(xjInputTypeEntity.editType.id)) {  //是否  单选
                 itemXJWorkResultInput.setVisibility(View.GONE);
                 itemXJWorkResultSpinner.setVisibility(View.GONE);
                 itemXJWorkResultMultiSelect.setVisibility(View.GONE);
                 itemXJWorkResultSwitch.setVisibility(View.VISIBLE);
 
-                setUnit(xjInputTypeEntity.unitID!=null?xjInputTypeEntity.unitID.name:"");
+                setUnit(xjInputTypeEntity.unitID != null ? xjInputTypeEntity.unitID.name : "");
 
                 if (!TextUtils.isEmpty(data.defaultVal) && TextUtils.isEmpty(data.concluse)) {
                     data.concluse = data.defaultVal;
@@ -768,14 +678,13 @@ public class XJWorkAdapter extends BaseListDataRecyclerViewAdapter<XJWorkEntity>
                     initSwitch(itemXJWorkResultSwitch, data.concluse, candidateValues);
                 }
 
-            }
-            else if ( "PATROL_editType/singleSelect".equals(xjInputTypeEntity.editType.id)) {  //是否  单选
+            } else if ("PATROL_editType/singleSelect".equals(xjInputTypeEntity.editType.id)) {  //是否  单选
                 itemXJWorkResultInput.setVisibility(View.GONE);
                 itemXJWorkResultSpinner.setVisibility(View.VISIBLE);
                 itemXJWorkResultMultiSelect.setVisibility(View.GONE);
                 itemXJWorkResultSwitch.setVisibility(View.GONE);
 
-                setUnit(xjInputTypeEntity.unitID!=null?xjInputTypeEntity.unitID.name:"");
+                setUnit(xjInputTypeEntity.unitID != null ? xjInputTypeEntity.unitID.name : "");
 
                 if (!TextUtils.isEmpty(data.defaultVal) && TextUtils.isEmpty(data.concluse)) {
                     data.concluse = data.defaultVal;
@@ -784,15 +693,14 @@ public class XJWorkAdapter extends BaseListDataRecyclerViewAdapter<XJWorkEntity>
                 } else {
                     initSpinner(itemXJWorkResultSpinner, data.concluse, candidateValues);
                 }
-            }
-            else if ("PATROL_editType/multipleSelect".equals(xjInputTypeEntity.editType.id)) {  //多选
+            } else if ("PATROL_editType/multipleSelect".equals(xjInputTypeEntity.editType.id)) {  //多选
                 itemXJWorkResultInput.setVisibility(View.GONE);
                 itemXJWorkResultSpinner.setVisibility(View.GONE);
                 itemXJWorkResultMultiSelect.setVisibility(View.VISIBLE);
                 itemXJWorkResultSwitch.setVisibility(View.GONE);
 
 
-                setUnit(xjInputTypeEntity.unitID!=null?xjInputTypeEntity.unitID.name:"");
+                setUnit(xjInputTypeEntity.unitID != null ? xjInputTypeEntity.unitID.name : "");
 
                 if (!TextUtils.isEmpty(data.defaultVal) && TextUtils.isEmpty(data.concluse)) {
                     itemXJWorkResultMultiSelect.setSpinner(data.defaultVal);
@@ -803,19 +711,16 @@ public class XJWorkAdapter extends BaseListDataRecyclerViewAdapter<XJWorkEntity>
             }
 //            initSpinner(itemXJWorkConclusionSpinner, realValueMap.get(data.conclusionID),realValues);
             if ("PATROL_realValue/abnormal".equals(data.conclusionID)) {
-                initSpinner(itemXJWorkConclusionSpinner, realValueMap.get("PATROL_realValue/abnormal"),realValues);
-            }
-            else if("PATROL_realValue/doubtful".equals(data.conclusionID)){
-                initSpinner(itemXJWorkConclusionSpinner, realValueMap.get("PATROL_realValue/doubtful"),realValues);
-            }
-            else {
-                initSpinner(itemXJWorkConclusionSpinner, realValueMap.get("PATROL_realValue/normal"),realValues);
+                initSpinner(itemXJWorkConclusionSpinner, realValueMap.get("PATROL_realValue/abnormal"), realValues);
+            } else if ("PATROL_realValue/doubtful".equals(data.conclusionID)) {
+                initSpinner(itemXJWorkConclusionSpinner, realValueMap.get("PATROL_realValue/doubtful"), realValues);
+            } else {
+                initSpinner(itemXJWorkConclusionSpinner, realValueMap.get("PATROL_realValue/normal"), realValues);
             }
 
-            if(data.isPhone){
+            if (data.isPhone) {
                 itemXJWorkCameraBtn.setImageResource(R.drawable.sl_xj_work_camera_n);
-            }
-            else{
+            } else {
                 itemXJWorkCameraBtn.setImageResource(R.drawable.sl_xj_work_camera);
             }
 
@@ -829,11 +734,10 @@ public class XJWorkAdapter extends BaseListDataRecyclerViewAdapter<XJWorkEntity>
 
 
                 itemXJWorkPics.setVisibility(View.VISIBLE);
-                if(pics.size() > 3){
+                if (pics.size() > 3) {
 //                    FaultPicHelper.initPics(pics.subList(0, 3), itemXJWorkPics);
                     itemXJWorkPicMoreView.setVisibility(View.VISIBLE);
-                }
-                else{
+                } else {
 //                    FaultPicHelper.initPics(pics, itemXJWorkPics);
                     itemXJWorkPicMoreView.setVisibility(View.GONE);
                 }
@@ -848,19 +752,11 @@ public class XJWorkAdapter extends BaseListDataRecyclerViewAdapter<XJWorkEntity>
         }
 
         private void initSwitch(SimpleSwitchView switchView, String defaultVal, Collection<String> candidateValue) {
-
             List<String> values = new ArrayList<>();
-//            if(TextUtils.isEmpty(defaultVal)){
-//                values.add("空");
-//            }
-
-            if(candidateValue!=null){
+            if (candidateValue != null) {
                 values.addAll(candidateValue);
             }
-
-            switchView.setValues( values.toArray(new String[values.size()]), TextUtils.isEmpty(defaultVal)?0:values.indexOf(defaultVal));
-
-
+            switchView.setValues(values.toArray(new String[values.size()]), TextUtils.isEmpty(defaultVal) ? 0 : values.indexOf(defaultVal));
         }
 
         private void initSpinner(Spinner spinner, String defaultVal, Collection<String> candidateValue) {
@@ -871,7 +767,7 @@ public class XJWorkAdapter extends BaseListDataRecyclerViewAdapter<XJWorkEntity>
 //            }
 
 
-            if(candidateValue!=null){
+            if (candidateValue != null) {
                 values.addAll(candidateValue);
             }
 
@@ -879,26 +775,23 @@ public class XJWorkAdapter extends BaseListDataRecyclerViewAdapter<XJWorkEntity>
             adapter.setDropDownViewResource(R.layout.ly_spinner_dropdown_item);     //设置下拉列表框的下拉选项样式
             spinner.setAdapter(adapter);
 
-            if(!TextUtils.isEmpty(defaultVal)){
+            if (!TextUtils.isEmpty(defaultVal)) {
                 spinner.setSelection(values.indexOf(defaultVal));
             }
         }
 
         //state 0 正常 1 异常 9 失效
         private void setSpinnerState(Spinner spinner, int state) {
-            if(state == 0){
+            if (state == 0) {
                 spinner.setEnabled(true);
                 spinner.setBackgroundResource(R.drawable.sh_xj_work_spinner_drop_down_blue);
-            }
-            else if(state == 1){
+            } else if (state == 1) {
                 spinner.setEnabled(true);
                 spinner.setBackgroundResource(R.drawable.sh_xj_work_spinner_drop_down_red);
-            }
-            else{
+            } else {
                 spinner.setEnabled(false);
                 spinner.setBackgroundResource(R.drawable.sh_xj_work_spinner_drop_down_disable);
             }
-
 
 
         }
@@ -951,8 +844,7 @@ public class XJWorkAdapter extends BaseListDataRecyclerViewAdapter<XJWorkEntity>
                 BigDecimal bigDecimal = new BigDecimal(charSequence);
                 if (xjInputTypeEntity.decimalPlace != null) {
                     xjWorkItemEntity.concluse = bigDecimal.setScale(Integer.parseInt(xjInputTypeEntity.decimalPlace), BigDecimal.ROUND_HALF_UP).toString();
-                }
-                else{
+                } else {
                     xjWorkItemEntity.concluse = charSequence;
                 }
 
@@ -1018,7 +910,6 @@ public class XJWorkAdapter extends BaseListDataRecyclerViewAdapter<XJWorkEntity>
             xjWorkItemEntity.conclusionName = realValueMap.get("PATROL_realValue/normal");
             itemXJWorkConclusionSpinner.setSelection(realValues.indexOf(xjWorkItemEntity.conclusionName));
         }
-
 
 
         /**

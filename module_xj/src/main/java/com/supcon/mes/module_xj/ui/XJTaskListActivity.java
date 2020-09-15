@@ -429,7 +429,6 @@ public class XJTaskListActivity extends BaseRefreshRecyclerActivity<XJTaskGroupE
             return;
         }
 
-        LogUtil.e("ciruy", entity.toString());
         if (entity.pageNo == 1) {
             mXJTaskEntities.clear();
             mXJTaskEntities.addAll(getXJTempTasks());
