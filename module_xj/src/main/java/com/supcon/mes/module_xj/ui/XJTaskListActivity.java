@@ -4,6 +4,7 @@ import android.annotation.SuppressLint;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.telephony.emergency.EmergencyNumber;
 import android.text.TextUtils;
 import android.view.View;
 import android.widget.TextView;
@@ -132,7 +133,8 @@ public class XJTaskListActivity extends BaseRefreshRecyclerActivity<XJTaskGroupE
 
     private Map<String, Object> queryMap = new HashMap<>();
 
-    public static final String  XJ_TASK_STAFF_KEY = "PATROL_1_0_0_patrolTask_potrolTaskList_LISTPT_ASSO_3a556662_35fb_4884_a6ab_1aff5d055ac7";
+//    public static final String  XJ_TASK_STAFF_KEY = "PATROL_1_0_0_patrolTask_potrolTaskList_LISTPT_ASSO_3a556662_35fb_4884_a6ab_1aff5d055ac7";
+    public static final String  XJ_TASK_STAFF_KEY = "PATROL_1_0_0_patrolTask_mobilePotrolTaskList_LISTPT_ASSO_bbeae76a_3694_4dc2_90f0_95fcfe8d0484";
 
     private XJTaskGroupAdapter mXJTaskGroupAdapter;
 
@@ -499,6 +501,7 @@ public class XJTaskListActivity extends BaseRefreshRecyclerActivity<XJTaskGroupE
             return;
         }
 
+        LogUtil.e("ciruy",entity.toString());
         if(entity.pageNo == 1){
             mXJTaskEntities.clear();
             mXJTaskEntities.addAll(getXJTempTasks());
@@ -543,103 +546,88 @@ public class XJTaskListActivity extends BaseRefreshRecyclerActivity<XJTaskGroupE
         List<XJTaskGroupEntity> xjTaskGroupEntities = new ArrayList<>();
         Flowable.fromIterable(taskEntities)
                 .subscribeOn(Schedulers.newThread())
-                .filter(new Predicate<XJTaskEntity>() {
-                    @Override
-                    public boolean test(XJTaskEntity xjTaskEntity) throws Exception {
+                .filter(xjTaskEntity -> {
 
-                        if(xjTaskEntity.workRoute == null){
-                            return false;
-                        }
-
-                        XJTaskEntity  taskEntity = getController(XJLocalTaskController.class).getLocalTask(xjTaskEntity.tableNo);
-                        if(taskStatusPosition == 1 && taskEntity!=null && taskEntity.isFinished){//待检过滤
-                            return false;
-                        }
-
-                        String key = xjTaskEntity.workRoute.code+""+ DateUtil.dateFormat(xjTaskEntity.startTime);
-
-                        if(xjTaskEntity.isTemp){
-                            List<XJTaskEntity> xjTaskEntities = new ArrayList<>();
-                            xjTaskEntities.add(xjTaskEntity);
-                            taskMap.put(xjTaskEntity.tableNo, xjTaskEntities);
-                        }
-
-                        else if(!taskMap.containsKey(key)){
-                            taskMap.put(key, new ArrayList<>());
-                        }
-
-                        return true;
+                    if(xjTaskEntity.workRoute == null){
+                        return false;
                     }
+                    XJTaskEntity  taskEntity = getController(XJLocalTaskController.class).getLocalTask(xjTaskEntity.tableNo);
+                    if(taskStatusPosition == 1 && taskEntity!=null && taskEntity.isFinished){//待检过滤
+                        return false;
+                    }
+
+                    String key = xjTaskEntity.workRoute.code+""+ DateUtil.dateFormat(xjTaskEntity.startTime);
+
+                    if(xjTaskEntity.isTemp){
+                        List<XJTaskEntity> xjTaskEntities = new ArrayList<>();
+                        xjTaskEntities.add(xjTaskEntity);
+                        taskMap.put(xjTaskEntity.tableNo, xjTaskEntities);
+                    }
+
+                    else if(!taskMap.containsKey(key)){
+                        taskMap.put(key, new ArrayList<>());
+                    }
+
+                    return true;
                 })
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Consumer<XJTaskEntity>() {
-                    @Override
-                    public void accept(XJTaskEntity xjTaskEntity) throws Exception {
+                .subscribe(xjTaskEntity -> {
 
-                        if(XJCacheUtil.check(context, xjTaskEntity.tableNo)){
+                    if(XJCacheUtil.check(context, xjTaskEntity.tableNo)){
 
-                            XJTaskEntity taskEntity = getController(XJLocalTaskController.class).getLocalTask(xjTaskEntity.tableNo);
+                        XJTaskEntity taskEntity = getController(XJLocalTaskController.class).getLocalTask(xjTaskEntity.tableNo);
 
-                            if(taskEntity!=null){
+                        if(taskEntity!=null){
 
-                                xjTaskEntity = taskEntity;
-                            }
-                            else
-                            {
-//                                XJCacheUtil.remove(xjTaskEntity.tableNo);
-                            }
+                            xjTaskEntity = taskEntity;
                         }
-
-                        if(!xjTaskEntity.isTemp){
-                            String key = xjTaskEntity.workRoute.code+""+ DateUtil.dateFormat(xjTaskEntity.startTime);
-                            List<XJTaskEntity> tasks = taskMap.get(key);
-                            tasks.add(0, xjTaskEntity);
-                        }
-                    }
-                }, new Consumer<Throwable>() {
-                    @Override
-                    public void accept(Throwable throwable) throws Exception {
+                        //                                XJCacheUtil.remove(xjTaskEntity.tableNo);
 
                     }
-                }, new Action() {
-                    @Override
-                    public void run() throws Exception {
 
-                        for(String key: taskMap.keySet()){
-
-                            XJTaskGroupEntity xjTaskGroupEntity = new XJTaskGroupEntity();
-                            List<XJTaskEntity> xjTaskEntities = taskMap.get(key);
-                            if(xjTaskEntities == null || xjTaskEntities.size() == 0){
-                                continue;
-                            }
-
-                            xjTaskGroupEntity.taskEntities = xjTaskEntities;
-
-                            XJTaskEntity taskEntity = xjTaskEntities.get(0);
-
-                            if(taskEntity.attrMap != null && taskEntity.attrMap.containsKey(XJ_TASK_STAFF_KEY)){
-                                xjTaskGroupEntity.staffName = (String) xjTaskEntities.get(0).attrMap.get(XJ_TASK_STAFF_KEY);
-                            }
-                            else if(taskEntity.isTemp){
-                                xjTaskGroupEntity.staffName = taskEntity.staffName;
-                            }
-
-                            xjTaskGroupEntity.date = taskEntity.startTime;
-
-                            if(taskEntity.workRoute!=null){
-                                xjTaskGroupEntity.name = taskEntity.workRoute.name;
-                            }
-
-                            if(taskEntity.patrolType!=null){
-                                xjTaskGroupEntity.typeValue = taskEntity.patrolType.value;
-                            }
-
-                            xjTaskGroupEntity.spanCount = 2;
-                            xjTaskGroupEntities.add(xjTaskGroupEntity);
-                        }
-                        refreshListController.refreshComplete(xjTaskGroupEntities);
-
+                    if(!xjTaskEntity.isTemp){
+                        String key = xjTaskEntity.workRoute.code+""+ DateUtil.dateFormat(xjTaskEntity.startTime);
+                        List<XJTaskEntity> tasks = taskMap.get(key);
+                        tasks.add(0, xjTaskEntity);
                     }
+                }, throwable -> {
+
+                }, () -> {
+
+                    for(String key: taskMap.keySet()){
+
+                        XJTaskGroupEntity xjTaskGroupEntity = new XJTaskGroupEntity();
+                        List<XJTaskEntity> xjTaskEntities = taskMap.get(key);
+                        if(xjTaskEntities == null || xjTaskEntities.size() == 0){
+                            continue;
+                        }
+
+                        xjTaskGroupEntity.taskEntities = xjTaskEntities;
+
+                        XJTaskEntity taskEntity = xjTaskEntities.get(0);
+
+                        if(taskEntity.attrMap != null && taskEntity.attrMap.containsKey(XJ_TASK_STAFF_KEY)){
+                            xjTaskGroupEntity.staffName = (String) xjTaskEntities.get(0).attrMap.get(XJ_TASK_STAFF_KEY);
+                        }
+                        else if(taskEntity.isTemp){
+                            xjTaskGroupEntity.staffName = taskEntity.staffName;
+                        }
+
+                        xjTaskGroupEntity.date = taskEntity.startTime;
+
+                        if(taskEntity.workRoute!=null){
+                            xjTaskGroupEntity.name = taskEntity.workRoute.name;
+                        }
+
+                        if(taskEntity.patrolType!=null){
+                            xjTaskGroupEntity.typeValue = taskEntity.patrolType.value;
+                        }
+
+                        xjTaskGroupEntity.spanCount = 2;
+                        xjTaskGroupEntities.add(xjTaskGroupEntity);
+                    }
+                    refreshListController.refreshComplete(xjTaskGroupEntities);
+
                 });
 
 

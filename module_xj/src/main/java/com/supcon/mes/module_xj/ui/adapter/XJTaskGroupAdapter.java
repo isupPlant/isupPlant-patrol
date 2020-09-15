@@ -3,7 +3,6 @@ package com.supcon.mes.module_xj.ui.adapter;
 import android.content.Context;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
@@ -24,10 +23,6 @@ import java.util.List;
 public class XJTaskGroupAdapter extends BaseListDataRecyclerViewAdapter<XJTaskGroupEntity> {
     public XJTaskGroupAdapter(Context context) {
         super(context);
-    }
-
-    public XJTaskGroupAdapter(Context context, List<XJTaskGroupEntity> list) {
-        super(context, list);
     }
 
     @Override
@@ -55,16 +50,8 @@ public class XJTaskGroupAdapter extends BaseListDataRecyclerViewAdapter<XJTaskGr
 
         private XJTaskAdapter mXJTaskAdapter;
 
-        public XJTaskRouterViewHolder(Context context) {
-            super(context);
-        }
-
         public XJTaskRouterViewHolder(Context context, ViewGroup parent) {
             super(context, parent);
-        }
-
-        public XJTaskRouterViewHolder(View itemView) {
-            super(itemView);
         }
 
         @Override
