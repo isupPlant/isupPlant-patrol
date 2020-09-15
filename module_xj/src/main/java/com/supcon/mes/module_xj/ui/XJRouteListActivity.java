@@ -18,37 +18,49 @@ import com.supcon.common.view.util.LogUtil;
 import com.supcon.common.view.util.StatusBarUtils;
 import com.supcon.mes.mbap.utils.SpaceItemDecoration;
 import com.supcon.mes.middleware.constant.Constant;
+import com.supcon.mes.middleware.model.bean.BAP5CommonListEntity;
 import com.supcon.mes.middleware.model.bean.xj.XJRouteEntity;
 import com.supcon.mes.middleware.model.event.SelectDataEvent;
 import com.supcon.mes.middleware.util.ErrorMsgHelper;
 import com.supcon.mes.module_xj.R;
+import com.supcon.mes.module_xj.model.api.LSXJRouterAPI;
 import com.supcon.mes.module_xj.model.api.XJRouteAPI;
+import com.supcon.mes.module_xj.model.bean.LSXJRouterEntity;
+import com.supcon.mes.module_xj.model.contract.LSXJRouterContract;
 import com.supcon.mes.module_xj.model.contract.XJRouteContract;
+import com.supcon.mes.module_xj.presenter.LSXJRouterPresenter;
 import com.supcon.mes.module_xj.presenter.XJRoutePresenter;
 import com.supcon.mes.module_xj.ui.adapter.XJRouteAdapter;
 
 import org.greenrobot.eventbus.EventBus;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
+import io.reactivex.Flowable;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.functions.Action;
 import io.reactivex.functions.Consumer;
+import io.reactivex.functions.Predicate;
+import io.reactivex.schedulers.Schedulers;
 
 /**
  * Created by wangshizhan on 2020/5/30
  * Email:wangshizhan@supcom.com
  */
 @Router(Constant.Router.XJ_ROUTE_LIST)
-@Presenter(XJRoutePresenter.class)
-public class XJRouteListActivity extends BaseRefreshRecyclerActivity implements XJRouteContract.View {
+@Presenter(value = {XJRoutePresenter.class, LSXJRouterPresenter.class})
+public class XJRouteListActivity extends BaseRefreshRecyclerActivity implements XJRouteContract.View, LSXJRouterContract.View {
 
     @BindByTag("titleText")
     TextView titleText;
 
     @BindByTag("contentView")
     RecyclerView contentView;
-
+    private List<XJRouteEntity> xjRouteEntityList;
     XJRouteAdapter mXJRouteAdapter;
+    private long eamId;
 
     @Override
     protected IListAdapter createAdapter() {
@@ -64,6 +76,7 @@ public class XJRouteListActivity extends BaseRefreshRecyclerActivity implements 
     @Override
     protected void onInit() {
         super.onInit();
+        eamId = getIntent().getLongExtra(Constant.IntentKey.SBDA_ONLINE_EAMID, -1);
         refreshListController.setAutoPullDownRefresh(true);
         refreshListController.setPullDownRefreshEnabled(false);
         refreshListController.setOnRefreshListener(new OnRefreshListener() {
@@ -110,11 +123,70 @@ public class XJRouteListActivity extends BaseRefreshRecyclerActivity implements 
 
     @Override
     public void getRouteListSuccess(List entity) {
-        refreshListController.refreshComplete(entity);
+        xjRouteEntityList = entity;
+        if (eamId != -1) {
+            presenterRouter.create(LSXJRouterAPI.class).queryRouteList(eamId);
+        } else {
+            refreshListController.refreshComplete(entity);
+        }
+
     }
 
     @Override
     public void getRouteListFailed(String errorMsg) {
+        refreshListController.refreshComplete(null);
+        LogUtil.e(ErrorMsgHelper.msgParse(errorMsg));
+    }
+
+
+    List<XJRouteEntity> xjData = new ArrayList<>();
+
+    @SuppressLint("CheckResult")
+    @Override
+    public void queryRouteListSuccess(BAP5CommonListEntity entity) {
+        List<LSXJRouterEntity> lsxjRouterEntityList = entity.data;
+        //获取当前设备相关联的巡检路线
+        Flowable.fromIterable(xjRouteEntityList)
+                .subscribeOn(Schedulers.newThread())
+                .filter(new Predicate<XJRouteEntity>() {
+                    @Override
+                    public boolean test(XJRouteEntity xjRouteEntity) throws Exception {
+                        if (lsxjRouterEntityList.size() == 0) {
+                            return false;
+                        } else {
+                            for (int i = 0; i < lsxjRouterEntityList.size(); i++) {
+                                if (xjRouteEntity.id != null && lsxjRouterEntityList.get(i).id != null &&
+                                        (xjRouteEntity.id.longValue() == lsxjRouterEntityList.get(i).id.longValue())) {
+                                    return true;
+                                }
+                            }
+                            return false;
+                        }
+
+                    }
+                })
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Consumer<XJRouteEntity>() {
+                    @Override
+                    public void accept(XJRouteEntity xjRouteEntity) throws Exception {
+                        xjData.add(xjRouteEntity);
+                    }
+                }, new Consumer<Throwable>() {
+                    @Override
+                    public void accept(Throwable throwable) throws Exception {
+
+                    }
+                }, new Action() {
+                    @Override
+                    public void run() throws Exception {
+                        refreshListController.refreshComplete(xjData);
+                    }
+                });
+
+    }
+
+    @Override
+    public void queryRouteListFailed(String errorMsg) {
         refreshListController.refreshComplete(null);
         LogUtil.e(ErrorMsgHelper.msgParse(errorMsg));
     }

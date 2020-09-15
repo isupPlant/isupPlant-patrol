@@ -116,11 +116,11 @@
                 app:text=""
                 app:text_size="14"
                 app:icon_res="@drawable/ic_xj_multi_check"
-                android:visibility="gone"
+
                 />
             <TextView
                 android:layout_width="0dp"
-                android:layout_weight="0.5"
+                android:layout_weight="1"
                 android:layout_height="wrap_content"
                 android:textColor="@color/hintColor"
                 android:textSize="10sp"

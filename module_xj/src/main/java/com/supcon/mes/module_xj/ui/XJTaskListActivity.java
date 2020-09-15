@@ -39,6 +39,7 @@ import com.supcon.mes.middleware.model.listener.OnAPIResultListener;
 import com.supcon.mes.middleware.model.listener.OnSuccessListener;
 import com.supcon.mes.middleware.presenter.DeploymentPresenter;
 import com.supcon.mes.middleware.util.SBTUtil;
+import com.supcon.mes.middleware.util.StartLocationUtils;
 import com.supcon.mes.middleware.util.TimeUtil;
 import com.supcon.mes.middleware.util.XJCacheUtil;
 import com.supcon.mes.module_xj.IntentRouter;
@@ -53,7 +54,8 @@ import com.supcon.mes.module_xj.model.bean.XJTaskEntity;
 import com.supcon.mes.module_xj.model.bean.XJTaskGroupEntity;
 import com.supcon.mes.module_xj.model.contract.XJTaskContract;
 import com.supcon.mes.module_xj.model.event.XJTempTaskAddEvent;
-import com.supcon.mes.module_xj.presenter.XJTaskPresenter;
+import com.supcon.mes.module_xj.presenter.XJRunningTaskPresenter;
+import com.supcon.mes.module_xj.service.RealTimeUploadLoactionService;
 import com.supcon.mes.module_xj.ui.adapter.XJTaskGroupAdapter;
 import com.supcon.mes.module_xj.util.BundleSaveUtil;
 import com.supcon.mes.sb2.config.SB2Config;
@@ -89,7 +91,7 @@ import io.reactivex.schedulers.Schedulers;
         XJTaskNoIssuedController.class,
         XJTaskUploadController.class,/*获取，上传*/
         XJLocalTaskController.class})
-@Presenter(value = {XJTaskPresenter.class, DeploymentPresenter.class})
+@Presenter(value = {XJRunningTaskPresenter.class, DeploymentPresenter.class})
 @SystemCode(entityCodes = {
         Constant.SystemCode.PATROL_taskState,
         Constant.SystemCode.PATROL_editType,
@@ -151,16 +153,28 @@ public class XJTaskListActivity extends BaseRefreshRecyclerActivity<XJTaskGroupE
 
         EventBus.getDefault().register(this);
 
-
     }
+
+
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
         if (mXJTaskGroupAdapter.getXJTaskEntity() != null && mXJTaskGroupAdapter.getXJTaskEntity().size() > 0) {
             SharedPreferencesUtils.setParam(context, Constant.SPKey.XJ_TASKS_CACHE + dateFilter + taskStatusPosition, GsonUtil.gsonString(mXJTaskGroupAdapter.getXJTaskEntity()));
+            if (mXJTaskEntities != null && mXJTaskEntities.size() > 0) {
+                SharedPreferencesUtils.setParam(context, Constant.SPKey.XJ_TASKS_CACHE + dateFilter + taskStatusPosition, GsonUtil.gsonString(mXJTaskEntities));
+            } else {
+                SharedPreferencesUtils.setParam(context, Constant.SPKey.XJ_TASKS_CACHE + dateFilter + taskStatusPosition, "");
+            }
+            EventBus.getDefault().unregister(this);
+
+            StartLocationUtils.stopLocation();
+
+
+            RealTimeUploadLoactionService.stopUploadLoactionLoop(this);
+
         }
-        EventBus.getDefault().unregister(this);
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
@@ -203,12 +217,16 @@ public class XJTaskListActivity extends BaseRefreshRecyclerActivity<XJTaskGroupE
                     }
                 });
 
-        if (mXJTaskEntities.size() == 0) {
+        if (mXJTaskEntities != null && mXJTaskEntities.size() > 0) {
+            if (mXJTaskEntities.size() == 0) {
+                refreshListController.refreshBegin();
+            } else {
+                createTaskGroups(mXJTaskEntities);
+            }
             refreshListController.refreshBegin();
-        } else {
-            createTaskGroups(mXJTaskEntities);
-        }
 
+
+        }
     }
 
     @Override
@@ -404,7 +422,8 @@ public class XJTaskListActivity extends BaseRefreshRecyclerActivity<XJTaskGroupE
     @Override
     protected void onResume() {
         super.onResume();
-        if (needRefresh) {
+
+        if(needRefresh){
             createTaskGroups(mXJTaskEntities);
             needRefresh = false;
         }
@@ -412,6 +431,9 @@ public class XJTaskListActivity extends BaseRefreshRecyclerActivity<XJTaskGroupE
             refreshListController.refreshBegin();
             isRefresh = false;
         }
+
+        StartLocationUtils.startLocation();
+        RealTimeUploadLoactionService.startUploadLoactionLoop(this);
     }
 
     private void initQueryMap() {
@@ -423,7 +445,8 @@ public class XJTaskListActivity extends BaseRefreshRecyclerActivity<XJTaskGroupE
         queryMap.put(Constant.BAPQuery.XJ_START_TIME_1, start);
         queryMap.put(Constant.BAPQuery.XJ_START_TIME_2, end);
 
-        queryMap.put(Constant.BAPQuery.XJ_TASK_STATE, "PATROL_taskState/issued");//PATROL_taskState/notIssued
+    //    queryMap.put(Constant.BAPQuery.XJ_TASK_STATE, "PATROL_taskState/issued");//PATROL_taskState/notIssued
+
     }
 
     private void getXJTask(int pageNo, Map<String, Object> queryMap) {
@@ -578,6 +601,7 @@ public class XJTaskListActivity extends BaseRefreshRecyclerActivity<XJTaskGroupE
 
                     }
                 });
+
 
 
     }

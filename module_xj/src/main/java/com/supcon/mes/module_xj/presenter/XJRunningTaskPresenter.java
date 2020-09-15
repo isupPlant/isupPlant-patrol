@@ -23,14 +23,14 @@ import io.reactivex.functions.Function;
  * Created by wangshizhan on 2020/3/24
  * Email:wangshizhan@supcom.com
  */
-public class XJTaskPresenter extends XJTaskContract.Presenter {
+public class XJRunningTaskPresenter extends XJTaskContract.Presenter {
 
     @Override
     public void getTaskList(int pageNo, int pageSize, Map<String, Object> queryMap) {
         FastQueryCondEntity fastQueryCondEntity = BAPQueryParamsHelper.createSingleFastQueryCond(queryMap);
         fastQueryCondEntity.modelAlias = "potrolTask";
-        fastQueryCondEntity.viewCode = "PATROL_1.0.0_patrolTask_potrolTaskList";
-  //      fastQueryCondEntity.viewCode = "PATROL_1.0.0_patrolTask_mobilePotrolTaskList";
+     //   fastQueryCondEntity.viewCode = "PATROL_1.0.0_patrolTask_potrolTaskList";
+        fastQueryCondEntity.viewCode = "PATROL_1.0.0_patrolTask_mobilePotrolTaskList";
 //        fastQueryCondEntity.condName = "fastCond";
 //        fastQueryCondEntity.remark = "fastCond";
 
@@ -54,7 +54,7 @@ public class XJTaskPresenter extends XJTaskContract.Presenter {
         pageQueryParam.put("fastQueryCond", gson.toJson(fastQueryCondEntity));
 //        pageQueryParam.put("customCondition", new CustomCondition());
 
-        mCompositeSubscription.add(XJHttpClient.getTaskList(pageQueryParam)
+        mCompositeSubscription.add(XJHttpClient.getRunningTaskList(pageQueryParam)
                 .onErrorReturn(new Function<Throwable, BAP5CommonEntity<CommonBAPListEntity<XJTaskEntity>>>() {
                     @Override
                     public BAP5CommonEntity<CommonBAPListEntity<XJTaskEntity>> apply(Throwable throwable) throws Exception {

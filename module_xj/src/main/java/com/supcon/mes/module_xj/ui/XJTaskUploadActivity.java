@@ -399,11 +399,23 @@ public class XJTaskUploadActivity extends BaseRefreshRecyclerActivity<XJTaskGrou
             return;
         }
 
+        for (int i = 0; i < taskEntities.size() - 1; i++) {//对上传任务进行排序  升序
+            for (int j = 1; j < taskEntities.size() - i; j++) {
+                XJTaskEntity a;
+                if ((taskEntities.get(j - 1)).startTime<(taskEntities.get(j)).startTime) { // 比较两个时间戳的大小
+                    a = taskEntities.get(j - 1);
+                    taskEntities.set((j - 1), taskEntities.get(j));
+                    taskEntities.set(j, a);
+                }
+            }
+        }
 
-       createTaskGroups(taskEntities);
+
+        createTaskGroups(taskEntities);
 
 
     }
+
 
     @Override
     public void getLocalTaskFailed(String errorMsg) {
