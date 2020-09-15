@@ -1,6 +1,7 @@
 package com.supcon.mes.module_xj.ui;
 
 import android.annotation.SuppressLint;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -327,17 +328,16 @@ public class XJWorkActivity extends BaseRefreshRecyclerActivity<XJWorkEntity> im
 
         });
 
+
         eamSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-
                 String deviceName = deviceNames.get(position);
                 showWorks(deviceName);
             }
 
             @Override
             public void onNothingSelected(AdapterView<?> parent) {
-
             }
         });
 
@@ -458,16 +458,9 @@ public class XJWorkActivity extends BaseRefreshRecyclerActivity<XJWorkEntity> im
         List<XJWorkEntity> noEamWorks = new ArrayList<>();
         Flowable.fromIterable(mXJAreaEntity.works)
                 .subscribeOn(Schedulers.newThread())
-                .filter(xjWorkEntity -> {
-
-                    if (xjWorkEntity.isFinished) {
-                        return false;
-                    }
-                    return true;
-                })
+                .filter(xjWorkEntity -> !xjWorkEntity.isFinished)
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(xjWorkEntity -> {
-
                     if (xjWorkEntity.realRemark != null) {
                         xjWorkEntity.remark = xjWorkEntity.realRemark;
                     } else {
@@ -516,30 +509,15 @@ public class XJWorkActivity extends BaseRefreshRecyclerActivity<XJWorkEntity> im
                     if (deviceNames.size() == 0) {
                         ((ViewGroup) eamSpinner.getParent()).setVisibility(View.GONE);
                         refreshListController.refreshComplete(mWorkEntities);
-//                            if(mWorkEntities.size() == 0){
-//                                refreshListController.refreshComplete(null);
-//                                return;
-//                            }
-//                            XJWorkEntity workEntity = new XJWorkEntity();
-//                            workEntity.isEamView =true;
-//                            workEntity.eamNum =1;
-//                            mWorkEntities.add(0, workEntity);
-//
-//                            refreshListController.refreshComplete(mWorkEntities);
+                    } else if (deviceNames.size() == 1) {
+                        ((ViewGroup) eamSpinner.getParent()).setVisibility(View.GONE);
+                        refreshListController.refreshComplete(mWorkEntities);
                     } else {
-
-                        if (deviceNames.size() == 1) {
-                            ((ViewGroup) eamSpinner.getParent()).setVisibility(View.GONE);
-                            refreshListController.refreshComplete(mWorkEntities);
-                        } else {
-                            deviceNames.add(0, getString(R.string.xj_work_eam_all));
-                            ((ViewGroup) eamSpinner.getParent()).setVisibility(View.VISIBLE);
-                            ArrayAdapter<String> eamSpinnerAdapter = new ArrayAdapter<>(context, R.layout.ly_spinner_item_dark, deviceNames);  //创建一个数组适配器
-                            eamSpinnerAdapter.setDropDownViewResource(R.layout.ly_spinner_dropdown_item);     //设置下拉列表框的下拉选项样式
-                            eamSpinner.setAdapter(eamSpinnerAdapter);
-                        }
-
-
+                        deviceNames.add(0, getString(R.string.xj_work_eam_all));
+                        ((ViewGroup) eamSpinner.getParent()).setVisibility(View.VISIBLE);
+                        ArrayAdapter<String> eamSpinnerAdapter = new ArrayAdapter<>(context, R.layout.ly_spinner_item_dark, deviceNames);  //创建一个数组适配器
+                        eamSpinnerAdapter.setDropDownViewResource(R.layout.ly_spinner_dropdown_item);     //设置下拉列表框的下拉选项样式
+                        eamSpinner.setAdapter(eamSpinnerAdapter);
                     }
                 });
 
@@ -554,19 +532,17 @@ public class XJWorkActivity extends BaseRefreshRecyclerActivity<XJWorkEntity> im
 
     }
 
+    private void showAllWorks() {
+        showWorks(getString(R.string.xj_work_eam_all));
+    }
+
     @SuppressLint("CheckResult")
     private void showWorks(String deviceName) {
-        boolean isAll;
-        isAll = getString(R.string.xj_work_eam_all).equals(deviceName);
+        boolean isAll = getString(R.string.xj_work_eam_all).equals(deviceName);
         List<XJWorkEntity> workEntities = new ArrayList<>();
         Flowable.fromIterable(mWorkEntities)
                 .subscribeOn(Schedulers.newThread())
-                .filter(xjWorkEntity -> {
-                    if (isAll || xjWorkEntity.eamId != null && xjWorkEntity.eamId.name != null && xjWorkEntity.eamId.name.equals(deviceName)) {
-                        return true;
-                    }
-                    return false;
-                })
+                .filter(xjWorkEntity -> isAll || xjWorkEntity.eamId != null && xjWorkEntity.eamId.name != null && xjWorkEntity.eamId.name.equals(deviceName))
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(workEntities::add, throwable -> {
                 }, () -> refreshListController.refreshComplete(workEntities));
@@ -704,8 +680,6 @@ public class XJWorkActivity extends BaseRefreshRecyclerActivity<XJWorkEntity> im
 
     @SuppressLint("CheckResult")
     public void showAllFinishDialog(long eamId) {
-
-
         new CustomDialog(context)
                 .twoButtonAlertDialog(eamId == 0 ? getString(R.string.xj_work_finish_warning2) : getString(R.string.xj_work_finish_warning1))
                 .bindView(R.id.grayBtn, getString(R.string.no))
@@ -717,7 +691,6 @@ public class XJWorkActivity extends BaseRefreshRecyclerActivity<XJWorkEntity> im
 
     @SuppressLint("CheckResult")
     private void doAllFinish(long eamId) {
-
         if (mWorkEntities.size() == 0) {
             ToastUtils.show(context, getString(R.string.xj_work_finish_warning3));
             return;
@@ -742,8 +715,7 @@ public class XJWorkActivity extends BaseRefreshRecyclerActivity<XJWorkEntity> im
                                 } else {
                                     sb.append("[").append(xjWorkItemEntity.eamId.name).append("]");
                                 }
-                                sb.append(context.getResources().getString(R.string.xj_patrol_xj_content) + xjWorkItemEntity.content + context.getResources().getString(R.string.xj_patrol_input_result));
-//                                ToastUtils.show(context,  sb.toString());
+                                sb.append(context.getResources().getString(R.string.xj_patrol_xj_content)).append(xjWorkItemEntity.content).append(context.getResources().getString(R.string.xj_patrol_input_result));
                                 msg = sb.toString();
                             } else if (xjWorkItemEntity.isPhone && !xjWorkItemEntity.isRealPhoto) {
                                 StringBuilder sb = new StringBuilder();
@@ -752,13 +724,10 @@ public class XJWorkActivity extends BaseRefreshRecyclerActivity<XJWorkEntity> im
                                 } else {
                                     sb.append("[").append(xjWorkItemEntity.eamId.name).append("]");
                                 }
-                                sb.append(context.getResources().getString(R.string.xj_patrol_xj_content) + xjWorkItemEntity.content + context.getResources().getString(R.string.xj_patrol_take_photo));
-//                                ToastUtils.show(context,  sb.toString());
+                                sb.append(context.getResources().getString(R.string.xj_patrol_xj_content)).append(xjWorkItemEntity.content).append(context.getResources().getString(R.string.xj_patrol_take_photo));
                                 msg = sb.toString();
                             }
-
                             if (!TextUtils.isEmpty(msg)) {
-
                                 if (isCanEndAll) {
                                     WorkItemLocationEvent workItemLocationEvent = new WorkItemLocationEvent(mXJWorkAdapter.getList().indexOf(xjWorkItemEntity));
                                     workItemLocationEvent.setMsg(msg);
@@ -766,60 +735,34 @@ public class XJWorkActivity extends BaseRefreshRecyclerActivity<XJWorkEntity> im
                                 }
                                 isCanEndAll = false;
                             }
-
-//                            if(TextUtils.isEmpty(xjWorkItemEntity.concluse) && TextUtils.isEmpty(xjWorkItemEntity.defaultVal)){
-//
-//                                if(isCanEndAll) {
-//                                    EventBus.getDefault().post(new WorkItemLocationEvent(mXJWorkAdapter.getList().indexOf(xjWorkItemEntity)));
-//                                }
-//                                isCanEndAll = false;
-//                            }
                             xjWorkEntities.add(xjWorkItemEntity);
                         },
                         throwable -> {
                         },
                         () -> {
-
                             if (!isCanEndAll) {
                                 return;
                             }
-
                             try {
                                 for (XJWorkEntity xjWorkItemEntity : xjWorkEntities) {
-
-                                    if (doFinish(xjWorkItemEntity)) {
-//                                        EventBus.getDefault().post(new XJWorkRefreshEvent(mXJWorkAdapter.getList().indexOf(xjWorkItemEntity), true));
-                                    }
+                                    doFinish(xjWorkItemEntity);
                                 }
-
+                                LogUtil.e("ciruy", xjWorkEntities.size()+","+mXJAreaEntity.works.size());
                                 if (xjWorkEntities.size() == mXJAreaEntity.works.size()) {
-//                                    onLoadSuccess("操作完成");
-//                                    mXJAreaEntity.isFinished = true;
-//                                    finish();
-
                                     onLoadSuccessAndExit(context.getResources().getString(R.string.xj_patrol_over), this::finish);
                                 } else {
 
                                     refreshWorkList();
-
-//                                    EventBus.getDefault().post(new XJWorkRefreshEvent());
                                 }
-
-
                             } catch (Exception e) {
                                 onLoadFailed(context.getResources().getString(R.string.xj_patrol_operater_fail) + e.getMessage());
                                 e.printStackTrace();
-                            } finally {
-
                             }
                             isOneKeyOver = false;
                         });
-
-
     }
 
     private void refreshWorkList() {
-
         mDevice = null;
         deviceNames.clear();
         mWorkEntities.clear();
@@ -1128,7 +1071,12 @@ public class XJWorkActivity extends BaseRefreshRecyclerActivity<XJWorkEntity> im
                 }
             }
         }
-        mXJWorkAdapter.notifyDataSetChanged();
+        if (deviceNames.size() > 1) {
+            eamSpinner.setSelection(1);
+            showWorks(deviceNames.get(1));
+        } else {
+            mXJWorkAdapter.notifyDataSetChanged();
+        }
     }
 
     @Override
