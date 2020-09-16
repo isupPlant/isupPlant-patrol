@@ -7,6 +7,7 @@ import com.supcon.common.com_http.util.RxSchedulers;
 import com.supcon.common.view.util.LogUtil;
 import com.supcon.mes.mbap.network.Api;
 import com.supcon.mes.mbap.utils.GsonUtil;
+import com.supcon.mes.middleware.SupPlantApplication;
 import com.supcon.mes.middleware.constant.Constant;
 import com.supcon.mes.middleware.model.bean.AttachmentEntity;
 import com.supcon.mes.middleware.model.bean.BAP5CommonEntity;
@@ -16,6 +17,7 @@ import com.supcon.mes.middleware.model.network.MiddlewareHttpClient;
 import com.supcon.mes.middleware.util.FileUtil;
 import com.supcon.mes.middleware.util.Util;
 import com.supcon.mes.middleware.util.ZipUtils;
+import com.supcon.mes.module_xj.R;
 import com.supcon.mes.module_xj.model.bean.XJTaskEntity;
 import com.supcon.mes.module_xj.model.bean.XJTaskUploadEntity;
 import com.supcon.mes.module_xj.model.bean.XJUploadEntity;
@@ -148,7 +150,7 @@ public class XJTaskSubmitPresenter extends XJTaskSubmitContract.Presenter {
         if (file.exists() && file.isFile()){
             if (file.length()/(1024*1024 ) > 100){
                 if(isViewNonNull(getView())){
-                    getView().uploadFileFailed("上传的巡检数据文件大于100MB，请重新处理数据上传！");
+                    getView().uploadFileFailed(SupPlantApplication.getAppContext().getString(R.string.xj_patrol_upload_size_warning));
                 }
                 return file;
             }

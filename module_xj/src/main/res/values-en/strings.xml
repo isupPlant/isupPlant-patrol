@@ -111,4 +111,5 @@
 	<string name="xj_patrol_start_service">Open service</string>
 	<string name="xj_patrol_close">Close</string>
 	<string name="xj_patrol_input_remark">Fill in the remarks</string>
+	<string name="xj_patrol_upload_size_warning">Upload data is larger than 100MB, please upload again after reduce</string>
 </resources>
