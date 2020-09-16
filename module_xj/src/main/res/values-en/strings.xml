@@ -75,7 +75,7 @@
 	<string name="xj_patrol_range">Abnormal conversion numbers in the normal range！</string>
 	<string name="xj_patrol_jump_check">Skip check</string>
 	<string name="xj_patrol_route_selete">Inspection route selection</string>
-	<string name="xj_patrol_uhf_succeed">UHF initialization succeeded！</string>
+	<string name="xj_patrol_uhf_succeed">UHF initialization successfully！</string>
 	<string name="xj_patrol_uhf_fail">UHF initialization failed！</string>
 	<string name="xj_patrol_sure">Sure</string>
 	<string name="xj_patrol_cancel">Cancel</string>
