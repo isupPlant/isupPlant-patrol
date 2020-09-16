@@ -457,9 +457,7 @@ public class XJWorkActivity extends BaseRefreshRecyclerActivity<XJWorkEntity> im
     private void initWorks() {
         List<XJWorkEntity> noEamWorks = new ArrayList<>();
         Flowable.fromIterable(mXJAreaEntity.works)
-                .subscribeOn(Schedulers.newThread())
                 .filter(xjWorkEntity -> !xjWorkEntity.isFinished)
-                .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(xjWorkEntity -> {
                     if (xjWorkEntity.realRemark != null) {
                         xjWorkEntity.remark = xjWorkEntity.realRemark;
@@ -526,8 +524,15 @@ public class XJWorkActivity extends BaseRefreshRecyclerActivity<XJWorkEntity> im
                 deviceNumber.add(xjWorkEntity.itemNumber.trim());
             }
         }
+
         if (deviceNumber.size() > 0) {
             presenterRouter.create(DeviceDCSParamQueryAPI.class).getDeviceDCSParams(deviceNumber);
+        }
+        else {
+            if(deviceNames.size()>0){
+                eamSpinner.setSelection(1);
+                showWorks(deviceNames.get(1));
+            }
         }
 
     }
@@ -747,11 +752,9 @@ public class XJWorkActivity extends BaseRefreshRecyclerActivity<XJWorkEntity> im
                                 for (XJWorkEntity xjWorkItemEntity : xjWorkEntities) {
                                     doFinish(xjWorkItemEntity);
                                 }
-                                LogUtil.e("ciruy", xjWorkEntities.size()+","+mXJAreaEntity.works.size());
                                 if (xjWorkEntities.size() == mXJAreaEntity.works.size()) {
                                     onLoadSuccessAndExit(context.getResources().getString(R.string.xj_patrol_over), this::finish);
                                 } else {
-
                                     refreshWorkList();
                                 }
                             } catch (Exception e) {
