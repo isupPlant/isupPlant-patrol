@@ -150,8 +150,9 @@ public class XJWorkViewActivity extends BaseRefreshRecyclerActivity<XJWorkEntity
 //            titleText.setText(getString(R.string.xj_work_view));
 //        }
 //        else {
-            titleText.setText(getString(R.string.xj_work_finish));
+//            titleText.setText(getString(R.string.xj_work_finish));
 //        }
+        titleText.setText(mXJAreaEntity.name);
         rightBtn.setVisibility(View.VISIBLE);
         rightBtn.setImageResource(R.drawable.ic_xj_work_upload);
         contentView.setLayoutManager(new LinearLayoutManager(context));

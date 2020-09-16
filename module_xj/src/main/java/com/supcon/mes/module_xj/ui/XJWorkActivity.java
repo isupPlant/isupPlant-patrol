@@ -88,6 +88,7 @@ import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 import io.reactivex.Flowable;
+import io.reactivex.Scheduler;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;
 
@@ -150,6 +151,7 @@ public class XJWorkActivity extends BaseRefreshRecyclerActivity<XJWorkEntity> im
     private TextView tempTv;
     private XJTaskEntity mXJTaskEntity;
     private ImageView viberStatusIv;
+    private boolean isAll = true;
 
     @Override
     protected int getLayoutID() {
@@ -238,7 +240,8 @@ public class XJWorkActivity extends BaseRefreshRecyclerActivity<XJWorkEntity> im
         super.initView();
         StatusBarUtils.setWindowStatusBarColor(this, R.color.themeColor);
         titleTextMiddle.setVisibility(View.VISIBLE);
-        titleTextMiddle.setText(getString(R.string.xj_work));
+//        titleTextMiddle.setText(getString(R.string.xj_work));
+        titleTextMiddle.setText(mXJAreaEntity.name);
         rightBtn.setImageResource(R.drawable.sl_xj_work_top_finish);
         rightBtn_sec.setImageResource(R.drawable.sl_top_more);
 
@@ -487,7 +490,6 @@ public class XJWorkActivity extends BaseRefreshRecyclerActivity<XJWorkEntity> im
                 }, throwable -> {
 
                 }, () -> {
-//                        refreshListController.refreshComplete(mWorkEntities);
                     if (noEamWorks.size() != 0) {
                         XJWorkEntity workEntity = new XJWorkEntity();
                         workEntity.isEamView = true;
@@ -516,6 +518,7 @@ public class XJWorkActivity extends BaseRefreshRecyclerActivity<XJWorkEntity> im
                         ArrayAdapter<String> eamSpinnerAdapter = new ArrayAdapter<>(context, R.layout.ly_spinner_item_dark, deviceNames);  //创建一个数组适配器
                         eamSpinnerAdapter.setDropDownViewResource(R.layout.ly_spinner_dropdown_item);     //设置下拉列表框的下拉选项样式
                         eamSpinner.setAdapter(eamSpinnerAdapter);
+                        eamSpinner.setSelection(isAll?0:1);
                     }
                 });
 
@@ -524,26 +527,15 @@ public class XJWorkActivity extends BaseRefreshRecyclerActivity<XJWorkEntity> im
                 deviceNumber.add(xjWorkEntity.itemNumber.trim());
             }
         }
-
         if (deviceNumber.size() > 0) {
             presenterRouter.create(DeviceDCSParamQueryAPI.class).getDeviceDCSParams(deviceNumber);
         }
-        else {
-            if(deviceNames.size()>0){
-                eamSpinner.setSelection(1);
-                showWorks(deviceNames.get(1));
-            }
-        }
-
-    }
-
-    private void showAllWorks() {
-        showWorks(getString(R.string.xj_work_eam_all));
     }
 
     @SuppressLint("CheckResult")
     private void showWorks(String deviceName) {
-        boolean isAll = getString(R.string.xj_work_eam_all).equals(deviceName);
+//        LogUtil.e("ciruy", "showWorks:"+deviceName);
+        isAll = getString(R.string.xj_work_eam_all).equals(deviceName);
         List<XJWorkEntity> workEntities = new ArrayList<>();
         Flowable.fromIterable(mWorkEntities)
                 .subscribeOn(Schedulers.newThread())
@@ -791,8 +783,6 @@ public class XJWorkActivity extends BaseRefreshRecyclerActivity<XJWorkEntity> im
                 xjWorkItemEntity.conclusionID = TextUtils.isEmpty(xjWorkItemEntity.conclusionID) ? "PATROL_realValue/normal" : xjWorkItemEntity.conclusionID;
                 xjWorkItemEntity.realValue = SystemCodeManager.getInstance().getSystemCodeEntity(xjWorkItemEntity.conclusionID);
             }
-
-
         }
         return true;
     }
@@ -1074,12 +1064,14 @@ public class XJWorkActivity extends BaseRefreshRecyclerActivity<XJWorkEntity> im
                 }
             }
         }
-        if (deviceNames.size() > 1) {
-            eamSpinner.setSelection(1);
-            showWorks(deviceNames.get(1));
-        } else {
+//        LogUtil.e("ciruy", "isAll:"+isAll+",deviceNames:"+deviceNames.toString());
+//        if (deviceNames.size() > 1) {
+//            eamSpinner.setSelection(isAll?0:1);
+//            LogUtil.e("ciruy", "eamSpinner:"+isAll);
+//            showWorks(deviceNames.get(isAll?0:1));
+//        } else {
             mXJWorkAdapter.notifyDataSetChanged();
-        }
+//        }
     }
 
     @Override

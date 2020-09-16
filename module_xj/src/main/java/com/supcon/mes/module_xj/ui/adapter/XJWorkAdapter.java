@@ -756,7 +756,7 @@ public class XJWorkAdapter extends BaseListDataRecyclerViewAdapter<XJWorkEntity>
             if (candidateValue != null) {
                 values.addAll(candidateValue);
             }
-            switchView.setValues(values.toArray(new String[values.size()]), TextUtils.isEmpty(defaultVal) ? 0 : values.indexOf(defaultVal));
+            switchView.setValues(values.toArray(new String[values.size()]), TextUtils.isEmpty(defaultVal) ? -1 : values.indexOf(defaultVal));
         }
 
         private void initSpinner(Spinner spinner, String defaultVal, Collection<String> candidateValue) {

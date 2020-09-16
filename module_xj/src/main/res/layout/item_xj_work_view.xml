@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
@@ -16,17 +17,19 @@
         android:visibility="gone"
         />
     <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="30dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
         android:textColor="@color/xjTitleColor"
         android:textSize="@dimen/fontSize_14sp"
         android:text=""
         android:gravity="center_vertical"
         android:id="@+id/itemXJWorkViewContent"
+        android:layout_toLeftOf="@+id/itemXJWorkViewRedo"
         android:layout_toRightOf="@+id/itemXJWorkViewFlag"
         android:layout_marginLeft="@dimen/dp_5"
         android:tag="itemXJWorkViewContent"
-        android:maxLines="5"
+        android:maxLines="3"
+        tools:text="@string/xj_patrol_test_str"
         />
     <ImageView
         android:layout_width="70dp"

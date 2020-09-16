@@ -30,8 +30,8 @@
         android:layout_toEndOf="@+id/itemXJWorkFlag"
         app:key_width="0dp"
         app:content_color="@color/xjTitleColor"
+        app:max_lines="3"
         android:gravity="center_vertical"
-        android:maxLines="3"
         android:tag="itemXJWorkContent"
         android:textColor="@color/xjTitleColor"
         android:textSize="@dimen/fontSize_14sp" />
