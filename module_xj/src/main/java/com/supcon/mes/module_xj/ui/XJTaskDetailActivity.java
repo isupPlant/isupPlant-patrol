@@ -11,6 +11,7 @@ import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
@@ -116,6 +117,8 @@ public class XJTaskDetailActivity extends BaseControllerActivity implements XJTa
 
     @BindByTag("xjTaskDetailParent")
     RelativeLayout xjTaskDetailParent;
+    @BindByTag("iv_close")
+    ImageView iv_close;
 
     private XJTaskEntity mXJTaskEntity;
     private XJAreaAdapter mXJAreaAdapter;
@@ -134,6 +137,7 @@ public class XJTaskDetailActivity extends BaseControllerActivity implements XJTa
         super.onInit();
         EventBus.getDefault().register(this);
         Window win = this.getWindow();
+        setFinishOnTouchOutside(false);
         win.setWindowAnimations(R.style.fadeStyle); //设置窗口弹出动画
         win.getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_HIDE_NAVIGATION);
         WindowManager.LayoutParams lp = win.getAttributes();
@@ -376,7 +380,7 @@ public class XJTaskDetailActivity extends BaseControllerActivity implements XJTa
     @Override
     protected void initListener() {
         super.initListener();
-        RxView.clicks(xjTaskDetailParent)
+        RxView.clicks(iv_close)
                 .subscribe(o -> back());
 
         if(mXJAreaAdapter!=null){
