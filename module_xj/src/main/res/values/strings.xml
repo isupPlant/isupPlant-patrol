@@ -112,4 +112,5 @@
     <string name="xj_patrol_close">关闭</string>
     <string name="xj_patrol_input_remark">填写备注</string>
     <string name="xj_patrol_test_str">测测试长数据测试长数据测试长数据测试长数据测试长数据测试长数据测试长数据测试长数据测试长数据测试长数据测试长数据测试长数据测试长数据测试长数据测试长数据测试长数据测试长数据测试长数据测试长数据测试长数据测试长数据测试长数据测试长数据试长数据</string>
+    <string name="xj_patrol_upload_size_warning">上传的巡检数据文件大于100MB，请重新处理数据上传！</string>
 </resources>

@@ -12,7 +12,7 @@
 	<string name="xj_task_list">Patrol task manager</string>
 	<string name="xj_work">Patrol operation</string>
 	<string name="xj_total">Inspection summary</string>
-	<string name="xj_task_total">Patrol tasks</string>
+	<string name="xj_task_total">Patrol Tasks</string>
 	<string name="xj_task_uncheck">Uncheck</string>
 	<string name="xj_task_running">Running</string>
 	<string name="xj_task_checked">Checked</string>
@@ -75,7 +75,7 @@
 	<string name="xj_patrol_range">Abnormal conversion numbers in the normal range！</string>
 	<string name="xj_patrol_jump_check">Skip check</string>
 	<string name="xj_patrol_route_selete">Inspection route selection</string>
-	<string name="xj_patrol_uhf_succeed">UHF initialization succeeded！</string>
+	<string name="xj_patrol_uhf_succeed">UHF initialization successfully！</string>
 	<string name="xj_patrol_uhf_fail">UHF initialization failed！</string>
 	<string name="xj_patrol_sure">Sure</string>
 	<string name="xj_patrol_cancel">Cancel</string>
@@ -112,4 +112,5 @@
 	<string name="xj_patrol_close">Close</string>
 	<string name="xj_patrol_input_remark">Fill in the remarks</string>
 	<string name="xj_patrol_test_str">aaa</string>
+	<string name="xj_patrol_upload_size_warning">Upload data is larger than 100MB, please upload again after reduce</string>
 </resources>
