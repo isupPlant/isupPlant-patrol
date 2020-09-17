@@ -7,8 +7,10 @@
     android:tag="xjTaskDetailParent">
 
     <LinearLayout
+        android:id="@+id/llContent"
+        android:tag="llContent"
         android:layout_width="match_parent"
-        android:layout_height="560dp"
+        android:layout_height="500dp"
         android:orientation="vertical"
         android:background="@drawable/sh_xj_task_detail"
         android:layout_marginLeft="@dimen/dp_12"
@@ -47,14 +49,14 @@
                 android:text="@string/xj_patrol_status"
                 android:gravity="center"
                 />
-            <ImageView
+<!--            <ImageView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:id="@+id/xjTaskDetailCloseBtn"
                 android:tag="xjTaskDetailCloseBtn"
                 android:src="@drawable/ic_close_33"
                 android:layout_alignParentRight="true"
-                />
+                />-->
           <RelativeLayout
               android:layout_width="match_parent"
               android:layout_height="wrap_content"
@@ -133,5 +135,15 @@
             android:id="@+id/xjTaskDetailContentView"
             android:tag="xjTaskDetailContentView"/>
     </LinearLayout>
+    <ImageView
+        android:layout_width="@dimen/dp_40"
+        android:layout_height="@dimen/dp_40"
+        android:src="@drawable/ic_top_close_p"
+        android:layout_below="@+id/llContent"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="@dimen/dp_10"
+        android:id="@+id/xjTaskDetailCloseBtn"
+        android:tag="xjTaskDetailCloseBtn"
+        />
 
 </RelativeLayout>

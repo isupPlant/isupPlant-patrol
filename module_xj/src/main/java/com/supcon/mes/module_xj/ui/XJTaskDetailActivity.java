@@ -381,6 +381,7 @@ public class XJTaskDetailActivity extends BaseControllerActivity implements XJTa
     protected void initListener() {
         super.initListener();
         RxView.clicks(xjTaskDetailCloseBtn)
+
                 .subscribe(o -> back());
 
         if(mXJAreaAdapter!=null){
