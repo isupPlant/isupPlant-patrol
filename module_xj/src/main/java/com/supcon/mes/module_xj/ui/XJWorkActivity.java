@@ -930,7 +930,7 @@ public class XJWorkActivity extends BaseRefreshRecyclerActivity<XJWorkEntity> im
         }
 
         new CustomSheetDialog(context)
-                .multiSheet("多选列表", list, checkedList)
+                .multiSheet(context.getString(R.string.xj_patrol_multi_choose_list), list, checkedList)
                 .setOnItemChildViewClickListener((childView, position, action, obj) -> {
 
                     List<SheetEntity> sheetEntities = GsonUtil.jsonToList(obj.toString(), SheetEntity.class);

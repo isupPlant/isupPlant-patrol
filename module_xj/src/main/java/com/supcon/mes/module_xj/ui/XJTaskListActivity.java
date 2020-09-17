@@ -122,7 +122,7 @@ public class XJTaskListActivity extends BaseRefreshRecyclerActivity<XJTaskGroupE
     private long deploymentId;
     private boolean needRefresh = false;
     private boolean isRefresh = false;
-    private String dateFilter = "今天";
+    private String dateFilter = Constant.Date.TODAY;
 
     @Override
     protected void onInit() {

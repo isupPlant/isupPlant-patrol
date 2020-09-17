@@ -113,4 +113,7 @@
 	<string name="xj_patrol_input_remark">Fill in the remarks</string>
 	<string name="xj_patrol_test_str">aaa</string>
 	<string name="xj_patrol_upload_size_warning">Upload data is larger than 100MB, please upload again after reduce</string>
+	<string name="xj_patrol_area_inspection">Area Patrol</string>
+	<string name="xj_patrol_no_device">No Device Patrol</string>
+	<string name="xj_patrol_multi_choose_list">Multi Choose List</string>
 </resources>
