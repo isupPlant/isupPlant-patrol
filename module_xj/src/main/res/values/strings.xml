@@ -116,4 +116,5 @@
     <string name="xj_patrol_area_inspection">区域巡检</string>
     <string name="xj_patrol_no_device">无设备巡检</string>
     <string name="xj_patrol_multi_choose_list">多选列表</string>
+    <string name="xj_patrol_no_route">未找到巡检线路，请检查基础数据！</string>
 </resources>
