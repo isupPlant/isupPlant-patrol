@@ -20,6 +20,7 @@ import com.app.annotation.Presenter;
 import com.app.annotation.apt.Router;
 import com.jakewharton.rxbinding2.view.RxView;
 import com.jakewharton.rxbinding2.widget.RxTextView;
+import com.mes.supcon.expert_ewg01p.config.ViberMode;
 import com.mes.supcon.expert_ewg01p.controller.ExpertController;
 import com.supcon.common.view.base.activity.BaseRefreshRecyclerActivity;
 import com.supcon.common.view.base.adapter.IListAdapter;
@@ -71,6 +72,7 @@ import com.supcon.mes.module_xj.model.event.XJAreaRefreshEvent;
 import com.supcon.mes.module_xj.model.event.XJWorkRefreshEvent;
 import com.supcon.mes.module_xj.presenter.DeviceDCSParamQueryPresenter;
 import com.supcon.mes.module_xj.ui.adapter.XJWorkAdapter;
+import com.supcon.mes.mogu_viber.config.ModuleConfig;
 import com.supcon.mes.mogu_viber.controller.MGViberController;
 import com.supcon.mes.sb2.model.event.ThermometerEvent;
 import com.supcon.mes.testo_805i.controller.InfraredEvent;
@@ -330,6 +332,7 @@ public class XJWorkActivity extends BaseRefreshRecyclerActivity<XJWorkEntity> im
                     break;
 
                 case "itemXJWorkVibBtn":
+
                     showVibView(xjWorkEntity);
                     break;
 
@@ -572,6 +575,10 @@ public class XJWorkActivity extends BaseRefreshRecyclerActivity<XJWorkEntity> im
         } else if (SBTUtil.isSupportTemp()) {
 
         } else if (vibMode == VibMode.EXPERT.getCode()) {
+            SharedPreferencesUtils.setParam(context, com.mes.supcon.expert_ewg01p.config.ModuleConfig.IS_VIBER,true);
+            expertViberController.initView();
+                SharedPreferencesUtils.setParam(context, ModuleConfig.CURRENT_MODE,
+                        ViberMode.DISTANCE.name());
 //            if (expertViberController == null) {
 //                expertViberController = new ExpertController(ExpertController.createContentView(context), true);
 ////        mMGViberController.setTemperatureNeed(true);
@@ -637,11 +644,13 @@ public class XJWorkActivity extends BaseRefreshRecyclerActivity<XJWorkEntity> im
             mXJWorkAdapter.notifyItemChanged(position);
         }, true).show();
     }
+
     @Override
     protected void onStop() {
         super.onStop();
         if (expertViberController != null) expertViberController.onStop();
     }
+
     private void showTempView(XJWorkEntity xjWorkEntity) {
         int tempMode = SharedPreferencesUtils.getParam(context, Constant.SPKey.TEMP_MODE, 0);
         if (tempMode == TemperatureMode.AIC.getCode()) {
@@ -653,7 +662,9 @@ public class XJWorkActivity extends BaseRefreshRecyclerActivity<XJWorkEntity> im
 
         } else if (SBTUtil.isSupportTemp()) {
 
-        }else if (tempMode == TemperatureMode.EXPERT.getCode()) {
+        } else if (tempMode == TemperatureMode.EXPERT.getCode()) {
+            SharedPreferencesUtils.setParam(context, com.mes.supcon.expert_ewg01p.config.ModuleConfig.IS_VIBER,false);
+            expertViberController.initView();
 //            if (expertViberController == null) {
 //                expertViberController = new ExpertController(ExpertController.createContentView(context), true);
 ////        mMGViberController.setTemperatureNeed(true);
