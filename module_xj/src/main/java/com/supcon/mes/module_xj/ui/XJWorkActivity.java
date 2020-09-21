@@ -367,13 +367,13 @@ public class XJWorkActivity extends BaseRefreshRecyclerActivity<XJWorkEntity> im
             return;
         }
         PopupWindowEntity popupWindowEntity = mPopupWindowEntityList.get(position);
-        switch (popupWindowEntity.getText()) {
-            case "一键完成":
+        switch (position) {
+            case 0:
                 mCustomPopupWindow.dismiss();
                 showAllFinishDialog();
                 break;
 
-            case "一键跳过":
+            case 1:
                 mCustomPopupWindow.dismiss();
                 showAllJumpDialog();
                 break;
@@ -983,7 +983,7 @@ public class XJWorkActivity extends BaseRefreshRecyclerActivity<XJWorkEntity> im
         }
 
         new CustomSheetDialog(context)
-                .multiSheet("多选列表", list, checkedList)
+                .multiSheet(context.getString(R.string.xj_patrol_multi_choose_list), list, checkedList)
                 .setOnItemChildViewClickListener((childView, position, action, obj) -> {
 
                     List<SheetEntity> sheetEntities = GsonUtil.jsonToList(obj.toString(), SheetEntity.class);

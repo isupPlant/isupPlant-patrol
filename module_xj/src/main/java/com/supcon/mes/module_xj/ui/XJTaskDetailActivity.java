@@ -11,6 +11,7 @@ import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
@@ -116,6 +117,9 @@ public class XJTaskDetailActivity extends BaseControllerActivity implements XJTa
 
     @BindByTag("xjTaskDetailParent")
     RelativeLayout xjTaskDetailParent;
+
+    @BindByTag("xjTaskDetailCloseBtn")
+    ImageView xjTaskDetailCloseBtn;
 
     private XJTaskEntity mXJTaskEntity;
     private XJAreaAdapter mXJAreaAdapter;
@@ -376,7 +380,8 @@ public class XJTaskDetailActivity extends BaseControllerActivity implements XJTa
     @Override
     protected void initListener() {
         super.initListener();
-        RxView.clicks(xjTaskDetailParent)
+        RxView.clicks(xjTaskDetailCloseBtn)
+
                 .subscribe(o -> back());
 
         if(mXJAreaAdapter!=null){

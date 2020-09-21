@@ -3,6 +3,7 @@ package com.supcon.mes.module_xj.presenter;
 import com.supcon.mes.middleware.SupPlantApplication;
 import com.supcon.mes.middleware.model.bean.xj.XJRouteEntity;
 import com.supcon.mes.middleware.model.bean.xj.XJRouteEntityDao;
+import com.supcon.mes.module_xj.R;
 import com.supcon.mes.module_xj.model.contract.XJRouteContract;
 
 import java.util.List;
@@ -33,7 +34,7 @@ public class XJRoutePresenter extends XJRouteContract.Presenter {
                                     XJRoutePresenter.this.getView().getRouteListSuccess(routeEntities);
                                 }
                                 else{
-                                    getView().getRouteListFailed("未找到巡检线路，请检查基础数据！");
+                                    getView().getRouteListFailed(SupPlantApplication.getAppContext().getString(R.string.xj_patrol_no_route));
                                 }
                             }
                         })

@@ -421,10 +421,10 @@ public class XJWorkViewActivity extends BaseRefreshRecyclerActivity<XJWorkEntity
                             workEntity.eamNum = deviceNames.size() + 1;
 
                             if(deviceNames.size()==0){
-                                workEntity.eamName = "区域巡检";
+                                workEntity.eamName = context.getString(R.string.xj_patrol_area_inspection);
                             }
                             else{
-                                workEntity.eamName = "无设备巡检";
+                                workEntity.eamName = context.getString(R.string.xj_patrol_no_device);
 
                             }
                             deviceNames.add(workEntity.eamName);
