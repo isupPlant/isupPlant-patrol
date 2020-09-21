@@ -1,7 +1,6 @@
 package com.supcon.mes.module_xj.ui;
 
 import android.annotation.SuppressLint;
-import android.os.Build;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -21,6 +20,7 @@ import com.app.annotation.Presenter;
 import com.app.annotation.apt.Router;
 import com.jakewharton.rxbinding2.view.RxView;
 import com.jakewharton.rxbinding2.widget.RxTextView;
+import com.mes.supcon.expert_ewg01p.controller.ExpertController;
 import com.supcon.common.view.base.activity.BaseRefreshRecyclerActivity;
 import com.supcon.common.view.base.adapter.IListAdapter;
 import com.supcon.common.view.util.DisplayUtil;
@@ -88,7 +88,6 @@ import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 import io.reactivex.Flowable;
-import io.reactivex.Scheduler;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;
 
@@ -128,6 +127,7 @@ public class XJWorkActivity extends BaseRefreshRecyclerActivity<XJWorkEntity> im
 
     XJWorkAdapter mXJWorkAdapter;
 
+    ExpertController expertViberController;
     XJAreaEntity mXJAreaEntity;
     ObjectEntity mDevice = null;
     List<String> deviceNames = new ArrayList<>();
@@ -142,6 +142,7 @@ public class XJWorkActivity extends BaseRefreshRecyclerActivity<XJWorkEntity> im
     private String thermometervalue = ""; // 全局测温值
     private MGViberController mMGViberController;
     private CustomDialog mMGViberDialog;
+
     private AICVibServiceController mAICVibController;
     private AV160Controller mAV160Controller;
     private CustomDialog mTesto805iDialog;
@@ -181,6 +182,20 @@ public class XJWorkActivity extends BaseRefreshRecyclerActivity<XJWorkEntity> im
         int tempMode = SharedPreferencesUtils.getParam(context, Constant.SPKey.TEMP_MODE, 0);
         int vibMode = SharedPreferencesUtils.getParam(context, Constant.SPKey.VIB_MODE, 0);
 
+        if (tempMode == TemperatureMode.EXPERT.getCode() || vibMode == VibMode.EXPERT.getCode()) {
+            if (expertViberController == null) {
+                View contentView = ExpertController.createContentView(context);
+                contentView.findViewById(R.id.viberFinishBtn).setOnClickListener(v -> expertViberController.hide());
+                expertViberController = new ExpertController(contentView, true);
+                expertViberController.onInit();
+                expertViberController.initView();
+                expertViberController.initListener();
+                expertViberController.initData();
+                registerController(MGViberController.class.getSimpleName(), mMGViberController);
+            } else {
+                expertViberController.initData();
+            }
+        }
         if (tempMode == TemperatureMode.AIC.getCode() || vibMode == VibMode.AIC.getCode()) {
 
             if (mAICVibController == null) {
@@ -217,7 +232,8 @@ public class XJWorkActivity extends BaseRefreshRecyclerActivity<XJWorkEntity> im
         if (mAV160Controller != null) {
             mAV160Controller.onDestroy();
         }
-
+        if (expertViberController != null)
+            expertViberController.onDestroy();
         int finishNum = 0;
         for (XJWorkEntity xjWorkEntity : mXJAreaEntity.works) {
             if (xjWorkEntity.isFinished) {
@@ -518,7 +534,7 @@ public class XJWorkActivity extends BaseRefreshRecyclerActivity<XJWorkEntity> im
                         ArrayAdapter<String> eamSpinnerAdapter = new ArrayAdapter<>(context, R.layout.ly_spinner_item_dark, deviceNames);  //创建一个数组适配器
                         eamSpinnerAdapter.setDropDownViewResource(R.layout.ly_spinner_dropdown_item);     //设置下拉列表框的下拉选项样式
                         eamSpinner.setAdapter(eamSpinnerAdapter);
-                        eamSpinner.setSelection(isAll?0:1);
+                        eamSpinner.setSelection(isAll ? 0 : 1);
                     }
                 });
 
@@ -555,6 +571,23 @@ public class XJWorkActivity extends BaseRefreshRecyclerActivity<XJWorkEntity> im
             showMGViberDialog(mPosition, xjWorkEntity);
         } else if (SBTUtil.isSupportTemp()) {
 
+        } else if (vibMode == VibMode.EXPERT.getCode()) {
+//            if (expertViberController == null) {
+//                expertViberController = new ExpertController(ExpertController.createContentView(context), true);
+////        mMGViberController.setTemperatureNeed(true);
+//                expertViberController.onInit();
+//                expertViberController.setOnDataSelectListener(data ->
+//                        LogUtil.d("onDataSelect:" + data));
+//            }
+            expertViberController.show();
+            expertViberController.setOnFinishListener(result -> {
+
+                xjWorkEntity.concluse = result.second;
+                mXJWorkAdapter.notifyItemChanged(mPosition);
+            });
+            expertViberController.run(result -> {
+                if (result.first != null) return;
+            });
         }
     }
 
@@ -604,7 +637,11 @@ public class XJWorkActivity extends BaseRefreshRecyclerActivity<XJWorkEntity> im
             mXJWorkAdapter.notifyItemChanged(position);
         }, true).show();
     }
-
+    @Override
+    protected void onStop() {
+        super.onStop();
+        if (expertViberController != null) expertViberController.onStop();
+    }
     private void showTempView(XJWorkEntity xjWorkEntity) {
         int tempMode = SharedPreferencesUtils.getParam(context, Constant.SPKey.TEMP_MODE, 0);
         if (tempMode == TemperatureMode.AIC.getCode()) {
@@ -616,6 +653,22 @@ public class XJWorkActivity extends BaseRefreshRecyclerActivity<XJWorkEntity> im
 
         } else if (SBTUtil.isSupportTemp()) {
 
+        }else if (tempMode == TemperatureMode.EXPERT.getCode()) {
+//            if (expertViberController == null) {
+//                expertViberController = new ExpertController(ExpertController.createContentView(context), true);
+////        mMGViberController.setTemperatureNeed(true);
+//                expertViberController.onInit();
+//                expertViberController.setOnDataSelectListener(data ->
+//                        LogUtil.d("onDataSelect:" + data));
+//            }
+            expertViberController.show();
+            expertViberController.setOnFinishListener(result -> {
+                xjWorkEntity.concluse = result.second;
+                mXJWorkAdapter.notifyItemChanged(mPosition);
+            });
+            expertViberController.run(result -> {
+                if (result.first != null) return;
+            });
         }
 
     }
@@ -1070,7 +1123,7 @@ public class XJWorkActivity extends BaseRefreshRecyclerActivity<XJWorkEntity> im
 //            LogUtil.e("ciruy", "eamSpinner:"+isAll);
 //            showWorks(deviceNames.get(isAll?0:1));
 //        } else {
-            mXJWorkAdapter.notifyDataSetChanged();
+        mXJWorkAdapter.notifyDataSetChanged();
 //        }
     }
 
