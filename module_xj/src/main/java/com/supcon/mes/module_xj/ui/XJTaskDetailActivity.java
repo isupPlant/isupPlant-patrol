@@ -117,9 +117,8 @@ public class XJTaskDetailActivity extends BaseControllerActivity implements XJTa
 
     @BindByTag("xjTaskDetailParent")
     RelativeLayout xjTaskDetailParent;
-
     @BindByTag("xjTaskDetailCloseBtn")
-    ImageView xjTaskDetailCloseBtn;
+    ImageView iv_close;
 
     private XJTaskEntity mXJTaskEntity;
     private XJAreaAdapter mXJAreaAdapter;
@@ -138,6 +137,7 @@ public class XJTaskDetailActivity extends BaseControllerActivity implements XJTa
         super.onInit();
         EventBus.getDefault().register(this);
         Window win = this.getWindow();
+        setFinishOnTouchOutside(false);
         win.setWindowAnimations(R.style.fadeStyle); //设置窗口弹出动画
         win.getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_HIDE_NAVIGATION);
         WindowManager.LayoutParams lp = win.getAttributes();
@@ -390,8 +390,7 @@ public class XJTaskDetailActivity extends BaseControllerActivity implements XJTa
     @Override
     protected void initListener() {
         super.initListener();
-        RxView.clicks(xjTaskDetailCloseBtn)
-
+        RxView.clicks(iv_close)
                 .subscribe(o -> back());
 
         if(mXJAreaAdapter!=null){
@@ -655,12 +654,22 @@ public class XJTaskDetailActivity extends BaseControllerActivity implements XJTa
      */
     private void dealSign(String code) {
         int index = 0;
+        if (mXJTaskEntity.areas == null || mXJTaskEntity.areas.size() == 0) {
+            showDialog();
+            return;
+        }
+        if(mXJTaskEntity.realStartTime == 0){
+            ToastUtils.show(context, getString(R.string.xj_area_sign_warning1));
+            return;
+        }
         for (XJAreaEntity areaEntity : mXJTaskEntity.areas) {
             if (code.equals(areaEntity.signCode)) {
                 updateXJAreaEntity(areaEntity);//update数据
                 LogUtil.i("BarcodeEvent1", code);
                 enterPosition = index;
                 doGoArea(areaEntity);  //跳转
+            }else {
+                ToastUtils.show(context, getString(R.string.xj_patrol_code_not_match));
             }
             index++;
         }
