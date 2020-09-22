@@ -362,10 +362,12 @@ public class XJTaskListActivity extends BaseRefreshRecyclerActivity<XJTaskGroupE
 
             Bundle bundle = new Bundle();
             if (XJCacheUtil.check(context, xjTaskEntity.tableNo)) {//检查本地缓存
-                bundle.putString(Constant.IntentKey.XJ_TASK_ENTITY_STR, XJCacheUtil.getString(xjTaskEntity.tableNo));
+//                bundle.putString(Constant.IntentKey.XJ_TASK_ENTITY_STR, XJCacheUtil.getString(xjTaskEntity.tableNo));
+                bundle.putString(Constant.IntentKey.XJ_TASK_NO_STR, xjTaskEntity.tableNo); //bundle 有大小限制，有本地缓存情况下，不传整个实体
             } else {
                 bundle.putString(Constant.IntentKey.XJ_TASK_ENTITY_STR, xjTaskEntity.toString());
             }
+//            bundle.putString(Constant.IntentKey.XJ_TASK_NO_STR,xjTaskEntity.tableNo);
             IntentRouter.go(context, Constant.Router.XJ_TASK_DETAIL, bundle);
         });
     }

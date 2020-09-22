@@ -162,12 +162,22 @@ public class XJTaskDetailActivity extends BaseControllerActivity implements XJTa
             }
         });
 
+//        String taskStr = getIntent().getStringExtra(Constant.IntentKey.XJ_TASK_ENTITY_STR);
+//
+//
+//        if(!TextUtils.isEmpty(taskStr)){
+//            mXJTaskEntity = GsonUtil.gsonToBean(taskStr, XJTaskEntity.class);
+//        }
+
+        String taskNo = getIntent().getStringExtra(Constant.IntentKey.XJ_TASK_NO_STR);
         String taskStr = getIntent().getStringExtra(Constant.IntentKey.XJ_TASK_ENTITY_STR);
 
-
-        if(!TextUtils.isEmpty(taskStr)){
-            mXJTaskEntity = GsonUtil.gsonToBean(taskStr, XJTaskEntity.class);
+        if (!TextUtils.isEmpty(taskNo)) {
+            if (XJCacheUtil.check(context, taskNo)) {//检查本地缓存
+                taskStr = XJCacheUtil.getString(taskNo);
+            }
         }
+        mXJTaskEntity = GsonUtil.gsonToBean(taskStr, XJTaskEntity.class);
 
 
         if (SBTUtil.isSupportUHF() && SharedPreferencesUtils.getParam(context, Constant.SPKey.UHF_ENABLE, false)){
@@ -569,8 +579,8 @@ public class XJTaskDetailActivity extends BaseControllerActivity implements XJTa
     private void doGoArea(XJAreaEntity xjAreaEntity) {
         Bundle bundle = new Bundle();
         Collections.sort(xjAreaEntity.works);
-        bundle.putSerializable(Constant.IntentKey.XJ_AREA_ENTITY_STR, xjAreaEntity.toString());
-        bundle.putSerializable(Constant.IntentKey.XJ_TASK_ENTITY_STR,mXJTaskEntity.toString());
+        bundle.putString(Constant.IntentKey.XJ_AREA_ENTITY_STR, xjAreaEntity.toString());
+        bundle.putString(Constant.IntentKey.XJ_TASK_NO_STR, mXJTaskEntity.tableNo);
         if (xjAreaEntity.isFinished || mXJTaskEntity.isFinished) {
             bundle.putBoolean(Constant.IntentKey.XJ_IS_FROM_TASK, true);
             bundle.putBoolean(Constant.IntentKey.XJ_IS_FINISHED, mXJTaskEntity.isFinished);

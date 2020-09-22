@@ -60,6 +60,7 @@ import com.supcon.mes.middleware.util.PopupWindowItemHelper;
 import com.supcon.mes.middleware.util.SBTUtil;
 import com.supcon.mes.middleware.util.SnackbarHelper;
 import com.supcon.mes.middleware.util.SystemCodeManager;
+import com.supcon.mes.middleware.util.XJCacheUtil;
 import com.supcon.mes.module_xj.IntentRouter;
 import com.supcon.mes.module_xj.R;
 import com.supcon.mes.module_xj.controller.XJCameraController;
@@ -170,10 +171,12 @@ public class XJWorkActivity extends BaseRefreshRecyclerActivity<XJWorkEntity> im
             mXJAreaEntity = GsonUtil.gsonToBean(xjAreaEntityStr, XJAreaEntity.class);
         }
 
-        String taskStr = getIntent().getStringExtra(Constant.IntentKey.XJ_TASK_ENTITY_STR);
+        String taskNo = getIntent().getStringExtra(Constant.IntentKey.XJ_TASK_NO_STR);
 
 
-        if (!TextUtils.isEmpty(taskStr)) {
+        if (!TextUtils.isEmpty(taskNo)) {
+
+            String taskStr = XJCacheUtil.getString(taskNo);
             mXJTaskEntity = GsonUtil.gsonToBean(taskStr, XJTaskEntity.class);
         }
 
@@ -300,8 +303,8 @@ public class XJWorkActivity extends BaseRefreshRecyclerActivity<XJWorkEntity> im
                 .throttleFirst(200, TimeUnit.MILLISECONDS)
                 .subscribe(o -> {
                     Bundle bundle = new Bundle();
-                    bundle.putSerializable(Constant.IntentKey.XJ_AREA_ENTITY_STR, mXJAreaEntity.toString());
-                    bundle.putSerializable(Constant.IntentKey.XJ_TASK_ENTITY_STR, mXJTaskEntity.toString());
+                    bundle.putString(Constant.IntentKey.XJ_AREA_ENTITY_STR, mXJAreaEntity.toString());
+                    bundle.putString(Constant.IntentKey.XJ_TASK_NO_STR, mXJTaskEntity.tableNo);
                     IntentRouter.go(context, Constant.Router.XJ_WORK_ITEM_VIEW, bundle);
                 });
 
@@ -808,6 +811,7 @@ public class XJWorkActivity extends BaseRefreshRecyclerActivity<XJWorkEntity> im
                                 for (XJWorkEntity xjWorkItemEntity : xjWorkEntities) {
                                     doFinish(xjWorkItemEntity);
                                 }
+
                                 if (xjWorkEntities.size() == mXJAreaEntity.works.size()) {
                                     onLoadSuccessAndExit(context.getResources().getString(R.string.xj_patrol_over), this::finish);
                                 } else {
@@ -938,6 +942,7 @@ public class XJWorkActivity extends BaseRefreshRecyclerActivity<XJWorkEntity> im
 
                     }, () -> {
                         mXJAreaEntity.finishNum = xjWorkItemEntities.size();
+
                         if (xjWorkItemEntities.size() == mXJAreaEntity.works.size()) {
                             mXJAreaEntity.isFinished = true;
                             back();
@@ -946,13 +951,6 @@ public class XJWorkActivity extends BaseRefreshRecyclerActivity<XJWorkEntity> im
                             refreshWorkList();
                         }
                         ToastUtils.show(context, String.format(getResources().getString(R.string.xj_work_skip_toast), "" + (xjWorkItemEntities.size())));
-//                            ((XJWorkActivity)context).runOnUiThread(new Runnable() {
-//                                @Override
-//                                public void run() {
-//
-//                                }
-//                            });
-
 
                     });
 

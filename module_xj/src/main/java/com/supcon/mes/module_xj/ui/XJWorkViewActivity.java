@@ -33,6 +33,7 @@ import com.supcon.mes.middleware.model.bean.xj.XJAreaEntity;
 import com.supcon.mes.middleware.model.bean.xj.XJWorkEntity;
 import com.supcon.mes.middleware.util.ErrorMsgHelper;
 import com.supcon.mes.middleware.util.SystemCodeManager;
+import com.supcon.mes.middleware.util.XJCacheUtil;
 import com.supcon.mes.module_xj.R;
 import com.supcon.mes.module_xj.controller.XJCameraController;
 import com.supcon.mes.module_xj.model.api.XJTaskSubmitAPI;
@@ -107,8 +108,17 @@ public class XJWorkViewActivity extends BaseRefreshRecyclerActivity<XJWorkEntity
         if(xjAreaEntityStr!=null){
             mXJAreaEntity = GsonUtil.gsonToBean(xjAreaEntityStr, XJAreaEntity.class);
         }
-        String taskStr = getIntent().getStringExtra(Constant.IntentKey.XJ_TASK_ENTITY_STR);
-        if(!TextUtils.isEmpty(taskStr)){
+//        String taskStr = getIntent().getStringExtra(Constant.IntentKey.XJ_TASK_ENTITY_STR);
+//        if(!TextUtils.isEmpty(taskStr)){
+//            mXJTaskEntity = GsonUtil.gsonToBean(taskStr, XJTaskEntity.class);
+//        }
+
+        String taskNo = getIntent().getStringExtra(Constant.IntentKey.XJ_TASK_NO_STR);
+
+
+        if (!TextUtils.isEmpty(taskNo)) {
+
+            String taskStr = XJCacheUtil.getString(taskNo);
             mXJTaskEntity = GsonUtil.gsonToBean(taskStr, XJTaskEntity.class);
         }
 
