@@ -88,6 +88,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 import io.reactivex.Flowable;
@@ -139,7 +140,7 @@ public class XJWorkActivity extends BaseRefreshRecyclerActivity<XJWorkEntity> im
     boolean isOneKeyOver = false;
     boolean isCanEndAll = true;
     private Map<String, String> passReasonMap, realValueMap;
-    private List<PopupWindowEntity> mPopupWindowEntityList;
+    private List<PopupWindowEntity> mPopupWindowEntityList=new ArrayList<>();
     private CustomPopupWindow mCustomPopupWindow;
     private SinglePickController<String> mSingPicker;
     private String thermometervalue = ""; // 全局测温值
@@ -277,12 +278,21 @@ public class XJWorkActivity extends BaseRefreshRecyclerActivity<XJWorkEntity> im
 
     }
 
+
+
     private void initPopupWindowData() {
-        Map<String, Integer> map = new HashMap<>();
-        map.put(context.getString(R.string.xj_work_over), R.drawable.ic_xj_work_finish);
-        map.put(context.getString(R.string.xj_work_jump), R.drawable.ic_xj_work_skip);
-        mPopupWindowEntityList = PopupWindowItemHelper.initPopupWindowData(map);
+        createPopupWindowEntityData(context.getString(R.string.xj_work_over), R.drawable.ic_xj_work_finish,0);
+        createPopupWindowEntityData(context.getString(R.string.xj_work_jump), R.drawable.ic_xj_work_skip,1);
         mCustomPopupWindow = new CustomPopupWindow(context, mPopupWindowEntityList);
+    }
+
+
+    public void createPopupWindowEntityData(String name,int iconId,int tag){
+        PopupWindowEntity popupWindowEntity=new PopupWindowEntity();
+        popupWindowEntity.setText(name);
+        popupWindowEntity.setIconId(iconId);
+        popupWindowEntity.setTag(tag);
+        mPopupWindowEntityList.add(popupWindowEntity);
     }
 
     @Override
@@ -373,7 +383,7 @@ public class XJWorkActivity extends BaseRefreshRecyclerActivity<XJWorkEntity> im
             return;
         }
         PopupWindowEntity popupWindowEntity = mPopupWindowEntityList.get(position);
-        switch (position) {
+        switch (popupWindowEntity.getTag()) {
             case 0:
                 mCustomPopupWindow.dismiss();
                 showAllFinishDialog();
@@ -530,9 +540,13 @@ public class XJWorkActivity extends BaseRefreshRecyclerActivity<XJWorkEntity> im
 
                     if (deviceNames.size() == 0) {
                         ((ViewGroup) eamSpinner.getParent()).setVisibility(View.GONE);
+                        mXJWorkAdapter=new XJWorkAdapter(this);
+                        contentView.setAdapter(mXJWorkAdapter);
                         refreshListController.refreshComplete(mWorkEntities);
                     } else if (deviceNames.size() == 1) {
                         ((ViewGroup) eamSpinner.getParent()).setVisibility(View.GONE);
+                        mXJWorkAdapter=new XJWorkAdapter(this);
+                        contentView.setAdapter(mXJWorkAdapter);
                         refreshListController.refreshComplete(mWorkEntities);
                     } else {
                         deviceNames.add(0, getString(R.string.xj_work_eam_all));

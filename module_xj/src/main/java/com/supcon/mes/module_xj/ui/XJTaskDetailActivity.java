@@ -662,16 +662,19 @@ public class XJTaskDetailActivity extends BaseControllerActivity implements XJTa
             ToastUtils.show(context, getString(R.string.xj_area_sign_warning1));
             return;
         }
+        boolean isExist=false;
         for (XJAreaEntity areaEntity : mXJTaskEntity.areas) {
             if (code.equals(areaEntity.signCode)) {
+                isExist=true;
                 updateXJAreaEntity(areaEntity);//update数据
                 LogUtil.i("BarcodeEvent1", code);
                 enterPosition = index;
                 doGoArea(areaEntity);  //跳转
-            }else {
-                ToastUtils.show(context, getString(R.string.xj_patrol_code_not_match));
             }
             index++;
+        }
+        if (!isExist){
+            ToastUtils.show(context, getString(R.string.xj_patrol_code_not_match));
         }
     }
 
