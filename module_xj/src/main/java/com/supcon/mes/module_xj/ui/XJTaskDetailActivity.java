@@ -570,6 +570,7 @@ public class XJTaskDetailActivity extends BaseControllerActivity implements XJTa
         Bundle bundle = new Bundle();
         Collections.sort(xjAreaEntity.works);
         bundle.putSerializable(Constant.IntentKey.XJ_AREA_ENTITY_STR, xjAreaEntity.toString());
+                bundle.putSerializable(Constant.IntentKey.XJ_AREA_EXCEPTION_IDS, mXJTaskEntity.exceptinWorkIds);
         bundle.putSerializable(Constant.IntentKey.XJ_TASK_ENTITY_STR,mXJTaskEntity.toString());
         if (xjAreaEntity.isFinished || mXJTaskEntity.isFinished) {
             bundle.putBoolean(Constant.IntentKey.XJ_IS_FROM_TASK, true);

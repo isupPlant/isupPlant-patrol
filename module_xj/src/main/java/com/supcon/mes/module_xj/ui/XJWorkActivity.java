@@ -83,6 +83,7 @@ import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -156,6 +157,12 @@ public class XJWorkActivity extends BaseRefreshRecyclerActivity<XJWorkEntity> im
     private ImageView viberStatusIv;
     private boolean isAll = true;
 
+    //Todo: swap from
+    //Todo: swap begin
+    private String exceptionIdsStr;
+    private List<String> exceptionIds = new ArrayList<>();
+    //Todo: swap end
+
     @Override
     protected int getLayoutID() {
         return R.layout.ac_xj_work;
@@ -166,6 +173,11 @@ public class XJWorkActivity extends BaseRefreshRecyclerActivity<XJWorkEntity> im
         super.onInit();
         EventBus.getDefault().register(this);
         String xjAreaEntityStr = getIntent().getStringExtra(Constant.IntentKey.XJ_AREA_ENTITY_STR);
+        exceptionIdsStr = getIntent().getStringExtra(Constant.IntentKey.XJ_AREA_EXCEPTION_IDS);
+        //Todo: swap begin
+        if(!TextUtils.isEmpty(exceptionIdsStr))
+            exceptionIds = Arrays.asList(exceptionIdsStr.split(","));
+        //Todo: swap end
         if (xjAreaEntityStr != null) {
             mXJAreaEntity = GsonUtil.gsonToBean(xjAreaEntityStr, XJAreaEntity.class);
         }
@@ -244,11 +256,7 @@ public class XJWorkActivity extends BaseRefreshRecyclerActivity<XJWorkEntity> im
         }
 
         mXJAreaEntity.finishNum = finishNum;
-        if (mXJAreaEntity.finishNum == mXJAreaEntity.works.size()) {
-            mXJAreaEntity.isFinished = true;
-        } else {
-            mXJAreaEntity.isFinished = false;
-        }
+        mXJAreaEntity.isFinished = mXJAreaEntity.finishNum == mXJAreaEntity.works.size();
 
         EventBus.getDefault().post(new XJAreaRefreshEvent(mXJAreaEntity));
     }
@@ -479,7 +487,12 @@ public class XJWorkActivity extends BaseRefreshRecyclerActivity<XJWorkEntity> im
     private void initWorks() {
         List<XJWorkEntity> noEamWorks = new ArrayList<>();
         Flowable.fromIterable(mXJAreaEntity.works)
-                .filter(xjWorkEntity -> !xjWorkEntity.isFinished)
+                //Todo: 大金swap from
+//                .filter(xjWorkEntity -> !xjWorkEntity.isFinished)
+                //Todo: 大金swap to begin
+                .filter(xjWorkEntity -> !xjWorkEntity.isFinished && xjWorkEntity.isRun)
+                .filter(xjWorkEntity -> !exceptionIds.contains(String.valueOf(xjWorkEntity.id)))
+                //Todo: 大金swap to end
                 .subscribe(xjWorkEntity -> {
                     if (xjWorkEntity.realRemark != null) {
                         xjWorkEntity.remark = xjWorkEntity.realRemark;
@@ -575,10 +588,10 @@ public class XJWorkActivity extends BaseRefreshRecyclerActivity<XJWorkEntity> im
         } else if (SBTUtil.isSupportTemp()) {
 
         } else if (vibMode == VibMode.EXPERT.getCode()) {
-            SharedPreferencesUtils.setParam(context, com.mes.supcon.expert_ewg01p.config.ModuleConfig.IS_VIBER,true);
+            SharedPreferencesUtils.setParam(context, com.mes.supcon.expert_ewg01p.config.ModuleConfig.IS_VIBER, true);
             expertViberController.initView();
-                SharedPreferencesUtils.setParam(context, ModuleConfig.CURRENT_MODE,
-                        ViberMode.DISTANCE.name());
+            SharedPreferencesUtils.setParam(context, ModuleConfig.CURRENT_MODE,
+                    ViberMode.DISTANCE.name());
 //            if (expertViberController == null) {
 //                expertViberController = new ExpertController(ExpertController.createContentView(context), true);
 ////        mMGViberController.setTemperatureNeed(true);
@@ -663,7 +676,7 @@ public class XJWorkActivity extends BaseRefreshRecyclerActivity<XJWorkEntity> im
         } else if (SBTUtil.isSupportTemp()) {
 
         } else if (tempMode == TemperatureMode.EXPERT.getCode()) {
-            SharedPreferencesUtils.setParam(context, com.mes.supcon.expert_ewg01p.config.ModuleConfig.IS_VIBER,false);
+            SharedPreferencesUtils.setParam(context, com.mes.supcon.expert_ewg01p.config.ModuleConfig.IS_VIBER, false);
             expertViberController.initView();
 //            if (expertViberController == null) {
 //                expertViberController = new ExpertController(ExpertController.createContentView(context), true);
