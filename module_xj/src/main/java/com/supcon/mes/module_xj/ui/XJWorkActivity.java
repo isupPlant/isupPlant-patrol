@@ -499,7 +499,6 @@ public class XJWorkActivity extends BaseRefreshRecyclerActivity<XJWorkEntity> im
                     } else {
                         xjWorkEntity.remark = "";
                     }
-
                     if (xjWorkEntity.eamId == null || xjWorkEntity.eamId.id == null) {
                         noEamWorks.add(xjWorkEntity);
                     } else {
@@ -526,27 +525,23 @@ public class XJWorkActivity extends BaseRefreshRecyclerActivity<XJWorkEntity> im
                         XJWorkEntity workEntity = new XJWorkEntity();
                         workEntity.isEamView = true;
                         workEntity.eamNum = deviceNames.size() + 1;
-
                         if (deviceNames.size() == 0) {
                             workEntity.eamName = "区域巡检";
                         } else {
                             workEntity.eamName = "无设备巡检";
-
                         }
                         deviceNames.add(workEntity.eamName);
                         mWorkEntities.add(workEntity);
                         mWorkEntities.addAll(noEamWorks);
                     }
 
+
+
                     if (deviceNames.size() == 0) {
                         ((ViewGroup) eamSpinner.getParent()).setVisibility(View.GONE);
-                        mXJWorkAdapter=new XJWorkAdapter(this);
-                        contentView.setAdapter(mXJWorkAdapter);
                         refreshListController.refreshComplete(mWorkEntities);
                     } else if (deviceNames.size() == 1) {
                         ((ViewGroup) eamSpinner.getParent()).setVisibility(View.GONE);
-                        mXJWorkAdapter=new XJWorkAdapter(this);
-                        contentView.setAdapter(mXJWorkAdapter);
                         refreshListController.refreshComplete(mWorkEntities);
                     } else {
                         deviceNames.add(0, getString(R.string.xj_work_eam_all));
