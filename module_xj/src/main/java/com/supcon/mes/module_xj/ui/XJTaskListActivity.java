@@ -194,7 +194,7 @@ public class XJTaskListActivity extends BaseRefreshRecyclerActivity<XJTaskGroupE
         if (mXJTaskEntities != null && mXJTaskEntities.size() > 0) {
             createTaskGroups(mXJTaskEntities);
         }
-        refreshListController.refreshBegin();
+    //    refreshListController.refreshBegin();
 
 
     }
@@ -392,7 +392,7 @@ public class XJTaskListActivity extends BaseRefreshRecyclerActivity<XJTaskGroupE
             needRefresh = false;
         }
         if (isRefresh) {
-            refreshListController.refreshBegin();
+            createTaskGroups(mXJTaskEntities);
             isRefresh = false;
         }
 
@@ -532,7 +532,7 @@ public class XJTaskListActivity extends BaseRefreshRecyclerActivity<XJTaskGroupE
 
                         XJTaskEntity taskEntity = xjTaskEntities.get(0);
 
-                        if (taskEntity.attrMap != null && taskEntity.attrMap.containsKey(XJ_TASK_STAFF_KEY)) {
+                        if (taskEntity.attrMap != null &&  taskEntity.attrMap.containsKey(XJ_TASK_STAFF_KEY)) {
                             xjTaskGroupEntity.staffName = (String) xjTaskEntities.get(0).attrMap.get(XJ_TASK_STAFF_KEY);
                         } else if (taskEntity.isTemp) {
                             xjTaskGroupEntity.staffName = taskEntity.staffName;
