@@ -508,9 +508,7 @@ public class XJWorkAdapter extends BaseListDataRecyclerViewAdapter<XJWorkEntity>
                 } else {
                     xjWorkEntity.concluse = result;
                 }
-                if (result!=null) {
                     autoJudge(xjWorkEntity);
-                }
             });
 
             itemXJWorkResultMultiSelect.setOnChildViewClickListener((childView, action, obj) -> {

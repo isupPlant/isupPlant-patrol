@@ -431,7 +431,12 @@ public class XJTaskDetailActivity extends BaseControllerActivity implements XJTa
                         }
 
                         mXJTaskEntity.realStartTime = System.currentTimeMillis();
-                        XJCacheUtil.putString(mXJTaskEntity.tableNo, mXJTaskEntity.toString());
+                        XJCacheUtil.putStringAsync(mXJTaskEntity.tableNo, mXJTaskEntity.toString(), new XJCacheUtil.Callback() {
+                            @Override
+                            public void apply() {
+                                LogUtil.d("保存成功");
+                            }
+                        });
                         //开始巡检
                         xjTaskDetailTaskBtn.setBackgroundResource(R.drawable.sl_xj_task_red);
                         xjTaskDetailTaskBtn.setText(getString(R.string.xj_task_end));
@@ -482,7 +487,12 @@ public class XJTaskDetailActivity extends BaseControllerActivity implements XJTa
                     mXJTaskEntity.isFinished = true;
                     mXJTaskEntity.realEndTime = new Date().getTime();
 
-                    XJCacheUtil.putString(mXJTaskEntity.tableNo, mXJTaskEntity.toString());
+                    XJCacheUtil.putStringAsync(mXJTaskEntity.tableNo, mXJTaskEntity.toString(), new XJCacheUtil.Callback() {
+                        @Override
+                        public void apply() {
+                            LogUtil.d("493 保存成功");
+                        }
+                    });
                     EventBus.getDefault().post(new RefreshEvent());
                     onLoadSuccessAndExit(getString(R.string.xj_task_finish_toast2), () -> back());
 //                    presenterRouter.create(OLXJTaskStatusAPI.class).endTasks(String.valueOf(olxjTaskEntity.id), "结束任务", true);
@@ -541,7 +551,12 @@ public class XJTaskDetailActivity extends BaseControllerActivity implements XJTa
                 xjAreaEntity.isSigned = true;
                 xjAreaEntity.payCardType = SystemCodeManager.getInstance().getSystemCodeEntity("PATROL_payCardType/signIn");
                 xjAreaEntity.cardTime = new Date().getTime();
-                XJCacheUtil.putString(mXJTaskEntity.tableNo, mXJTaskEntity.toString());
+                XJCacheUtil.putStringAsync(mXJTaskEntity.tableNo, mXJTaskEntity.toString(), new XJCacheUtil.Callback() {
+                    @Override
+                    public void apply() {
+                        LogUtil.d("557 保存成功");
+                    }
+                });
                 goArea(xjAreaEntity);
 
             }).show();
@@ -597,7 +612,12 @@ public class XJTaskDetailActivity extends BaseControllerActivity implements XJTa
                     if (enterPosition != -1) {
                         mXJTaskEntity.areas.set(enterPosition, areaEntity.getXJAreaEntity());
                         mXJAreaAdapter.notifyItemChanged(enterPosition);
-                        XJCacheUtil.putString(mXJTaskEntity.tableNo, mXJTaskEntity.toString());
+                        XJCacheUtil.putStringAsync(mXJTaskEntity.tableNo, mXJTaskEntity.toString(), new XJCacheUtil.Callback() {
+                            @Override
+                            public void apply() {
+                                LogUtil.d("618 保存成功");
+                            }
+                        });
                     }
                 });
 
