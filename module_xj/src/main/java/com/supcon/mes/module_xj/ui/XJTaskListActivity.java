@@ -135,7 +135,6 @@ public class XJTaskListActivity extends BaseRefreshRecyclerActivity<XJTaskGroupE
         if (!TextUtils.isEmpty(taskCache)) {
             mXJTaskEntities.addAll(GsonUtil.jsonToList(taskCache, XJTaskEntity.class));
         }
-
         EventBus.getDefault().register(this);
 
     }
@@ -362,10 +361,12 @@ public class XJTaskListActivity extends BaseRefreshRecyclerActivity<XJTaskGroupE
 
             Bundle bundle = new Bundle();
             if (XJCacheUtil.check(context, xjTaskEntity.tableNo)) {//检查本地缓存
-                bundle.putString(Constant.IntentKey.XJ_TASK_ENTITY_STR, XJCacheUtil.getString(xjTaskEntity.tableNo));
+//                bundle.putString(Constant.IntentKey.XJ_TASK_ENTITY_STR, XJCacheUtil.getString(xjTaskEntity.tableNo));
+                bundle.putString(Constant.IntentKey.XJ_TASK_NO_STR, xjTaskEntity.tableNo); //bundle 有大小限制，有本地缓存情况下，不传整个实体
             } else {
                 bundle.putString(Constant.IntentKey.XJ_TASK_ENTITY_STR, xjTaskEntity.toString());
             }
+//            bundle.putString(Constant.IntentKey.XJ_TASK_NO_STR,xjTaskEntity.tableNo);
             IntentRouter.go(context, Constant.Router.XJ_TASK_DETAIL, bundle);
         });
     }
@@ -390,7 +391,7 @@ public class XJTaskListActivity extends BaseRefreshRecyclerActivity<XJTaskGroupE
             needRefresh = false;
         }
         if (isRefresh) {
-            refreshListController.refreshBegin();
+            createTaskGroups(mXJTaskEntities);
             isRefresh = false;
         }
 
@@ -477,7 +478,7 @@ public class XJTaskListActivity extends BaseRefreshRecyclerActivity<XJTaskGroupE
                     if (xjTaskEntity.workRoute == null) {
                         return false;
                     }
-                    XJTaskEntity taskEntity = getController(XJLocalTaskController.class).getLocalTask(xjTaskEntity.tableNo);
+                    XJTaskEntity taskEntity = GsonUtil.gsonToBean(XJCacheUtil.getString(xjTaskEntity.tableNo), XJTaskEntity.class);
                     if (taskStatusPosition == 1 && taskEntity != null && taskEntity.isFinished) {//待检过滤
                         return false;
                     }
@@ -499,8 +500,9 @@ public class XJTaskListActivity extends BaseRefreshRecyclerActivity<XJTaskGroupE
 
                     if (XJCacheUtil.check(context, xjTaskEntity.tableNo)) {
 
-                        XJTaskEntity taskEntity = getController(XJLocalTaskController.class).getLocalTask(xjTaskEntity.tableNo);
-
+                        //         XJTaskEntity taskEntity = getController(XJLocalTaskController.class).getLocalTask(xjTaskEntity.tableNo);
+                        String taskStr = XJCacheUtil.getString(xjTaskEntity.tableNo);
+                        XJTaskEntity taskEntity = GsonUtil.gsonToBean(taskStr, XJTaskEntity.class);
                         if (taskEntity != null) {
 
                             xjTaskEntity = taskEntity;
@@ -530,7 +532,7 @@ public class XJTaskListActivity extends BaseRefreshRecyclerActivity<XJTaskGroupE
 
                         XJTaskEntity taskEntity = xjTaskEntities.get(0);
 
-                        if (taskEntity.attrMap != null && taskEntity.attrMap.containsKey(XJ_TASK_STAFF_KEY)) {
+                        if (taskEntity.attrMap != null &&  taskEntity.attrMap.containsKey(XJ_TASK_STAFF_KEY)) {
                             xjTaskGroupEntity.staffName = (String) xjTaskEntities.get(0).attrMap.get(XJ_TASK_STAFF_KEY);
                         } else if (taskEntity.isTemp) {
                             xjTaskGroupEntity.staffName = taskEntity.staffName;

@@ -5,6 +5,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
+import android.support.v4.util.ArrayMap;
 import android.support.v7.widget.RecyclerView;
 import android.text.InputType;
 import android.text.TextUtils;
@@ -507,8 +508,7 @@ public class XJWorkAdapter extends BaseListDataRecyclerViewAdapter<XJWorkEntity>
                 } else {
                     xjWorkEntity.concluse = result;
                 }
-
-                autoJudge(xjWorkEntity);
+                    autoJudge(xjWorkEntity);
             });
 
             itemXJWorkResultMultiSelect.setOnChildViewClickListener((childView, action, obj) -> {
@@ -673,11 +673,9 @@ public class XJWorkAdapter extends BaseListDataRecyclerViewAdapter<XJWorkEntity>
                 if (!TextUtils.isEmpty(data.defaultVal) && TextUtils.isEmpty(data.concluse)) {
                     data.concluse = data.defaultVal;
                     initSwitch(itemXJWorkResultSwitch, data.defaultVal, candidateValues);
-
                 } else {
                     initSwitch(itemXJWorkResultSwitch, data.concluse, candidateValues);
                 }
-
             } else if ("PATROL_editType/singleSelect".equals(xjInputTypeEntity.editType.id)) {  //是否  单选
                 itemXJWorkResultInput.setVisibility(View.GONE);
                 itemXJWorkResultSpinner.setVisibility(View.VISIBLE);

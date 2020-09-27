@@ -117,4 +117,5 @@
 	<string name="xj_patrol_no_device">No Device Patrol</string>
 	<string name="xj_patrol_multi_choose_list">Multi Choose List</string>
 	<string name="xj_patrol_no_route">No route！</string>
+	<string name="xj_patrol_code_not_match">Check in code does not match</string>
 </resources>

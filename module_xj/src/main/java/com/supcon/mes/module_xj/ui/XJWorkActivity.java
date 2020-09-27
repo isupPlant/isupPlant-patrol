@@ -60,6 +60,7 @@ import com.supcon.mes.middleware.util.PopupWindowItemHelper;
 import com.supcon.mes.middleware.util.SBTUtil;
 import com.supcon.mes.middleware.util.SnackbarHelper;
 import com.supcon.mes.middleware.util.SystemCodeManager;
+import com.supcon.mes.middleware.util.XJCacheUtil;
 import com.supcon.mes.module_xj.IntentRouter;
 import com.supcon.mes.module_xj.R;
 import com.supcon.mes.module_xj.controller.XJCameraController;
@@ -88,6 +89,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 import io.reactivex.Flowable;
@@ -139,7 +141,7 @@ public class XJWorkActivity extends BaseRefreshRecyclerActivity<XJWorkEntity> im
     boolean isOneKeyOver = false;
     boolean isCanEndAll = true;
     private Map<String, String> passReasonMap, realValueMap;
-    private List<PopupWindowEntity> mPopupWindowEntityList;
+    private List<PopupWindowEntity> mPopupWindowEntityList=new ArrayList<>();
     private CustomPopupWindow mCustomPopupWindow;
     private SinglePickController<String> mSingPicker;
     private String thermometervalue = ""; // 全局测温值
@@ -182,10 +184,12 @@ public class XJWorkActivity extends BaseRefreshRecyclerActivity<XJWorkEntity> im
             mXJAreaEntity = GsonUtil.gsonToBean(xjAreaEntityStr, XJAreaEntity.class);
         }
 
-        String taskStr = getIntent().getStringExtra(Constant.IntentKey.XJ_TASK_ENTITY_STR);
+        String taskNo = getIntent().getStringExtra(Constant.IntentKey.XJ_TASK_NO_STR);
 
 
-        if (!TextUtils.isEmpty(taskStr)) {
+        if (!TextUtils.isEmpty(taskNo)) {
+
+            String taskStr = XJCacheUtil.getString(taskNo);
             mXJTaskEntity = GsonUtil.gsonToBean(taskStr, XJTaskEntity.class);
         }
 
@@ -282,12 +286,21 @@ public class XJWorkActivity extends BaseRefreshRecyclerActivity<XJWorkEntity> im
 
     }
 
+
+
     private void initPopupWindowData() {
-        Map<String, Integer> map = new HashMap<>();
-        map.put(context.getString(R.string.xj_work_over), R.drawable.ic_xj_work_finish);
-        map.put(context.getString(R.string.xj_work_jump), R.drawable.ic_xj_work_skip);
-        mPopupWindowEntityList = PopupWindowItemHelper.initPopupWindowData(map);
+        createPopupWindowEntityData(context.getString(R.string.xj_work_over), R.drawable.ic_xj_work_finish,0);
+        createPopupWindowEntityData(context.getString(R.string.xj_work_jump), R.drawable.ic_xj_work_skip,1);
         mCustomPopupWindow = new CustomPopupWindow(context, mPopupWindowEntityList);
+    }
+
+
+    public void createPopupWindowEntityData(String name,int iconId,int tag){
+        PopupWindowEntity popupWindowEntity=new PopupWindowEntity();
+        popupWindowEntity.setText(name);
+        popupWindowEntity.setIconId(iconId);
+        popupWindowEntity.setTag(tag);
+        mPopupWindowEntityList.add(popupWindowEntity);
     }
 
     @Override
@@ -308,8 +321,8 @@ public class XJWorkActivity extends BaseRefreshRecyclerActivity<XJWorkEntity> im
                 .throttleFirst(200, TimeUnit.MILLISECONDS)
                 .subscribe(o -> {
                     Bundle bundle = new Bundle();
-                    bundle.putSerializable(Constant.IntentKey.XJ_AREA_ENTITY_STR, mXJAreaEntity.toString());
-                    bundle.putSerializable(Constant.IntentKey.XJ_TASK_ENTITY_STR, mXJTaskEntity.toString());
+                    bundle.putString(Constant.IntentKey.XJ_AREA_ENTITY_STR, mXJAreaEntity.toString());
+                    bundle.putString(Constant.IntentKey.XJ_TASK_NO_STR, mXJTaskEntity.tableNo);
                     IntentRouter.go(context, Constant.Router.XJ_WORK_ITEM_VIEW, bundle);
                 });
 
@@ -378,7 +391,7 @@ public class XJWorkActivity extends BaseRefreshRecyclerActivity<XJWorkEntity> im
             return;
         }
         PopupWindowEntity popupWindowEntity = mPopupWindowEntityList.get(position);
-        switch (position) {
+        switch (popupWindowEntity.getTag()) {
             case 0:
                 mCustomPopupWindow.dismiss();
                 showAllFinishDialog();
@@ -499,7 +512,6 @@ public class XJWorkActivity extends BaseRefreshRecyclerActivity<XJWorkEntity> im
                     } else {
                         xjWorkEntity.remark = "";
                     }
-
                     if (xjWorkEntity.eamId == null || xjWorkEntity.eamId.id == null) {
                         noEamWorks.add(xjWorkEntity);
                     } else {
@@ -526,17 +538,17 @@ public class XJWorkActivity extends BaseRefreshRecyclerActivity<XJWorkEntity> im
                         XJWorkEntity workEntity = new XJWorkEntity();
                         workEntity.isEamView = true;
                         workEntity.eamNum = deviceNames.size() + 1;
-
                         if (deviceNames.size() == 0) {
                             workEntity.eamName = "区域巡检";
                         } else {
                             workEntity.eamName = "无设备巡检";
-
                         }
                         deviceNames.add(workEntity.eamName);
                         mWorkEntities.add(workEntity);
                         mWorkEntities.addAll(noEamWorks);
                     }
+
+
 
                     if (deviceNames.size() == 0) {
                         ((ViewGroup) eamSpinner.getParent()).setVisibility(View.GONE);
@@ -821,6 +833,7 @@ public class XJWorkActivity extends BaseRefreshRecyclerActivity<XJWorkEntity> im
                                 for (XJWorkEntity xjWorkItemEntity : xjWorkEntities) {
                                     doFinish(xjWorkItemEntity);
                                 }
+
                                 if (xjWorkEntities.size() == mXJAreaEntity.works.size()) {
                                     onLoadSuccessAndExit(context.getResources().getString(R.string.xj_patrol_over), this::finish);
                                 } else {
@@ -951,6 +964,7 @@ public class XJWorkActivity extends BaseRefreshRecyclerActivity<XJWorkEntity> im
 
                     }, () -> {
                         mXJAreaEntity.finishNum = xjWorkItemEntities.size();
+
                         if (xjWorkItemEntities.size() == mXJAreaEntity.works.size()) {
                             mXJAreaEntity.isFinished = true;
                             back();
@@ -959,13 +973,6 @@ public class XJWorkActivity extends BaseRefreshRecyclerActivity<XJWorkEntity> im
                             refreshWorkList();
                         }
                         ToastUtils.show(context, String.format(getResources().getString(R.string.xj_work_skip_toast), "" + (xjWorkItemEntities.size())));
-//                            ((XJWorkActivity)context).runOnUiThread(new Runnable() {
-//                                @Override
-//                                public void run() {
-//
-//                                }
-//                            });
-
 
                     });
 
