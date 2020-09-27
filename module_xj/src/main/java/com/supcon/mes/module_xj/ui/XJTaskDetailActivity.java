@@ -117,8 +117,9 @@ public class XJTaskDetailActivity extends BaseControllerActivity implements XJTa
 
     @BindByTag("xjTaskDetailParent")
     RelativeLayout xjTaskDetailParent;
+
     @BindByTag("xjTaskDetailCloseBtn")
-    ImageView iv_close;
+    ImageView xjTaskDetailCloseBtn;
 
     private XJTaskEntity mXJTaskEntity;
     private XJAreaAdapter mXJAreaAdapter;
@@ -390,7 +391,7 @@ public class XJTaskDetailActivity extends BaseControllerActivity implements XJTa
     @Override
     protected void initListener() {
         super.initListener();
-        RxView.clicks(iv_close)
+        RxView.clicks(xjTaskDetailCloseBtn)
                 .subscribe(o -> back());
 
         if(mXJAreaAdapter!=null){
