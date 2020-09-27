@@ -60,6 +60,9 @@
 	<string name="xj_work_over_all">Whether to complete all the inspection items？</string>
 	<string name="xj_work_over">A key to complete</string>
 	<string name="xj_work_jump">A key to skip</string>
+<!--	<string name="xj_patrol_upload_task">Confirm to upload tasks in this area？</string>-->
+<!--	<string name="xj_patrol_upload">Failed to upload inspection data！</string>-->
+<!--	<string name="xj_patrol_upload_succeed">Upload successfully</string>-->
 	<string name="xj_upload_task">Upload task</string>
 	<string name="xj_patrol_no_device_look">No device details to view！</string>
 	<string name="xj_patrol_give_photo_method">Please select the method of obtaining photos</string>

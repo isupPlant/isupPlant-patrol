@@ -25,6 +25,7 @@ import com.supcon.common.view.base.activity.BaseControllerActivity;
 import com.supcon.common.view.util.LogUtil;
 import com.supcon.common.view.util.SharedPreferencesUtils;
 import com.supcon.common.view.util.ToastUtils;
+import com.supcon.mes.expert_uhf.controller.ExpertUHFRFIDController;
 import com.supcon.mes.mbap.utils.DateUtil;
 import com.supcon.mes.mbap.utils.GsonUtil;
 import com.supcon.mes.mbap.utils.controllers.SinglePickController;
@@ -38,6 +39,7 @@ import com.supcon.mes.middleware.model.bean.xj.XJAreaEntityDao;
 import com.supcon.mes.middleware.model.bean.xj.XJWorkEntity;
 import com.supcon.mes.middleware.model.bean.xj.XJWorkEntityDao;
 import com.supcon.mes.middleware.model.event.RefreshEvent;
+import com.supcon.mes.middleware.model.inter.IMap;
 import com.supcon.mes.middleware.model.inter.SystemCode;
 import com.supcon.mes.middleware.util.SBTUtil;
 import com.supcon.mes.middleware.util.SystemCodeManager;
@@ -56,11 +58,13 @@ import com.supcon.mes.module_xj.model.event.XJAreaRefreshEvent;
 import com.supcon.mes.module_xj.presenter.XJTaskSubmitPresenter;
 import com.supcon.mes.module_xj.presenter.XJUpdateTaskStatusPresenter;
 import com.supcon.mes.module_xj.ui.adapter.XJAreaAdapter;
+import com.supcon.mes.module_xj.util.BundleSaveUtil;
 import com.supcon.mes.nfc.model.bean.NFCEntity;
 import com.supcon.mes.sb2.model.event.BarcodeEvent;
 import com.supcon.mes.sb2.model.event.SB2AttachEvent;
 import com.supcon.mes.sb2.model.event.UhfRfidEvent;
 import com.supcon.mes.sb2.util.EM55UHFRFIDHelper;
+import com.supcon.mes.sb2.util.SoundHelper;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
@@ -78,6 +82,7 @@ import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.functions.Consumer;
 import io.reactivex.functions.Function;
 import io.reactivex.schedulers.Schedulers;
+import retrofit2.http.HEAD;
 
 import static com.supcon.mes.module_xj.ui.XJTaskListActivity.XJ_TASK_STAFF_KEY;
 
@@ -86,13 +91,16 @@ import static com.supcon.mes.module_xj.ui.XJTaskListActivity.XJ_TASK_STAFF_KEY;
  * Email:wangshizhan@supcom.com
  */
 @Router(Constant.Router.XJ_TASK_DETAIL)
-@Controller(value = {SystemCodeJsonController.class, XJLocalTaskController.class})
+@Controller(value = {SystemCodeJsonController.class, XJLocalTaskController.class,
+        ExpertUHFRFIDController.class})
 @Presenter(value = {XJTaskSubmitPresenter.class, XJUpdateTaskStatusPresenter.class})
 @SystemCode(entityCodes = {
         Constant.SystemCode.PATROL_signInType,
         Constant.SystemCode.PATROL_passReason
 })
-public class XJTaskDetailActivity extends BaseControllerActivity implements XJTaskSubmitContract.View, XJUpdateStatusContract.View {
+public class XJTaskDetailActivity extends BaseControllerActivity implements XJTaskSubmitContract.View
+        , IMap ,
+        XJUpdateStatusContract.View {
 
     @BindByTag("xjTaskDetailRouteName")
     TextView xjTaskDetailRouteName;
@@ -124,7 +132,9 @@ public class XJTaskDetailActivity extends BaseControllerActivity implements XJTa
     private XJAreaAdapter mXJAreaAdapter;
     private ScanDriverController driverController;
     private EM55UHFRFIDHelper em55UHFRFIDHelper;
+    private ExpertUHFRFIDController mExpertUHFRFIDController;
     private int enterPosition = -1;
+    private SoundHelper mSoundHelper = new SoundHelper();
 
     @Override
     protected int getLayoutID() {
@@ -175,6 +185,10 @@ public class XJTaskDetailActivity extends BaseControllerActivity implements XJTa
             if (XJCacheUtil.check(context, taskNo)) {//检查本地缓存
                 taskStr = XJCacheUtil.getString(taskNo);
             }
+//        String taskStr = BundleSaveUtil.instance.getValue(Constant.IntentKey.XJ_TASK_ENTITY_STR);
+//
+//        if (!TextUtils.isEmpty(taskStr)) {
+//            mXJTaskEntity = GsonUtil.gsonToBean(taskStr, XJTaskEntity.class);
         }
         mXJTaskEntity = GsonUtil.gsonToBean(taskStr, XJTaskEntity.class);
 
@@ -199,6 +213,7 @@ public class XJTaskDetailActivity extends BaseControllerActivity implements XJTa
                 .build(context);
         registerController(ScanDriverController.class.getSimpleName(), driverController);
         driverController.openScan();
+        mExpertUHFRFIDController = getController(ExpertUHFRFIDController.class);
     }
 
     @Override
@@ -256,10 +271,26 @@ public class XJTaskDetailActivity extends BaseControllerActivity implements XJTa
 
     }
 
+//    @Override
+//    protected void onResume() {
+//        super.onResume();
+//        mExpertUHFRFIDController.start(result -> {
+//            if (TextUtils.isEmpty(result.first)) {
+//                char[] str = result.second.strEPC.replaceAll(" ", "").toCharArray();
+//                StringBuilder stringBuilder = new StringBuilder();
+//                for (char c : str)
+//                    if (c >= '0' && c <= '9' && stringBuilder.length() < 8)
+//                        stringBuilder.append(c);
+//                EventBus.getDefault().post(new UhfRfidEvent(stringBuilder.toString()));
+//            }
+//        });
+//    }
+
     @Override
     protected void onStop() {
         super.onStop();
 
+        mExpertUHFRFIDController.stop();
         if (em55UHFRFIDHelper != null && em55UHFRFIDHelper.isStart())
             em55UHFRFIDHelper.inventoryStop();
     }
@@ -372,6 +403,7 @@ public class XJTaskDetailActivity extends BaseControllerActivity implements XJTa
         mXJAreaAdapter = new XJAreaAdapter(context);
 
         xjTaskDetailContentView.setLayoutManager(new LinearLayoutManager(context));
+        mXJAreaAdapter.exceptionIds = mXJTaskEntity.exceptinWorkIds;
         mXJAreaAdapter.setList(mXJTaskEntity.areas);
         xjTaskDetailContentView.setAdapter(mXJAreaAdapter);
 
@@ -394,7 +426,7 @@ public class XJTaskDetailActivity extends BaseControllerActivity implements XJTa
                 }
 
                 if (mXJTaskEntity.areas == null || mXJTaskEntity.areas.size() == 0) {
-                    //       ToastUtils.show(context, getString(R.string.xj_area_sign_warning2));
+                    ToastUtils.show(context, getString(R.string.xj_area_sign_warning2));
                     showDialog();
                     return;
                 }
@@ -406,13 +438,12 @@ public class XJTaskDetailActivity extends BaseControllerActivity implements XJTa
                 }
 
             });
-        }
 
 
-        RxView.clicks(xjTaskDetailTaskBtn)
-                .throttleFirst(200, TimeUnit.MILLISECONDS)
-                .subscribe(o -> {
-                    if (mXJTaskEntity.realStartTime == 0) {
+            RxView.clicks(xjTaskDetailTaskBtn)
+                    .throttleFirst(200, TimeUnit.MILLISECONDS)
+                    .subscribe(o -> {
+                        if (mXJTaskEntity.realStartTime == 0) {
 
                         if (mXJTaskEntity.areas == null || mXJTaskEntity.areas.size() == 0) {
                             //                   ToastUtils.show(context, getString(R.string.xj_area_sign_warning2));
@@ -436,8 +467,25 @@ public class XJTaskDetailActivity extends BaseControllerActivity implements XJTa
                     } else {
                         showFinishDialog();
                     }
+//                            if (mXJTaskEntity.areas == null || mXJTaskEntity.areas.size() == 0) {
+//                                //                   ToastUtils.show(context, getString(R.string.xj_area_sign_warning2));
+//                                showDialog();
+//                                return;
+//                            }
+//
+//                            mXJTaskEntity.realStartTime = System.currentTimeMillis();
+//                            XJCacheUtil.putString(mXJTaskEntity.tableNo, mXJTaskEntity.toString());
+//                            //开始巡检
+//                            xjTaskDetailTaskBtn.setBackgroundResource(R.drawable.sl_xj_task_red);
+//                            xjTaskDetailTaskBtn.setText(getString(R.string.xj_task_end));
+//
+//                            presenterRouter.create(XJUpdateStatusAPI.class).updateXJTaskStatus(mXJTaskEntity.id, "PATROL_taskState/running");
+//                        } else {
+//                            showFinishDialog();
+//                        }
 
-                });
+                    });
+        }
     }
 
     public void showDialog() {
@@ -497,7 +545,7 @@ public class XJTaskDetailActivity extends BaseControllerActivity implements XJTa
         }
 
         for (XJAreaEntity xjAreaEntity : areaEntities) {
-            if (!xjAreaEntity.isFinished) {
+            if (!xjAreaEntity.isFinished && xjAreaEntity.getTotalNum(mXJTaskEntity.exceptinWorkIds) > 0) {
                 return false;
             }
         }
@@ -582,6 +630,12 @@ public class XJTaskDetailActivity extends BaseControllerActivity implements XJTa
         Collections.sort(xjAreaEntity.works);
         bundle.putString(Constant.IntentKey.XJ_AREA_ENTITY_STR, xjAreaEntity.toString());
         bundle.putString(Constant.IntentKey.XJ_TASK_NO_STR, mXJTaskEntity.tableNo);
+        bundle.putString(Constant.IntentKey.XJ_AREA_EXCEPTION_IDS, mXJTaskEntity.exceptinWorkIds);
+//        BundleSaveUtil.instance
+//                .put(Constant.IntentKey.XJ_AREA_ENTITY_STR, xjAreaEntity.toString())
+//                .put(Constant.IntentKey.XJ_TASK_ENTITY_STR, mXJTaskEntity.toString())
+//                .put(Constant.IntentKey.XJ_AREA_EXCEPTION_IDS, mXJTaskEntity.exceptinWorkIds);
+//        bundle.putBoolean(Constant.IntentKey.BUNDLE_TEMP_SAVE, true);
         if (xjAreaEntity.isFinished || mXJTaskEntity.isFinished) {
             bundle.putBoolean(Constant.IntentKey.XJ_IS_FROM_TASK, true);
             bundle.putBoolean(Constant.IntentKey.XJ_IS_FINISHED, mXJTaskEntity.isFinished);
@@ -673,8 +727,11 @@ public class XJTaskDetailActivity extends BaseControllerActivity implements XJTa
                 isExist = true;
                 updateXJAreaEntity(areaEntity);//update数据
                 LogUtil.i("BarcodeEvent1", code);
-                enterPosition = index;
-                doGoArea(areaEntity);  //跳转
+                if (enterPosition != index) {
+                    doGoArea(areaEntity);  //跳转
+                    enterPosition = index;
+                }
+                break;
             }
             index++;
         }

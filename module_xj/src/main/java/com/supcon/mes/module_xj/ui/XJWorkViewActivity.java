@@ -43,6 +43,7 @@ import com.supcon.mes.module_xj.model.event.XJAreaRefreshEvent;
 import com.supcon.mes.module_xj.model.event.XJWorkRefreshEvent;
 import com.supcon.mes.module_xj.presenter.XJTaskSubmitPresenter;
 import com.supcon.mes.module_xj.ui.adapter.XJWorkViewAdapter;
+import com.supcon.mes.module_xj.util.BundleSaveUtil;
 import com.supcon.mes.testo_805i.controller.TestoController;
 
 import org.greenrobot.eventbus.EventBus;
@@ -224,7 +225,7 @@ public class XJWorkViewActivity extends BaseRefreshRecyclerActivity<XJWorkEntity
 //
 //                            Bundle bundle = new Bundle();
 //                            bundle.putSerializable("images", (Serializable) FaultPicHelper.getImagePathList(galleryBeanList));
-//                            bundle.putInt("position", imgIndex);  //点击位置索引
+//                            bundle.putInt("position", imgIndex);  //点击位22置索引
 //
 //                            int[] location = new int[2];
 //                            childView.getLocationOnScreen(location);  //点击图片的位置

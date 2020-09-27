@@ -19,6 +19,7 @@ import com.supcon.common.view.util.DisplayUtil;
 import com.supcon.common.view.util.LogUtil;
 import com.supcon.common.view.util.SharedPreferencesUtils;
 import com.supcon.common.view.util.StatusBarUtils;
+import com.supcon.mes.expert_uhf.controller.ExpertUHFRFIDController;
 import com.supcon.mes.mbap.utils.DateUtil;
 import com.supcon.mes.mbap.utils.GsonUtil;
 import com.supcon.mes.mbap.utils.SpaceItemDecoration;
@@ -79,9 +80,12 @@ import io.reactivex.schedulers.Schedulers;
  * Email:wangshizhan@supcom.com
  */
 @Router(value = Constant.AppCode.MPS_Patrol, viewCode = "tempTaskEdit,potrolTaskEdit")
-@Controller(value = {SystemCodeJsonController.class, CheckUserPermissionController.class,
-        XJTaskDateFilterController.class, XJTaskStatusFilterController.class,/*顶部筛选*/
-        XJTaskNoIssuedController.class, XJTaskUploadController.class,/*获取，上传*/
+@Controller(value = {SystemCodeJsonController.class,
+        CheckUserPermissionController.class,
+        XJTaskDateFilterController.class,
+        XJTaskStatusFilterController.class,/*顶部筛选*/
+        XJTaskNoIssuedController.class,
+        XJTaskUploadController.class,/*获取，上传*/
         XJLocalTaskController.class})
 @Presenter(value = {XJRunningTaskPresenter.class, DeploymentPresenter.class})
 @SystemCode(entityCodes = {
@@ -95,7 +99,8 @@ import io.reactivex.schedulers.Schedulers;
         Constant.SystemCode.PATROL_routeType,
         Constant.SystemCode.PATROL_payCardType
 })
-public class XJTaskListActivity extends BaseRefreshRecyclerActivity<XJTaskGroupEntity> implements XJTaskContract.View, DeploymentContract.View {
+public class XJTaskListActivity extends BaseRefreshRecyclerActivity<XJTaskGroupEntity>
+        implements XJTaskContract.View, DeploymentContract.View {
 
     public static final String XJ_TASK_STAFF_KEY = "PATROL_1_0_0_patrolTask_mobilePotrolTaskList_LISTPT_ASSO_bbeae76a_3694_4dc2_90f0_95fcfe8d0484";
     @BindByTag("titleText")
@@ -127,9 +132,14 @@ public class XJTaskListActivity extends BaseRefreshRecyclerActivity<XJTaskGroupE
     @Override
     protected void onInit() {
         super.onInit();
+        ExpertUHFRFIDController.initSerialPort(this);
         refreshListController.setAutoPullDownRefresh(false);
         refreshListController.setPullDownRefreshEnabled(true);
 
+//        String activityRouter = getIntent().getStringExtra(Constant.IntentKey.ACTIVITY_ROUTER);
+//        if(!TextUtils.isEmpty(activityRouter)){
+//            SupPlantApplication.exitMain();
+//        }
         String taskCache = SharedPreferencesUtils.getParam(context, Constant.SPKey.XJ_TASKS_CACHE + dateFilter + taskStatusPosition, "");
 
         if (!TextUtils.isEmpty(taskCache)) {
@@ -149,12 +159,21 @@ public class XJTaskListActivity extends BaseRefreshRecyclerActivity<XJTaskGroupE
             SharedPreferencesUtils.setParam(context, Constant.SPKey.XJ_TASKS_CACHE + dateFilter + taskStatusPosition, "");
         }
         EventBus.getDefault().unregister(this);
-
-        StartLocationUtils.stopLocation();
-
-
-        RealTimeUploadLoactionService.stopUploadLoactionLoop(this);
-
+//        if (mXJTaskGroupAdapter.getXJTaskEntity() != null && mXJTaskGroupAdapter.getXJTaskEntity().size() > 0) {
+//            SharedPreferencesUtils.setParam(context, Constant.SPKey.XJ_TASKS_CACHE + dateFilter + taskStatusPosition, GsonUtil.gsonString(mXJTaskGroupAdapter.getXJTaskEntity()));
+//            if (mXJTaskEntities != null && mXJTaskEntities.size() > 0) {
+//                SharedPreferencesUtils.setParam(context, Constant.SPKey.XJ_TASKS_CACHE + dateFilter + taskStatusPosition, GsonUtil.gsonString(mXJTaskEntities));
+//            } else {
+//                SharedPreferencesUtils.setParam(context, Constant.SPKey.XJ_TASKS_CACHE + dateFilter + taskStatusPosition, "");
+//            }
+//            EventBus.getDefault().unregister(this);
+//
+//            StartLocationUtils.stopLocation();
+//
+//
+//            RealTimeUploadLoactionService.stopUploadLoactionLoop(this);
+//
+//        }
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
@@ -176,6 +195,21 @@ public class XJTaskListActivity extends BaseRefreshRecyclerActivity<XJTaskGroupE
         Flowable.timer(200, TimeUnit.MILLISECONDS)
                 .subscribe(aLong -> {
                     int code = 0;
+//                .subscribe(new Consumer<Long>() {
+//                    @Override
+//                    public void accept(Long aLong) throws Exception {
+//                        int code = 0;
+////                        if(SBTUtil.isSBT()){
+////                            code|= SB2Config.BARCORD;
+////                        }
+//
+//                        if (SharedPreferencesUtils.getParam(context, Constant.SPKey.TEMP_MODE, 0) == TemperatureMode.SBT.getCode() && SBTUtil.isSupportTemp()) {
+//                            code |= SB2Config.TEMPERATURE;
+//                        }
+//
+//                        if (SharedPreferencesUtils.getParam(context, Constant.SPKey.UHF_ENABLE, false) && SBTUtil.isSupportUHF()) {
+//                            code |= SB2Config.UHF;
+//                        }
 
                     if (SharedPreferencesUtils.getParam(context, Constant.SPKey.TEMP_MODE, 0) == TemperatureMode.SBT.getCode() && SBTUtil.isSupportTemp()) {
                         code |= SB2Config.TEMPERATURE;
@@ -194,8 +228,15 @@ public class XJTaskListActivity extends BaseRefreshRecyclerActivity<XJTaskGroupE
             createTaskGroups(mXJTaskEntities);
         }
         refreshListController.refreshBegin();
+//            if (mXJTaskEntities.size() == 0) {
+//                refreshListController.refreshBegin();
+//            } else {
+//                createTaskGroups(mXJTaskEntities);
+//            }
+//            refreshListController.refreshBegin();
 
 
+//        }
     }
 
     @Override
@@ -227,7 +268,8 @@ public class XJTaskListActivity extends BaseRefreshRecyclerActivity<XJTaskGroupE
         super.initListener();
 
         getController(CheckUserPermissionController.class)
-                .checkUserPermission(SupPlantApplication.getUserName(), "PATROL_1.0.0_patrolTask_tempTaskList", "start_ml5tgr8")
+                .checkUserPermission(SupPlantApplication.getUserName(),
+                        "PATROL_1.0.0_patrolTask_tempTaskList", "start_ml5tgr8")
                 .setSuccessListener((OnSuccessListener<Boolean>) result -> {
                     if (result) {
                         rightBtn.setVisibility(View.VISIBLE);
@@ -292,7 +334,8 @@ public class XJTaskListActivity extends BaseRefreshRecyclerActivity<XJTaskGroupE
             LogUtil.d("end:" + end);
             dateFilter = filter;
             //如果缓存中有先从缓存中取出显示
-            String taskCache = SharedPreferencesUtils.getParam(context, Constant.SPKey.XJ_TASKS_CACHE + dateFilter + taskStatusPosition, "");
+            String taskCache = SharedPreferencesUtils.getParam(context,
+                    Constant.SPKey.XJ_TASKS_CACHE + dateFilter + taskStatusPosition, "");
             mXJTaskEntities.clear();
             if (!TextUtils.isEmpty(taskCache)) {
                 mXJTaskEntities.addAll(GsonUtil.jsonToList(taskCache, XJTaskEntity.class));
@@ -312,6 +355,7 @@ public class XJTaskListActivity extends BaseRefreshRecyclerActivity<XJTaskGroupE
 
         getController(XJTaskStatusFilterController.class).setOnSuccessListener(result -> {
             LogUtil.d("result:" + result);
+
             taskStatusPosition = result;
             refreshListController.refreshBegin();
         });
@@ -367,6 +411,11 @@ public class XJTaskListActivity extends BaseRefreshRecyclerActivity<XJTaskGroupE
                 bundle.putString(Constant.IntentKey.XJ_TASK_ENTITY_STR, xjTaskEntity.toString());
             }
 //            bundle.putString(Constant.IntentKey.XJ_TASK_NO_STR,xjTaskEntity.tableNo);
+//                BundleSaveUtil.instance.put(Constant.IntentKey.XJ_TASK_ENTITY_STR, XJCacheUtil.getString(xjTaskEntity.tableNo));
+//            } else {
+//                bundle.putString(Constant.IntentKey.XJ_TASK_ENTITY_STR, xjTaskEntity.toString());
+//                BundleSaveUtil.instance.put(Constant.IntentKey.XJ_TASK_ENTITY_STR, xjTaskEntity.toString());
+//            }
             IntentRouter.go(context, Constant.Router.XJ_TASK_DETAIL, bundle);
         });
     }
@@ -392,6 +441,7 @@ public class XJTaskListActivity extends BaseRefreshRecyclerActivity<XJTaskGroupE
         }
         if (isRefresh) {
             createTaskGroups(mXJTaskEntities);
+            refreshListController.refreshBegin();
             isRefresh = false;
         }
 
@@ -413,9 +463,7 @@ public class XJTaskListActivity extends BaseRefreshRecyclerActivity<XJTaskGroupE
     }
 
     private void getXJTask(int pageNo, Map<String, Object> queryMap) {
-
         presenterRouter.create(XJTaskAPI.class).getTaskList(pageNo, 20, queryMap);
-
     }
 
     @Override
@@ -465,6 +513,7 @@ public class XJTaskListActivity extends BaseRefreshRecyclerActivity<XJTaskGroupE
 
         return tempTaskEntities;
     }
+
 
     @SuppressLint("CheckResult")
     private void createTaskGroups(List<XJTaskEntity> taskEntities) {
@@ -532,7 +581,7 @@ public class XJTaskListActivity extends BaseRefreshRecyclerActivity<XJTaskGroupE
 
                         XJTaskEntity taskEntity = xjTaskEntities.get(0);
 
-                        if (taskEntity.attrMap != null &&  taskEntity.attrMap.containsKey(XJ_TASK_STAFF_KEY)) {
+                        if (taskEntity.attrMap != null && taskEntity.attrMap.containsKey(XJ_TASK_STAFF_KEY)) {
                             xjTaskGroupEntity.staffName = (String) xjTaskEntities.get(0).attrMap.get(XJ_TASK_STAFF_KEY);
                         } else if (taskEntity.isTemp) {
                             xjTaskGroupEntity.staffName = taskEntity.staffName;

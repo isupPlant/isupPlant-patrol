@@ -553,6 +553,7 @@ public class XJWorkAdapter extends BaseListDataRecyclerViewAdapter<XJWorkEntity>
         @Override
         protected void update(XJWorkEntity data) {
             mXJCameraController.addListener(itemXJWorkPics, getAdapterPosition(), XJWorkAdapter.this);
+            LogUtil.e("InputType"+SupPlantApplication.dao().getXJInputTypeEntityDao().loadAll());
             XJInputTypeEntity xjInputTypeEntity = SupPlantApplication.dao().getXJInputTypeEntityDao().queryBuilder()
                     .where(XJInputTypeEntityDao.Properties.Ip.eq(SupPlantApplication.getIp()))
                     .where(XJInputTypeEntityDao.Properties.Id.eq(data.inputStandardId.id)).unique();

@@ -61,7 +61,7 @@ dependencies {
     implementation project(':isupplant-shell:module_scan')
     annotationProcessor "com.supcon.mes.common:apt:$rootProject.ext.aptVersion@jar"
 
-//    api "com.supcon.mes.drive:expert_uhf:$rootProject.ext.expert_uhfVersion"
+    api "com.supcon.mes.drive:expert_uhf:$rootProject.ext.expert_uhfVersion"
     api "com.supcon.mes.drive:expert_viber:$rootProject.ext.expert_viberVersion"
     //蘑菇头测振
     implementation (name:'../libs/blemulti-release', ext: 'aar')
