@@ -440,7 +440,6 @@ public class XJTaskListActivity extends BaseRefreshRecyclerActivity<XJTaskGroupE
             needRefresh = false;
         }
         if (isRefresh) {
-            createTaskGroups(mXJTaskEntities);
             refreshListController.refreshBegin();
             isRefresh = false;
         }
