@@ -600,6 +600,7 @@ public class XJWorkAdapter extends BaseListDataRecyclerViewAdapter<XJWorkEntity>
                 itemXJWorkResultSpinner.setVisibility(View.GONE);
                 itemXJWorkResultSwitch.setVisibility(View.GONE);
                 itemXJWorkResultInput.setVisibility(View.VISIBLE);
+                itemXJWorkResultInput.setEnabled(true);
                 itemXJWorkResultMultiSelect.setVisibility(View.GONE);
 
                 if (data.isThermometric) {  //要求测温
