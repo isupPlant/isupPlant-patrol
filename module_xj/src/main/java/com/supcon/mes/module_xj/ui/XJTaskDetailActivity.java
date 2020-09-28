@@ -273,20 +273,20 @@ public class XJTaskDetailActivity extends BaseControllerActivity implements XJTa
 
     }
 
-//    @Override
-//    protected void onResume() {
-//        super.onResume();
-//        mExpertUHFRFIDController.start(result -> {
-//            if (TextUtils.isEmpty(result.first)) {
-//                char[] str = result.second.strEPC.replaceAll(" ", "").toCharArray();
-//                StringBuilder stringBuilder = new StringBuilder();
-//                for (char c : str)
-//                    if (c >= '0' && c <= '9' && stringBuilder.length() < 8)
-//                        stringBuilder.append(c);
-//                EventBus.getDefault().post(new UhfRfidEvent(stringBuilder.toString()));
-//            }
-//        });
-//    }
+    @Override
+    protected void onResume() {
+        super.onResume();
+        mExpertUHFRFIDController.start(result -> {
+            if (TextUtils.isEmpty(result.first)) {
+                char[] str = result.second.strEPC.replaceAll(" ", "").toCharArray();
+                StringBuilder stringBuilder = new StringBuilder();
+                for (char c : str)
+                    if (c >= '0' && c <= '9' && stringBuilder.length() < 8)
+                        stringBuilder.append(c);
+                EventBus.getDefault().post(new UhfRfidEvent(stringBuilder.toString()));
+            }
+        });
+    }
 
     @Override
     protected void onStop() {

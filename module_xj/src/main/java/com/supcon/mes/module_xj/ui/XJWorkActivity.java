@@ -748,7 +748,7 @@ public class XJWorkActivity extends BaseRefreshRecyclerActivity<XJWorkEntity> im
         } else if (SBTUtil.isSupportTemp()) {
 
         } else if (tempMode == TemperatureMode.EXPERT.getCode()) {
-            SharedPreferencesUtils.setParam(context, com.mes.supcon.expert_ewg01p.config.ModuleConfig.IS_VIBER, false);
+            SharedPreferencesUtils.setParam(context, ModuleConfig.IS_VIBER, false);
             expertViberController.initView();
 //            if (expertViberController == null) {
 //                expertViberController = new ExpertController(ExpertController.createContentView(context), true);
