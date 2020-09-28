@@ -8,14 +8,14 @@
         android:text="08:00-10:00"
         android:id="@+id/itemTaskTime"
         android:gravity="center"
-        android:textColor="#555555"
-        android:textSize="14sp"
+        android:textColor="#333333"
+        android:textSize="15sp"
         android:tag="itemTaskTime"
         android:layout_gravity="center_vertical"
         android:layout_marginLeft="@dimen/dp_10"
         />
     <TextView
-        android:layout_width="55dp"
+        android:layout_width="50dp"
         android:layout_height="25dp"
         android:layout_marginLeft="5dp"
         android:layout_marginRight="@dimen/dp_5"
