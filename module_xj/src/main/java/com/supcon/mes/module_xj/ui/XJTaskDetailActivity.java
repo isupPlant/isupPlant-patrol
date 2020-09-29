@@ -73,8 +73,10 @@ import org.greenrobot.eventbus.ThreadMode;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 import io.reactivex.Flowable;
@@ -301,7 +303,6 @@ public class XJTaskDetailActivity extends BaseControllerActivity implements XJTa
     protected void onDestroy() {
         super.onDestroy();
         EventBus.getDefault().unregister(this);
-
         if (em55UHFRFIDHelper != null) {
             em55UHFRFIDHelper.close();
         }
@@ -310,10 +311,7 @@ public class XJTaskDetailActivity extends BaseControllerActivity implements XJTa
     @Override
     protected void initView() {
         super.initView();
-
-
         updateView();
-
     }
 
     @Override
@@ -325,13 +323,9 @@ public class XJTaskDetailActivity extends BaseControllerActivity implements XJTa
 
     private void updateView() {
         if (mXJTaskEntity != null) {
-
-
             if (mXJTaskEntity.workRoute != null)
                 xjTaskDetailRouteName.setText(mXJTaskEntity.workRoute.name);
-
             xjTaskDetailTableNo.setText(mXJTaskEntity.tableNo);
-
             xjTaskDetailTaskState.setText(mXJTaskEntity.isFinished ? getString(R.string.xj_task_checked) : getString(R.string.xj_task_uncheck));
             xjTaskDetailTaskState.setTextColor(getResources().getColor(R.color.xjBtnColor));
 
@@ -493,20 +487,14 @@ public class XJTaskDetailActivity extends BaseControllerActivity implements XJTa
     public void showDialog() {
         new CustomDialog(context)
                 .twoButtonAlertDialog(getString(R.string.xj_area_sign_warning2))
-                .bindView(com.supcon.mes.middleware.R.id.redBtn, context.getResources().getString(R.string.xj_patrol_sure))
-                .bindView(com.supcon.mes.middleware.R.id.grayBtn, context.getResources().getString(R.string.xj_patrol_cancel))
-                .bindClickListener(com.supcon.mes.middleware.R.id.redBtn, new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v1) {
-                        com.supcon.mes.middleware.IntentRouter.go(context, Constant.AppCode.COM_DataManage);
-                        back();
-                    }
+                .bindView(R.id.redBtn, context.getResources().getString(R.string.xj_patrol_sure))
+                .bindView(R.id.grayBtn, context.getResources().getString(R.string.xj_patrol_cancel))
+                .bindClickListener(R.id.redBtn, v1 -> {
+                    IntentRouter.go(context, Constant.AppCode.COM_DataManage);
+                    back();
                 }, true)
-                .bindClickListener(com.supcon.mes.middleware.R.id.grayBtn, new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
+                .bindClickListener(R.id.grayBtn, v -> {
 
-                    }
                 }, true)
                 .show();
 
@@ -629,6 +617,7 @@ public class XJTaskDetailActivity extends BaseControllerActivity implements XJTa
 
     private void doGoArea(XJAreaEntity xjAreaEntity) {
         Bundle bundle = new Bundle();
+        LogUtil.e("ciruy", TextUtils.isEmpty(mXJTaskEntity.exceptinWorkIds)?"":mXJTaskEntity.exceptinWorkIds);
         Collections.sort(xjAreaEntity.works);
         bundle.putString(Constant.IntentKey.XJ_AREA_ENTITY_STR, xjAreaEntity.toString());
         bundle.putString(Constant.IntentKey.XJ_TASK_NO_STR, mXJTaskEntity.tableNo);
@@ -706,7 +695,7 @@ public class XJTaskDetailActivity extends BaseControllerActivity implements XJTa
 //        dealSign((String) nfcJson.get("id"));
 //    }
 
-
+//    private Set<String> scannedCodeSet = new HashSet<>();
     /**
      * @param
      * @return
@@ -719,6 +708,7 @@ public class XJTaskDetailActivity extends BaseControllerActivity implements XJTa
             showDialog();
             return;
         }
+
         if (mXJTaskEntity.realStartTime == 0) {
             ToastUtils.show(context, getString(R.string.xj_area_sign_warning1));
             return;

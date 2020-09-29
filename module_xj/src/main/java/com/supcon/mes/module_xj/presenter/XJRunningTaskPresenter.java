@@ -29,7 +29,7 @@ public class XJRunningTaskPresenter extends XJTaskContract.Presenter {
     public void getTaskList(int pageNo, int pageSize, Map<String, Object> queryMap) {
         FastQueryCondEntity fastQueryCondEntity = BAPQueryParamsHelper.createSingleFastQueryCond(queryMap);
         fastQueryCondEntity.modelAlias = "potrolTask";
-     //   fastQueryCondEntity.viewCode = "PATROL_1.0.0_patrolTask_potrolTaskList";
+        //   fastQueryCondEntity.viewCode = "PATROL_1.0.0_patrolTask_potrolTaskList";
         fastQueryCondEntity.viewCode = "PATROL_1.0.0_patrolTask_mobilePotrolTaskList";
 //        fastQueryCondEntity.condName = "fastCond";
 //        fastQueryCondEntity.remark = "fastCond";
@@ -68,10 +68,9 @@ public class XJRunningTaskPresenter extends XJTaskContract.Presenter {
                 .subscribe(new Consumer<BAP5CommonEntity<CommonBAPListEntity<XJTaskEntity>>>() {
                     @Override
                     public void accept(BAP5CommonEntity<CommonBAPListEntity<XJTaskEntity>> commonBAPListEntityBAP5CommonEntity) throws Exception {
-                        if(commonBAPListEntityBAP5CommonEntity.success){
+                        if (commonBAPListEntityBAP5CommonEntity.success) {
                             getView().getTaskListSuccess(commonBAPListEntityBAP5CommonEntity.data);
-                        }
-                        else{
+                        } else {
                             getView().getTaskListFailed(commonBAPListEntityBAP5CommonEntity.msg);
                         }
                     }
