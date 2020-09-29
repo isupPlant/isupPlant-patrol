@@ -595,28 +595,27 @@ public class XJWorkAdapter extends BaseListDataRecyclerViewAdapter<XJWorkEntity>
             if (!TextUtils.isEmpty(xjInputTypeEntity.candidateValue)) {
                 candidateValues.addAll(Arrays.asList(xjInputTypeEntity.candidateValue.split(",")));
             }
-
             if ("PATROL_editType/input".equals(xjInputTypeEntity.editType.id)) {   //录入框
                 itemXJWorkResultSpinner.setVisibility(View.GONE);
                 itemXJWorkResultSwitch.setVisibility(View.GONE);
                 itemXJWorkResultInput.setVisibility(View.VISIBLE);
-                itemXJWorkResultInput.setEnabled(true);
                 itemXJWorkResultMultiSelect.setVisibility(View.GONE);
-
                 if (data.isThermometric) {  //要求测温
                     itemXJWorkResultInput.setEnabled(false);
+                    itemXJWorkResultInput.setEditable(false);
                     itemXJWorkResultInput.setHint(context.getResources().getString(R.string.xj_patrol_temp_value));
 
                     itemXJWorkBtnLayout.setVisibility(View.VISIBLE);
                     itemXJWorkTempBtn.setVisibility(View.VISIBLE);
-
                 } else if (data.isSeismic) {
                     itemXJWorkResultInput.setEnabled(false);
+                    itemXJWorkResultInput.setEditable(false);
                     itemXJWorkResultInput.setHint(context.getResources().getString(R.string.xj_patrol_shock_value));
                     itemXJWorkBtnLayout.setVisibility(View.VISIBLE);
                     itemXJWorkVibBtn.setVisibility(View.VISIBLE);
                 } else {
                     itemXJWorkResultInput.setEnabled(true);
+                    itemXJWorkResultInput.setEditable(true);
                     itemXJWorkResultInput.setHint(context.getResources().getString(R.string.xj_patrol_check));
                 }
 
