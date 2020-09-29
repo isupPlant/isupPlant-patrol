@@ -147,6 +147,8 @@ public class XJTaskListActivity extends BaseRefreshRecyclerActivity<XJTaskGroupE
         }
         EventBus.getDefault().register(this);
 
+        StartLocationUtils.startLocation();
+        RealTimeUploadLoactionService.startUploadLoactionLoop(this);
     }
 
 
@@ -444,8 +446,6 @@ public class XJTaskListActivity extends BaseRefreshRecyclerActivity<XJTaskGroupE
             isRefresh = false;
         }
 
-        StartLocationUtils.startLocation();
-        RealTimeUploadLoactionService.startUploadLoactionLoop(this);
     }
 
     private void initQueryMap() {
