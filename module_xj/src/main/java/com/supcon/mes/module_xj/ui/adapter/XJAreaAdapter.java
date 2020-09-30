@@ -134,5 +134,4 @@ public class XJAreaAdapter extends BaseListDataRecyclerViewAdapter<XJAreaEntity>
 
     }
 
-
 }

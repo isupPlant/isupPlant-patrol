@@ -368,29 +368,30 @@ public class XJTaskDetailActivity extends BaseControllerActivity implements XJTa
                     .where(XJAreaEntityDao.Properties.WorkRouteId.eq(mXJTaskEntity.workRoute.id))
                     .where(XJAreaEntityDao.Properties.Valid.eq(true))
                     .where(XJAreaEntityDao.Properties.Ip.eq(SupPlantApplication.getIp()))
+                    .orderAsc(XJAreaEntityDao.Properties.Sort)
                     .list();
 
             mXJTaskEntity.areas = areaEntities;
 
             //过滤没有巡检项的巡检区域，不显示
-            List<Integer> noAreaList = new ArrayList<>();
-            for (int i = 0; i < mXJTaskEntity.areas.size(); i++) {
-                List<XJWorkEntity> xjWorkEntities = SupPlantApplication.dao().getXJWorkEntityDao().queryBuilder()
-                        .where(XJWorkEntityDao.Properties.AreaLongId.eq(mXJTaskEntity.areas.get(i).id))
-                        .where(XJWorkEntityDao.Properties.Ip.eq(SupPlantApplication.getIp()))
-                        .orderAsc(XJWorkEntityDao.Properties.Sort)
-                        .list();
-                if (xjWorkEntities == null || xjWorkEntities.size() == 0) {
-                    noAreaList.add(i);
-                }
-            }
+//            List<Integer> noAreaList = new ArrayList<>();
+//            for (int i = 0; i < mXJTaskEntity.areas.size(); i++) {
+//                List<XJWorkEntity> xjWorkEntities = SupPlantApplication.dao().getXJWorkEntityDao().queryBuilder()
+//                        .where(XJWorkEntityDao.Properties.AreaLongId.eq(mXJTaskEntity.areas.get(i).id))
+//                        .where(XJWorkEntityDao.Properties.Ip.eq(SupPlantApplication.getIp()))
+//                        .orderAsc(XJWorkEntityDao.Properties.Sort)
+//                        .list();
+//                if (xjWorkEntities == null || xjWorkEntities.size() == 0) {
+//                    noAreaList.add(i);
+//                }
+//            }
 //            for (int d:noAreaList){
 //                mXJTaskEntity.areas.remove(d);
 //            }
         }
 
 
-        if (mXJTaskEntity.areas == null || mXJTaskEntity.areas.size() == 0) {
+        if (mXJTaskEntity.areas.size() == 0) {
 
             ToastUtils.show(context, getString(R.string.xj_area_empty_warning));
 
