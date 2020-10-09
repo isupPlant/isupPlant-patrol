@@ -19,6 +19,7 @@ import com.supcon.common.view.util.DisplayUtil;
 import com.supcon.common.view.util.LogUtil;
 import com.supcon.common.view.util.SharedPreferencesUtils;
 import com.supcon.common.view.util.StatusBarUtils;
+import com.supcon.common.view.util.ToastUtils;
 import com.supcon.mes.expert_uhf.controller.ExpertUHFRFIDController;
 import com.supcon.mes.mbap.utils.DateUtil;
 import com.supcon.mes.mbap.utils.GsonUtil;
@@ -38,6 +39,7 @@ import com.supcon.mes.middleware.model.inter.SystemCode;
 import com.supcon.mes.middleware.model.listener.OnAPIResultListener;
 import com.supcon.mes.middleware.model.listener.OnSuccessListener;
 import com.supcon.mes.middleware.presenter.DeploymentPresenter;
+import com.supcon.mes.middleware.util.ErrorMsgHelper;
 import com.supcon.mes.middleware.util.SBTUtil;
 import com.supcon.mes.middleware.util.StartLocationUtils;
 import com.supcon.mes.middleware.util.TimeUtil;
@@ -476,7 +478,7 @@ public class XJTaskListActivity extends BaseRefreshRecyclerActivity<XJTaskGroupE
 
             return;
         }
-
+//        ToastUtils.show(context, "获取到"+taskEntities.size()+"条巡检任务");
         if (entity.pageNo == 1) {
             mXJTaskEntities.clear();
             mXJTaskEntities.addAll(getXJTempTasks());
@@ -606,6 +608,7 @@ public class XJTaskListActivity extends BaseRefreshRecyclerActivity<XJTaskGroupE
     @Override
     public void getTaskListFailed(String errorMsg) {
         createTaskGroups(mXJTaskEntities);
+        ToastUtils.show(context, ErrorMsgHelper.msgParse(errorMsg));
     }
 
     @Override
