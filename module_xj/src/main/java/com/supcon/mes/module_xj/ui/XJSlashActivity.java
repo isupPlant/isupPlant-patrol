@@ -30,7 +30,7 @@ public class XJSlashActivity extends Activity {
 
         activityRouter = getActivityRouter();
 
-        LogUtil.e("XJSlashActivity activityRouter:"+activityRouter);
+//        LogUtil.e("XJSlashActivity activityRouter:"+activityRouter);
         if(!TextUtils.isEmpty(activityRouter)){
             SupPlantApplication.exitMain();
         }

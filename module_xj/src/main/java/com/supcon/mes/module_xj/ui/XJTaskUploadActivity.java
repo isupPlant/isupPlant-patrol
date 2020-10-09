@@ -359,7 +359,7 @@ public class XJTaskUploadActivity extends BaseRefreshRecyclerActivity<XJTaskGrou
                             XJTaskEntity taskEntity = xjTaskEntities.get(0);
 
                             if(taskEntity.attrMap != null && taskEntity.attrMap.containsKey(XJ_TASK_STAFF_KEY)){
-                                LogUtil.e(""+taskEntity.attrMap.get(XJ_TASK_STAFF_KEY));
+//                                LogUtil.e(""+taskEntity.attrMap.get(XJ_TASK_STAFF_KEY));
                                 xjTaskGroupEntity.staffName = (String) taskEntity.attrMap.get(XJ_TASK_STAFF_KEY);
                             }
                             else{
