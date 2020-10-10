@@ -81,7 +81,12 @@ public class XJTaskGroupAdapter extends BaseListDataRecyclerViewAdapter<XJTaskGr
 
         @Override
         protected void update(XJTaskGroupEntity data) {
-            xjTaskGroupName.setText(data.name);
+            if (data.isTemp){
+                xjTaskGroupName.setText(data.name+"(临时)");
+            }else{
+                xjTaskGroupName.setText(data.name);
+            }
+
             xjTaskGroupType.setText(data.typeValue);
 
             xjTaskGroupStaff.setText(data.staffName);

@@ -16,5 +16,5 @@ public class XJTaskGroupEntity extends BaseEntity {
     public String typeValue;
     public int spanCount;
     public List<XJTaskEntity> taskEntities;
-
+    public boolean isTemp;
 }

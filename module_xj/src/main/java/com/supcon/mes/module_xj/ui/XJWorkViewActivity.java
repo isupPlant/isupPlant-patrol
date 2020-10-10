@@ -194,7 +194,12 @@ public class XJWorkViewActivity extends BaseRefreshRecyclerActivity<XJWorkEntity
                 .subscribe(new Consumer<Object>() {
                     @Override
                     public void accept(Object o) throws Exception {
-                        showFinishDialog();
+                        if (mXJWorkItemAdapter.getList().size()>0){
+                            showFinishDialog();
+                        }else{
+                            ToastUtils.show(context, "暂无巡检数据可以上传!");
+                        }
+
                     }
                 });
 

@@ -110,7 +110,7 @@ public class XJTempTaskActivity extends BaseControllerActivity {
             mXJTaskEntity.workRoute = (XJRouteEntity) event.getEntity();
             mXJTaskEntity.patrolType = SystemCodeManager.getInstance().getSystemCodeEntity(mXJTaskEntity.workRoute.patrolType.id);
 //            mXJTaskEntity.workRoute.name = mXJTaskEntity.workRoute.name+"Temp";
-            mXJTaskEntity.tableNo = "Temp" + new Date().getTime();
+            mXJTaskEntity.tableNo = getResources().getString(R.string.xj_temp_task);
             mXJTaskEntity.staffName = SupPlantApplication.getAccountInfo().staffName;
 
             xjTempTaskRouteSelect.setContent(mXJTaskEntity.workRoute.name + getResources().getString(R.string.xj_temp_task));
@@ -313,7 +313,7 @@ public class XJTempTaskActivity extends BaseControllerActivity {
     public void onBackPressed() {
 
         new CustomDialog(context)
-                .twoButtonAlertDialog(mXJTaskEntity.areas != null ? getString(R.string.xj_temp_task_exit_warning) : getString(R.string.xj_temp_task_exit_warning2))
+                .twoButtonAlertDialog(mXJTaskEntity.areas != null &&mXJTaskEntity.areas .size()>0? getString(R.string.xj_temp_task_exit_warning) : getString(R.string.xj_temp_task_exit_warning2))
                 .bindView(R.id.grayBtn, context.getResources().getString(R.string.xj_patrol_stay))
                 .bindView(R.id.redBtn, context.getResources().getString(R.string.xj_patrol_go))
                 .bindClickListener(R.id.grayBtn, v -> {

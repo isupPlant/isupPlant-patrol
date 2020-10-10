@@ -586,6 +586,7 @@ public class XJTaskListActivity extends BaseRefreshRecyclerActivity<XJTaskGroupE
                             xjTaskGroupEntity.staffName = (String) xjTaskEntities.get(0).attrMap.get(XJ_TASK_STAFF_KEY);
                         } else if (taskEntity.isTemp) {
                             xjTaskGroupEntity.staffName = taskEntity.staffName;
+                            xjTaskGroupEntity.isTemp = taskEntity.isTemp;
                         }
 
                         xjTaskGroupEntity.date = taskEntity.startTime;
@@ -597,7 +598,6 @@ public class XJTaskListActivity extends BaseRefreshRecyclerActivity<XJTaskGroupE
                         if (taskEntity.patrolType != null) {
                             xjTaskGroupEntity.typeValue = taskEntity.patrolType.value;
                         }
-
                         xjTaskGroupEntity.spanCount = 2;
                         xjTaskGroupEntities.add(xjTaskGroupEntity);
                     }
