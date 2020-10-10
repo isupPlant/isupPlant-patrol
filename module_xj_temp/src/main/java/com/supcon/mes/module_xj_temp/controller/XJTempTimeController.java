@@ -91,7 +91,7 @@ public class XJTempTimeController extends BaseViewController {
                                             ((ICustomView)childView).setContent(customDateStart);
 
                                         })
-                                        .show(DateUtil.dateFormat(customDateStart));
+                                        .show(DateUtil.dateFormat(customDateStart, "yyyy-MM-dd HH:mm:ss"));
                             }
                         }
                     })
@@ -124,7 +124,7 @@ public class XJTempTimeController extends BaseViewController {
                                             ((ICustomView)childView).setContent(customDateEnd);
 
                                         })
-                                        .show(DateUtil.dateFormat(customDateEnd));
+                                        .show(DateUtil.dateFormat(customDateEnd, "yyyy-MM-dd HH:mm:ss"));
                             }
                         }
                     })
