@@ -86,7 +86,6 @@ import io.reactivex.functions.Function;
 import io.reactivex.schedulers.Schedulers;
 import retrofit2.http.HEAD;
 
-import static com.supcon.mes.module_xj.ui.XJTaskListActivity.XJ_TASK_STAFF_KEY;
 
 /**
  * Created by wangshizhan on 2020/4/13
@@ -351,7 +350,12 @@ public class XJTaskDetailActivity extends BaseControllerActivity implements XJTa
                     + " - " + DateUtil.dateFormat(mXJTaskEntity.endTime, "MM-dd HH:mm"));
 
             if (mXJTaskEntity.attrMap != null)
-                xjTaskDetailStaff.setText("" + mXJTaskEntity.attrMap.get(XJ_TASK_STAFF_KEY));
+            for(String key : mXJTaskEntity.attrMap.keySet()) {
+                String value = (String) mXJTaskEntity.attrMap.get(key);
+                if (!TextUtils.isEmpty(value)){
+                    xjTaskDetailStaff.setText("" + value);
+                }
+            }
             else if (mXJTaskEntity.isTemp) {
                 xjTaskDetailStaff.setText(mXJTaskEntity.staffName);
             }

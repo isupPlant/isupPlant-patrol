@@ -104,7 +104,7 @@ import io.reactivex.schedulers.Schedulers;
 public class XJTaskListActivity extends BaseRefreshRecyclerActivity<XJTaskGroupEntity>
         implements XJTaskContract.View, DeploymentContract.View {
 
-    public static final String XJ_TASK_STAFF_KEY = "PATROL_1_0_0_patrolTask_mobilePotrolTaskList_LISTPT_ASSO_bbeae76a_3694_4dc2_90f0_95fcfe8d0484";
+  //  public static final String XJ_TASK_STAFF_KEY = "PATROL_1_0_0_patrolTask_mobilePotrolTaskList_LISTPT_ASSO_bbeae76a_3694_4dc2_90f0_95fcfe8d0484";
     @BindByTag("titleText")
     TextView titleText;
     @BindByTag("contentView")
@@ -582,8 +582,13 @@ public class XJTaskListActivity extends BaseRefreshRecyclerActivity<XJTaskGroupE
 
                         XJTaskEntity taskEntity = xjTaskEntities.get(0);
 
-                        if (taskEntity.attrMap != null && taskEntity.attrMap.containsKey(XJ_TASK_STAFF_KEY)) {
-                            xjTaskGroupEntity.staffName = (String) xjTaskEntities.get(0).attrMap.get(XJ_TASK_STAFF_KEY);
+                        if (taskEntity.attrMap != null  ) {
+                            for(String keyset : xjTaskEntities.get(0).attrMap.keySet()) {
+                                String value = (String)   (String) xjTaskEntities.get(0).attrMap.get(keyset);
+                                if (!TextUtils.isEmpty(value)){
+                                    xjTaskGroupEntity.staffName =value;
+                                }
+                            }
                         } else if (taskEntity.isTemp) {
                             xjTaskGroupEntity.staffName = taskEntity.staffName;
                             xjTaskGroupEntity.isTemp = taskEntity.isTemp;

@@ -19,7 +19,7 @@ public class XJUpdateTaskStatusPresenter  extends XJUpdateStatusContract.Present
     @Override
     public void updateXJTaskStatus(long taskId,String status) {
         Map<String,Object> params=new HashMap<>();
-        params.put("userId", SupPlantApplication.getAccountInfo().userId);
+        params.put("userId", SupPlantApplication.getAccountInfo().staffId);
         params.put("taskId",taskId);
         params.put("status",status);
         mCompositeSubscription.add(XJHttpClient.updateXJTaskStatus(params).onErrorReturn(new Function<Throwable, BAP5CommonEntity>() {
