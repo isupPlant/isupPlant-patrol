@@ -15,9 +15,9 @@
         android:layout_marginLeft="@dimen/dp_10"
         />
     <TextView
-        android:layout_width="50dp"
+        android:layout_width="60dp"
         android:layout_height="25dp"
-        android:layout_marginLeft="5dp"
+        android:layout_marginLeft="@dimen/dp_5"
         android:layout_marginRight="@dimen/dp_5"
         android:text="@string/xj_patrol_item_status"
         android:id="@+id/itemTaskStatus"

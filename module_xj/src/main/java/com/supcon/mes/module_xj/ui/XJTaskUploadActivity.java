@@ -19,6 +19,7 @@ import com.supcon.common.view.util.DisplayUtil;
 import com.supcon.common.view.util.LogUtil;
 import com.supcon.common.view.util.StatusBarUtils;
 import com.supcon.common.view.util.ToastUtils;
+import com.supcon.common.view.view.loader.base.OnLoaderFinishListener;
 import com.supcon.mes.mbap.utils.DateUtil;
 import com.supcon.mes.mbap.utils.GsonUtil;
 import com.supcon.mes.mbap.utils.SpaceItemDecoration;
@@ -460,7 +461,7 @@ public class XJTaskUploadActivity extends BaseRefreshRecyclerActivity<XJTaskGrou
 
     @Override
     public void uploadXJDataSuccess() {
-        onLoadSuccess();
+        onLoadSuccess(context.getResources().getString(R.string.operate_succeed));
         for(XJTaskEntity xjTaskEntity : mUploadTasks){
             XJCacheUtil.remove(xjTaskEntity.tableNo);
         }

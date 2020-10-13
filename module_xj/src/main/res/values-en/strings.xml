@@ -17,7 +17,7 @@
 	<string name="xj_task_running">Running</string>
 	<string name="xj_task_checked">Checked</string>
 	<string name="xj_task_download">Download tasks</string>
-	<string name="xj_task_upload">Upload tasks</string>
+	<string name="xj_task_upload">Upload task</string>
 	<string name="xj_task_get">Get tasks</string>
 	<string name="xj_task_get_warning1">No tasks!</string>
 	<string name="xj_task_get_warning2">No tasks are selected!</string>
@@ -121,4 +121,5 @@
 	<string name="xj_patrol_multi_choose_list">Multi Choose List</string>
 	<string name="xj_patrol_no_route">No route！</string>
 	<string name="xj_patrol_code_not_match">Check in code does not match</string>
+	<string name="operate_succeed">Operate succeed</string>
 </resources>
