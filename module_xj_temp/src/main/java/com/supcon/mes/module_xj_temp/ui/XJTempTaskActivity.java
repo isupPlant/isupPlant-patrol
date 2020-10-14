@@ -110,7 +110,8 @@ public class XJTempTaskActivity extends BaseControllerActivity {
             mXJTaskEntity.workRoute = (XJRouteEntity) event.getEntity();
             mXJTaskEntity.patrolType = SystemCodeManager.getInstance().getSystemCodeEntity(mXJTaskEntity.workRoute.patrolType.id);
 //            mXJTaskEntity.workRoute.name = mXJTaskEntity.workRoute.name+"Temp";
-            mXJTaskEntity.tableNo = getResources().getString(R.string.xj_temp_task);
+       //     mXJTaskEntity.tableNo = getResources().getString(R.string.xj_temp_task);
+            mXJTaskEntity.tableNo = "Temp"+new Date().getTime();
             mXJTaskEntity.staffName = SupPlantApplication.getAccountInfo().staffName;
 
             xjTempTaskRouteSelect.setContent(mXJTaskEntity.workRoute.name + getResources().getString(R.string.xj_temp_task));
@@ -225,10 +226,21 @@ public class XJTempTaskActivity extends BaseControllerActivity {
                             }
 
                         }
-
-                        XJCacheUtil.putString(mXJTaskEntity.tableNo, mXJTaskEntity.toString());
-                        EventBus.getDefault().post(new XJTempTaskAddEvent(mXJTaskEntity));
-                        back();
+                        new CustomDialog(context)
+                                .twoButtonAlertDialog(getString(R.string.xj_temp_task_sure_warning))
+                                .bindView(R.id.grayBtn, context.getResources().getString(R.string.xj_patrol_cancel))
+                                .bindView(R.id.redBtn, context.getResources().getString(R.string.xj_patrol_sure))
+                                .bindClickListener(R.id.grayBtn, v -> {}, true)
+                                .bindClickListener(R.id.redBtn, new View.OnClickListener() {
+                                            @Override
+                                            public void onClick(View view) {
+                                                XJCacheUtil.putString(mXJTaskEntity.tableNo, mXJTaskEntity.toString());
+                                                EventBus.getDefault().post(new XJTempTaskAddEvent(mXJTaskEntity));
+                                                back();
+                                            }
+                                        }
+                                        , true)
+                                .show();
                     }
                 });
 

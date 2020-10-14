@@ -14,4 +14,5 @@
     <string name="xj_patrol_go">离开</string>
     <string name="xj_patrol_selete_time">选择开始时间——选择结束时间</string>
     <string name="xj_patrol_xj_qy">巡检区域</string>
+    <string name="xj_temp_task_sure_warning">是否新建临时巡检任务？</string>
 </resources>

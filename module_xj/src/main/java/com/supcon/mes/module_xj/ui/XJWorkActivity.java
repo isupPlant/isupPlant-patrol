@@ -25,6 +25,7 @@ import com.mes.supcon.expert_ewg01p.config.ViberMode;
 import com.mes.supcon.expert_ewg01p.controller.ExpertController;
 import com.supcon.common.view.base.activity.BaseRefreshRecyclerActivity;
 import com.supcon.common.view.base.adapter.IListAdapter;
+import com.supcon.common.view.listener.OnRefreshListener;
 import com.supcon.common.view.util.DisplayUtil;
 import com.supcon.common.view.util.LogUtil;
 import com.supcon.common.view.util.SharedPreferencesUtils;
@@ -207,7 +208,7 @@ public class XJWorkActivity extends BaseRefreshRecyclerActivity<XJWorkEntity> im
 //            mXJTaskEntity = GsonUtil.gsonToBean(taskStr, XJTaskEntity.class);
 //        }
         refreshListController.setPullDownRefreshEnabled(false);
-        refreshListController.setAutoPullDownRefresh(false);
+        refreshListController.setAutoPullDownRefresh(true);
 
         int tempMode = SharedPreferencesUtils.getParam(context, Constant.SPKey.TEMP_MODE, 0);
         int vibMode = SharedPreferencesUtils.getParam(context, Constant.SPKey.VIB_MODE, 0);
@@ -508,6 +509,7 @@ public class XJWorkActivity extends BaseRefreshRecyclerActivity<XJWorkEntity> im
                 .subscribe(charSequence -> {
                     xjWorkEntity.remark = charSequence.toString();
                     xjWorkEntity.realRemark = charSequence.toString();
+                    mXJWorkAdapter.notifyDataSetChanged();
                 });
         if (xjWorkEntity.remark != null) {
             iCustomView.setContent(xjWorkEntity.remark);
@@ -528,10 +530,14 @@ public class XJWorkActivity extends BaseRefreshRecyclerActivity<XJWorkEntity> im
 
         passReasonMap = getController(SystemCodeJsonController.class).getCodeMap(Constant.SystemCode.PATROL_passReason);
         realValueMap = getController(SystemCodeJsonController.class).getCodeMap(Constant.SystemCode.PATROL_realValue);
-
-        if (mXJAreaEntity != null && mXJAreaEntity.works != null) {
-            refreshWorkList();
-        }
+        refreshListController.setOnRefreshListener(new OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                if (mXJAreaEntity != null && mXJAreaEntity.works != null) {
+                    refreshWorkList();
+                }
+            }
+        });
     }
 
     @Override

@@ -14,4 +14,5 @@
 	<string name="xj_patrol_go">go away</string>
 	<string name="xj_patrol_selete_time">Select start time-select end time</string>
 	<string name="xj_patrol_xj_qy">Inspection area</string>
+	<string name="xj_temp_task_sure_warning">Do you want to create a new temporary patrol task？</string>
 </resources>
