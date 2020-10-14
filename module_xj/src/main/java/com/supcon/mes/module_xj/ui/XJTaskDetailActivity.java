@@ -228,7 +228,11 @@ public class XJTaskDetailActivity extends BaseControllerActivity implements XJTa
     @SuppressLint("CheckResult")
     private void openDevice() {
 
-
+        if (em55UHFRFIDHelper == null) {
+            return;
+        }
+        em55UHFRFIDHelper.inventoryStop();
+        em55UHFRFIDHelper.close();
         Flowable.just(true)
                 .subscribeOn(Schedulers.newThread())
                 .map(new Function<Boolean, Boolean>() {
@@ -265,8 +269,10 @@ public class XJTaskDetailActivity extends BaseControllerActivity implements XJTa
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onDeviceAttached(SB2AttachEvent sb2AttachEvent) {
 
-        em55UHFRFIDHelper.inventoryStop();
-        em55UHFRFIDHelper.close();
+        if (em55UHFRFIDHelper != null) {
+            em55UHFRFIDHelper.inventoryStop();
+            em55UHFRFIDHelper.close();
+        }
 
         if (sb2AttachEvent.isAttached()) {
             openDevice();
