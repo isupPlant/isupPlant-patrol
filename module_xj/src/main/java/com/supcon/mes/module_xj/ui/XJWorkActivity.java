@@ -231,17 +231,12 @@ public class XJWorkActivity extends BaseRefreshRecyclerActivity<XJWorkEntity> im
         }
         if (tempMode == TemperatureMode.AIC.getCode() || vibMode == VibMode.AIC.getCode()) {
 
-            if (mAICVibController == null) {
+//            if (mAICVibController == null) {
                 AICVibService.start(context);
-                mAICVibController = new AICVibServiceController(AICVibServiceController.getLayoutView(context), true);
-                mAICVibController.onInit();
-                mAICVibController.initView();
-                mAICVibController.initListener();
-                mAICVibController.initData();
-                registerController(AICVibController.class.getSimpleName(), mAICVibController);
-            } else {
-                mAICVibController.initData();
-            }
+//                mAICVibController = new AICVibServiceController(AICVibServiceController.getLayoutView(context), true);
+//                mAICVibController.onInit();
+//                registerController(AICVibController.class.getSimpleName(), mAICVibController);
+//            }
         }
 
         if (tempMode == TemperatureMode.SBT.getCode() && SBTUtil.isSupportTemp()) {
@@ -796,21 +791,17 @@ public class XJWorkActivity extends BaseRefreshRecyclerActivity<XJWorkEntity> im
     private void showAICDialog(int position, XJWorkEntity xjWorkItemEntity, boolean isTempTest) {
 
 
-//        if(mAICVibController==null) {
-//
-//            mAICVibController = ((XJWorkActivity)getActivity()).getAICVibController();
-//
-//            if(mAICVibController == null){
-//                mAICVibController = new AICVibServiceController(AICVibServiceController.getLayoutView(context), true);
-//
-//                mAICVibController.onInit();
-//
-//                mAICVibController.initView();
-//                mAICVibController.initListener();
-//                mAICVibController.initData();
-//            }
-//
-//        }
+        if(mAICVibController==null) {
+
+            mAICVibController = new AICVibServiceController(AICVibServiceController.getLayoutView(context), true);
+            mAICVibController.onInit();
+            mAICVibController.initView();
+            mAICVibController.initListener();
+            mAICVibController.initData();
+        }
+        else{
+            mAICVibController.reset();
+        }
 
         mAICVibController.setOnDataSelectListener(data -> {
             LogUtil.d("onDataSelect:" + data);
@@ -820,7 +811,7 @@ public class XJWorkActivity extends BaseRefreshRecyclerActivity<XJWorkEntity> im
             xjWorkItemEntity.concluse = data;
             mXJWorkAdapter.notifyItemChanged(position);
         });
-        mAICVibController.reset();
+
         mAICVibController.show(isTempTest);
     }
 
