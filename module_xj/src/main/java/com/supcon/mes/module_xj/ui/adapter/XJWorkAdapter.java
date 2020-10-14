@@ -273,7 +273,6 @@ public class XJWorkAdapter extends BaseListDataRecyclerViewAdapter<XJWorkEntity>
                     .debounce(500, TimeUnit.MILLISECONDS)
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribe(charSequence -> {
-
                         XJWorkEntity xjWorkItemEntity = getItem(getAdapterPosition());
 
                         if (xjWorkItemEntity == null) {

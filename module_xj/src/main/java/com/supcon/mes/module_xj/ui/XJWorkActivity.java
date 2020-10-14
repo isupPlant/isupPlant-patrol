@@ -30,7 +30,6 @@ import com.supcon.common.view.util.LogUtil;
 import com.supcon.common.view.util.SharedPreferencesUtils;
 import com.supcon.common.view.util.StatusBarUtils;
 import com.supcon.common.view.util.ToastUtils;
-import com.supcon.mes.aic_vib.controller.AICVibController;
 import com.supcon.mes.aic_vib.controller.AICVibServiceController;
 import com.supcon.mes.aic_vib.service.AICVibService;
 import com.supcon.mes.av160.controller.AV160Controller;
@@ -58,7 +57,6 @@ import com.supcon.mes.middleware.model.inter.SystemCode;
 import com.supcon.mes.middleware.ui.view.CustomPopupWindow;
 import com.supcon.mes.middleware.util.AnimationUtil;
 import com.supcon.mes.middleware.util.ErrorMsgHelper;
-import com.supcon.mes.middleware.util.PopupWindowItemHelper;
 import com.supcon.mes.middleware.util.SBTUtil;
 import com.supcon.mes.middleware.util.SnackbarHelper;
 import com.supcon.mes.middleware.util.SystemCodeManager;
@@ -92,7 +90,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 import io.reactivex.Flowable;
@@ -608,8 +605,6 @@ public class XJWorkActivity extends BaseRefreshRecyclerActivity<XJWorkEntity> im
                         mWorkEntities.addAll(noEamWorks);
                     }
 
-
-
                     if (deviceNames.size() == 0) {
                         ((ViewGroup) eamSpinner.getParent()).setVisibility(View.GONE);
                         refreshListController.refreshComplete(mWorkEntities);
@@ -640,10 +635,14 @@ public class XJWorkActivity extends BaseRefreshRecyclerActivity<XJWorkEntity> im
     private void showWorks(String deviceName) {
 //        LogUtil.e("ciruy", "showWorks:"+deviceName);
         isAll = getString(R.string.xj_work_eam_all).equals(deviceName);
+        if(isAll){
+            refreshListController.refreshComplete(mWorkEntities);
+            return;
+        }
         List<XJWorkEntity> workEntities = new ArrayList<>();
         Flowable.fromIterable(mWorkEntities)
                 .subscribeOn(Schedulers.newThread())
-                .filter(xjWorkEntity -> isAll || xjWorkEntity.eamId != null && xjWorkEntity.eamId.name != null && xjWorkEntity.eamId.name.equals(deviceName))
+                .filter(xjWorkEntity -> xjWorkEntity.eamId != null && xjWorkEntity.eamId.name != null && xjWorkEntity.eamId.name.equals(deviceName))
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(workEntities::add, throwable -> {
                 }, () -> refreshListController.refreshComplete(workEntities));
