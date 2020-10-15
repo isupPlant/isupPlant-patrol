@@ -43,7 +43,6 @@ import com.supcon.mes.module_xj.model.event.XJAreaRefreshEvent;
 import com.supcon.mes.module_xj.model.event.XJWorkRefreshEvent;
 import com.supcon.mes.module_xj.presenter.XJTaskSubmitPresenter;
 import com.supcon.mes.module_xj.ui.adapter.XJWorkViewAdapter;
-import com.supcon.mes.module_xj.util.BundleSaveUtil;
 import com.supcon.mes.testo_805i.controller.TestoController;
 
 import org.greenrobot.eventbus.EventBus;
@@ -106,14 +105,9 @@ public class XJWorkViewActivity extends BaseRefreshRecyclerActivity<XJWorkEntity
         String xjAreaEntityStr = getIntent().getStringExtra(Constant.IntentKey.XJ_AREA_ENTITY_STR);
         isFromTask = getIntent().getBooleanExtra(Constant.IntentKey.XJ_IS_FROM_TASK, false);
         isXJFinished = getIntent().getBooleanExtra(Constant.IntentKey.XJ_IS_FINISHED, false);
-        if(xjAreaEntityStr!=null){
-            mXJAreaEntity = GsonUtil.gsonToBean(xjAreaEntityStr, XJAreaEntity.class);
-        }
-//        String taskStr = getIntent().getStringExtra(Constant.IntentKey.XJ_TASK_ENTITY_STR);
-//        if(!TextUtils.isEmpty(taskStr)){
-//            mXJTaskEntity = GsonUtil.gsonToBean(taskStr, XJTaskEntity.class);
+//        if(xjAreaEntityStr!=null){
+//            mXJAreaEntity = GsonUtil.gsonToBean(xjAreaEntityStr, XJAreaEntity.class);
 //        }
-
         String taskNo = getIntent().getStringExtra(Constant.IntentKey.XJ_TASK_NO_STR);
 
 
@@ -121,6 +115,16 @@ public class XJWorkViewActivity extends BaseRefreshRecyclerActivity<XJWorkEntity
 
             String taskStr = XJCacheUtil.getString(taskNo);
             mXJTaskEntity = GsonUtil.gsonToBean(taskStr, XJTaskEntity.class);
+        }
+
+        if (xjAreaEntityStr != null && mXJTaskEntity != null) {
+
+            for(XJAreaEntity areaEntity: mXJTaskEntity.areas){
+                if(xjAreaEntityStr.equals(String.valueOf(areaEntity.id))){
+                    mXJAreaEntity = areaEntity;
+                    break;
+                }
+            }
         }
 
         refreshListController.setPullDownRefreshEnabled(false);
