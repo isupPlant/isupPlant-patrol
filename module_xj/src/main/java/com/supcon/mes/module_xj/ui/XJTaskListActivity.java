@@ -503,25 +503,48 @@ public class XJTaskListActivity extends BaseRefreshRecyclerActivity<XJTaskGroupE
     private List<XJTaskEntity> getXJTempTasks() {
         List<XJTaskEntity> tempTaskEntities = new ArrayList<>();
         List<String> tempTasks = XJCacheUtil.getTempTasks(context);
+        String[] dates = TimeUtil.getTimePeriod(dateFilter);
+        String start = TimeUtil.date2TimeStamp(dates[0],"yyyy-MM-dd");
+        String end =TimeUtil.date2TimeStamp(dates[1],"yyyy-MM-dd");
         for (String s : tempTasks) {
             XJTaskEntity xjTaskEntity = GsonUtil.gsonToBean(XJCacheUtil.getString(s.replace(".0", "")), XJTaskEntity.class);
+            String startTime= TimeUtil.date2TimeStamp(DateUtil.dateFormat(xjTaskEntity.startTime,"yyyy-MM-dd"),"yyyy-MM-dd");
+            boolean b =false;
+            if (!TextUtils.isEmpty(start)&&!TextUtils.isEmpty(end)){
+                b=Long.parseLong(startTime) >= Long.parseLong(start) && Long.parseLong(startTime) <= Long.parseLong(end);
+            }
             if (taskStatusPosition == 0) {
-                tempTaskEntities.add(xjTaskEntity);
+                if (!TextUtils.isEmpty(start)&&!TextUtils.isEmpty(end)){
+                    if (b){
+                        tempTaskEntities.add(xjTaskEntity);
+                    }
+                }else{
+                    tempTaskEntities.add(xjTaskEntity);
+                }
             } else if (taskStatusPosition == 1) {
                 if (!xjTaskEntity.isFinished) {
-                    tempTaskEntities.add(xjTaskEntity);
+                    if (!TextUtils.isEmpty(start)&&!TextUtils.isEmpty(end)){
+                        if (b){
+                            tempTaskEntities.add(xjTaskEntity);
+                        }
+                    }else{
+                        tempTaskEntities.add(xjTaskEntity);
+                    }
                 }
             } else if (taskStatusPosition == 2) {
                 if (xjTaskEntity.isFinished) {
-                    tempTaskEntities.add(xjTaskEntity);
+                    if (!TextUtils.isEmpty(start)&&!TextUtils.isEmpty(end)){
+                        if (b){
+                            tempTaskEntities.add(xjTaskEntity);
+                        }
+                    }else{
+                        tempTaskEntities.add(xjTaskEntity);
+                    }
                 }
             }
 
         }
-            String[] dates = TimeUtil.getTimePeriod(dateFilter);
-            String start = dates[0];
-            String end = dates[1];
-            LogUtil.e("日期"+start+"------------"+end);
+
 
         return tempTaskEntities;
     }
@@ -637,4 +660,5 @@ public class XJTaskListActivity extends BaseRefreshRecyclerActivity<XJTaskGroupE
     public void getCurrentDeploymentFailed(String errorMsg) {
 
     }
+
 }

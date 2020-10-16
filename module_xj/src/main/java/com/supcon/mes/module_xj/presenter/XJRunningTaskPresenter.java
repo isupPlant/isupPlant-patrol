@@ -6,6 +6,7 @@ import com.supcon.mes.middleware.SupPlantApplication;
 import com.supcon.mes.middleware.constant.Constant;
 import com.supcon.mes.middleware.model.bean.BAP5CommonEntity;
 import com.supcon.mes.middleware.model.bean.CommonBAPListEntity;
+import com.supcon.mes.middleware.model.bean.CustomCondition;
 import com.supcon.mes.middleware.model.bean.FastQueryCondEntity;
 import com.supcon.mes.middleware.model.bean.JoinSubcondEntity;
 import com.supcon.mes.middleware.util.BAPQueryParamsHelper;
@@ -49,7 +50,9 @@ public class XJRunningTaskPresenter extends XJTaskContract.Presenter {
         pageQueryParam.put("pageSize", pageSize);
         pageQueryParam.put("paging", true);
         pageQueryParam.put("pageNo", pageNo);
-
+        if (queryMap.get(Constant.BAPQuery.XJ_TASK_STATE)==null||!queryMap.get(Constant.BAPQuery.XJ_TASK_STATE).equals("PATROL_taskState/notIssued")){
+            pageQueryParam.put("customCondition", new CustomCondition(1));
+        }
         Gson gson = new GsonBuilder().disableHtmlEscaping().create();
         pageQueryParam.put("fastQueryCond", gson.toJson(fastQueryCondEntity));
 //        pageQueryParam.put("customCondition", new CustomCondition());

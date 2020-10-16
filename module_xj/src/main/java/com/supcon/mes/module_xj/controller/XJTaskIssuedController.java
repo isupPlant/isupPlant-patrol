@@ -10,6 +10,7 @@ import com.supcon.mes.middleware.model.listener.OnAPIResultListener;
 import com.supcon.mes.module_xj.model.api.XJTaskAPI;
 import com.supcon.mes.module_xj.model.bean.XJTaskEntity;
 import com.supcon.mes.module_xj.model.contract.XJTaskContract;
+import com.supcon.mes.module_xj.presenter.XJRunningTaskPresenter;
 import com.supcon.mes.module_xj.presenter.XJTaskPresenter;
 
 import java.util.HashMap;
@@ -20,7 +21,7 @@ import java.util.Map;
  * Created by wangshizhan on 2020/4/9
  * Email:wangshizhan@supcom.com
  */
-@Presenter(XJTaskPresenter.class)
+@Presenter(XJRunningTaskPresenter.class)
 public class XJTaskIssuedController extends BaseDataController implements XJTaskContract.View {
 
     private Map<String, Object> queryMap = new HashMap<>();

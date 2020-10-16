@@ -85,7 +85,7 @@ public class XJTaskSubmitPresenter extends XJTaskSubmitContract.Presenter {
 
        for(XJTaskEntity xjTaskEntity : xjTaskEntities){
 
-           XJTaskUploadEntity xjTaskUploadEntity = new XJTaskUploadEntity(xjTaskEntity, isArea?"PATROL_taskState/issued":"PATROL_taskState/completed");
+           XJTaskUploadEntity xjTaskUploadEntity = new XJTaskUploadEntity(xjTaskEntity, isArea?"PATROL_taskState/running":"PATROL_taskState/completed");
            xjTaskUploadEntity.actualStartTime = xjTaskEntity.realStartTime;
            xjTaskUploadEntity.actualEndTime = xjTaskEntity.realEndTime;
 
