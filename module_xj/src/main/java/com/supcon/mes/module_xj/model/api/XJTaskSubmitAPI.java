@@ -11,7 +11,7 @@ import java.util.Map;
  * Created by wangshizhan on 2020/4/15
  * Email:wangshizhan@supcom.com
  */
-@ContractFactory(entites = {String.class, NullEntity.class})
+@ContractFactory(entites = {String.class, Long.class})
 public interface XJTaskSubmitAPI {
 
     void uploadFile(List<XJTaskEntity> xjTaskEntities, boolean isArea);

@@ -48,6 +48,7 @@ import com.supcon.mes.testo_805i.controller.TestoController;
 import org.greenrobot.eventbus.EventBus;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -502,8 +503,17 @@ public class XJWorkViewActivity extends BaseRefreshRecyclerActivity<XJWorkEntity
     }
 
     @Override
-    public void uploadXJDataSuccess() {
+    public void uploadXJDataSuccess(Long id) {
         onLoadSuccess(context.getResources().getString(R.string.xj_patrol_upload_succeed));
+        if (id!=null){
+            mXJTaskEntity.id = id;
+            XJCacheUtil.putStringAsync(mXJTaskEntity.tableNo, mXJTaskEntity.toString(), new XJCacheUtil.Callback() {
+                @Override
+                public void apply() {
+                    LogUtil.d("493 保存成功");
+                }
+            });
+        }
     }
 
     @Override

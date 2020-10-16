@@ -219,20 +219,20 @@ public class XJTaskSubmitPresenter extends XJTaskSubmitContract.Presenter {
     @Override
     public void uploadXJData(boolean isOnLine, Map<String, Object> pageMap) {
         mCompositeSubscription.add(XJHttpClient.uploadTaskResult(isOnLine, pageMap)
-                .onErrorReturn(new Function<Throwable, BAP5CommonEntity<String>>() {
+                .onErrorReturn(new Function<Throwable, BAP5CommonEntity<Long>>() {
                     @Override
-                    public BAP5CommonEntity<String> apply(Throwable throwable) throws Exception {
+                    public BAP5CommonEntity<Long> apply(Throwable throwable) throws Exception {
                         BAP5CommonEntity bap5CommonEntity = new BAP5CommonEntity();
                         bap5CommonEntity.success = false;
                         bap5CommonEntity.msg = throwable.toString();
                         return bap5CommonEntity;
                     }
                 })
-                .subscribe(new Consumer<BAP5CommonEntity<String>>() {
+                .subscribe(new Consumer<BAP5CommonEntity<Long>>() {
                     @Override
-                    public void accept(BAP5CommonEntity<String> commonEntity) throws Exception {
+                    public void accept(BAP5CommonEntity<Long> commonEntity) throws Exception {
                         if(commonEntity.success){
-                            getView().uploadXJDataSuccess();
+                            getView().uploadXJDataSuccess(commonEntity.data);
                         }
                         else{
                             getView().uploadXJDataFailed(commonEntity.msg);

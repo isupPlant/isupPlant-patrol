@@ -1218,7 +1218,7 @@ public class XJWorkActivity extends BaseRefreshRecyclerActivity<XJWorkEntity> im
     }
 
     @Override
-    public void uploadXJDataSuccess() {
+    public void uploadXJDataSuccess(Long id) {
         onLoadSuccess();
         onBackPressed();
     }

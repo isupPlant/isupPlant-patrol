@@ -783,7 +783,7 @@ public class XJTaskDetailActivity extends BaseControllerActivity implements XJTa
     }
 
     @Override
-    public void uploadXJDataSuccess() {
+    public void uploadXJDataSuccess(Long id) {
 
     }
 

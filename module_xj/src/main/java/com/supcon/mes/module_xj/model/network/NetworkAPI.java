@@ -62,7 +62,7 @@ public interface NetworkAPI {
      * @return
      */
     @POST("/msService/PATROL/uploadTaskResult")
-    Flowable<BAP5CommonEntity<String>> uploadTaskResult(@Query ("isOnLine") boolean isOnLine, @Body Map<String, Object> pageMap);
+    Flowable<BAP5CommonEntity<Long>> uploadTaskResult(@Query ("isOnLine") boolean isOnLine, @Body Map<String, Object> pageMap);
 
     /**
      * 上传实时定位

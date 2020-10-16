@@ -469,7 +469,7 @@ public class XJTaskUploadActivity extends BaseRefreshRecyclerActivity<XJTaskGrou
     }
 
     @Override
-    public void uploadXJDataSuccess() {
+    public void uploadXJDataSuccess(Long id) {
         onLoadSuccess(context.getResources().getString(R.string.operate_succeed));
         for(XJTaskEntity xjTaskEntity : mUploadTasks){
             XJCacheUtil.remove(xjTaskEntity.tableNo);

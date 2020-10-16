@@ -120,8 +120,10 @@ import java.util.Map;
        potrolTask.endTime= xjTaskEntity.endTime;
        if (!potrolTask.isTemp){
            potrolTask.tableInfoId = xjTaskEntity.tableInfoId;
-           potrolTask.id = xjTaskEntity.id;
        }
+        if (xjTaskEntity.id!=null){
+            potrolTask.id = xjTaskEntity.id;
+        }
    }
 
     public void setWorkItems(List<XJWorkEntity> works) {
