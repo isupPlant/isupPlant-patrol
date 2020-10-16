@@ -120,6 +120,8 @@ import java.util.Map;
        potrolTask.endTime= xjTaskEntity.endTime;
        if (!potrolTask.isTemp){
            potrolTask.tableInfoId = xjTaskEntity.tableInfoId;
+       }else{
+           potrolTask.source=new StringIdEntity("PATROL_tempTaskSource/PDA");
        }
         if (xjTaskEntity.id!=null){
             potrolTask.id = xjTaskEntity.id;
@@ -180,7 +182,7 @@ import java.util.Map;
        public XJRouteEntity workRoute;
        public Long startTime;
        public Long endTime;
-
+       public StringIdEntity source;
     }
 
 

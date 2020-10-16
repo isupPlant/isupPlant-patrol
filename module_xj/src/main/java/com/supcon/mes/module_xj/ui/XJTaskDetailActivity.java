@@ -55,6 +55,7 @@ import com.supcon.mes.module_xj.model.bean.XJTaskEntity;
 import com.supcon.mes.module_xj.model.contract.XJTaskSubmitContract;
 import com.supcon.mes.module_xj.model.contract.XJUpdateStatusContract;
 import com.supcon.mes.module_xj.model.event.XJAreaRefreshEvent;
+import com.supcon.mes.module_xj.model.event.XJTempTaskUploadRefreshEvent;
 import com.supcon.mes.module_xj.presenter.XJTaskSubmitPresenter;
 import com.supcon.mes.module_xj.presenter.XJUpdateTaskStatusPresenter;
 import com.supcon.mes.module_xj.ui.adapter.XJAreaAdapter;
@@ -665,7 +666,17 @@ public class XJTaskDetailActivity extends BaseControllerActivity implements XJTa
                 });
 
     }
-
+    @SuppressLint("CheckResult")
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onTempTaskUploadRefresh(XJTempTaskUploadRefreshEvent event) {
+        mXJTaskEntity.id=event.getId();
+        XJCacheUtil.putStringAsync(mXJTaskEntity.tableNo, mXJTaskEntity.toString(), new XJCacheUtil.Callback() {
+            @Override
+            public void apply() {
+                LogUtil.d("493 保存成功");
+            }
+        });
+    }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onCodeReciver(CodeResultEvent codeResultEvent) {

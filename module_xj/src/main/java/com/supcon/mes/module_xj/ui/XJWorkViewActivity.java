@@ -40,6 +40,7 @@ import com.supcon.mes.module_xj.model.api.XJTaskSubmitAPI;
 import com.supcon.mes.module_xj.model.bean.XJTaskEntity;
 import com.supcon.mes.module_xj.model.contract.XJTaskSubmitContract;
 import com.supcon.mes.module_xj.model.event.XJAreaRefreshEvent;
+import com.supcon.mes.module_xj.model.event.XJTempTaskUploadRefreshEvent;
 import com.supcon.mes.module_xj.model.event.XJWorkRefreshEvent;
 import com.supcon.mes.module_xj.presenter.XJTaskSubmitPresenter;
 import com.supcon.mes.module_xj.ui.adapter.XJWorkViewAdapter;
@@ -507,12 +508,7 @@ public class XJWorkViewActivity extends BaseRefreshRecyclerActivity<XJWorkEntity
         onLoadSuccess(context.getResources().getString(R.string.xj_patrol_upload_succeed));
         if (id!=null){
             mXJTaskEntity.id = id;
-            XJCacheUtil.putStringAsync(mXJTaskEntity.tableNo, mXJTaskEntity.toString(), new XJCacheUtil.Callback() {
-                @Override
-                public void apply() {
-                    LogUtil.d("493 保存成功");
-                }
-            });
+            EventBus.getDefault().post(new XJTempTaskUploadRefreshEvent(id));
         }
     }
 
