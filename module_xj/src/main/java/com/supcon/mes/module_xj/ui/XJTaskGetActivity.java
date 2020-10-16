@@ -71,7 +71,7 @@ public class XJTaskGetActivity extends BaseRefreshRecyclerActivity<XJTaskGroupEn
         implements XJTaskContract.View,
         XJTaskStateContract.View {
 
-    private static final String XJ_TASK_STAFF_KEY = "PATROL_1_0_0_patrolTask_potrolTaskList_LISTPT_ASSO_3a556662_35fb_4884_a6ab_1aff5d055ac7";
+   // private static final String XJ_TASK_STAFF_KEY = "PATROL_1_0_0_patrolTask_potrolTaskList_LISTPT_ASSO_3a556662_35fb_4884_a6ab_1aff5d055ac7";
     @BindByTag("titleText")
     TextView titleText;
     @BindByTag("contentView")
@@ -341,8 +341,14 @@ public class XJTaskGetActivity extends BaseRefreshRecyclerActivity<XJTaskGroupEn
 
                         XJTaskEntity taskEntity = xjTaskEntities.get(0);
 
-                        if (taskEntity.attrMap != null && taskEntity.attrMap.containsKey(XJ_TASK_STAFF_KEY)) {
-                            xjTaskGroupEntity.staffName = (String) xjTaskEntities.get(0).attrMap.get(XJ_TASK_STAFF_KEY);
+                        if (taskEntity.attrMap != null) {
+
+                            for(String keyset : taskEntity.attrMap.keySet()) {
+                                String value = (String)  taskEntity.attrMap.get(keyset);
+                                if (!TextUtils.isEmpty(value)){
+                                    xjTaskGroupEntity.staffName =value;
+                                }
+                            }
                         }
 
                         xjTaskGroupEntity.date = taskEntity.startTime;

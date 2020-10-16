@@ -6,6 +6,7 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
 import android.view.View;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.app.annotation.BindByTag;
@@ -122,7 +123,7 @@ public class XJTaskListActivity extends BaseRefreshRecyclerActivity<XJTaskGroupE
     @BindByTag("xjTaskUploadTaskNum")
     TextView xjTaskUploadTaskNum;
     @BindByTag("titleSetting")
-    TextView titleSetting;
+    ImageView titleSetting;
     private Map<String, Object> queryMap = new HashMap<>();
     private XJTaskGroupAdapter mXJTaskGroupAdapter;
 
