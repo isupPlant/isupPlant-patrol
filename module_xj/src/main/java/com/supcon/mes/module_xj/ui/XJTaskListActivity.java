@@ -121,6 +121,8 @@ public class XJTaskListActivity extends BaseRefreshRecyclerActivity<XJTaskGroupE
     TextView xjTaskUploadTaskBtn;
     @BindByTag("xjTaskUploadTaskNum")
     TextView xjTaskUploadTaskNum;
+    @BindByTag("titleSetting")
+    TextView titleSetting;
     private Map<String, Object> queryMap = new HashMap<>();
     private XJTaskGroupAdapter mXJTaskGroupAdapter;
 
@@ -137,7 +139,7 @@ public class XJTaskListActivity extends BaseRefreshRecyclerActivity<XJTaskGroupE
         ExpertUHFRFIDController.initSerialPort(this);
         refreshListController.setAutoPullDownRefresh(false);
         refreshListController.setPullDownRefreshEnabled(true);
-
+        titleSetting.setVisibility(View.VISIBLE);
 //        String activityRouter = getIntent().getStringExtra(Constant.IntentKey.ACTIVITY_ROUTER);
 //        if(!TextUtils.isEmpty(activityRouter)){
 //            SupPlantApplication.exitMain();
@@ -291,6 +293,11 @@ public class XJTaskListActivity extends BaseRefreshRecyclerActivity<XJTaskGroupE
                     Bundle bundle = new Bundle();
                     bundle.putLong(Constant.IntentKey.DEPLOYMENT_ID, deploymentId);
                     IntentRouter.go(context, Constant.AppCode.MPS_TempPatrol, bundle);
+                });
+        RxView.clicks(titleSetting)
+                .throttleFirst(200, TimeUnit.MILLISECONDS)
+                .subscribe(o -> {
+                    IntentRouter.go(context, Constant.Router.PDA_SETTING);
                 });
 
         initQueryMap();
@@ -511,6 +518,10 @@ public class XJTaskListActivity extends BaseRefreshRecyclerActivity<XJTaskGroupE
             }
 
         }
+            String[] dates = TimeUtil.getTimePeriod(dateFilter);
+            String start = dates[0];
+            String end = dates[1];
+            LogUtil.e("日期"+start+"------------"+end);
 
         return tempTaskEntities;
     }

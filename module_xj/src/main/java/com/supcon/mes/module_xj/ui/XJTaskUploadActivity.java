@@ -93,7 +93,7 @@ public class XJTaskUploadActivity extends BaseRefreshRecyclerActivity<XJTaskGrou
 
     private XJTaskGroupAdapter mXJTaskGroupAdapter;
     private Map<String, Object> queryMap = new HashMap<>();
-    private static final String  XJ_TASK_STAFF_KEY = "PATROL_1_0_0_patrolTask_mobilePotrolTaskList_LISTPT_ASSO_bbeae76a_3694_4dc2_90f0_95fcfe8d0484";
+  //  private static final String  XJ_TASK_STAFF_KEY = "PATROL_1_0_0_patrolTask_mobilePotrolTaskList_LISTPT_ASSO_bbeae76a_3694_4dc2_90f0_95fcfe8d0484";
     private List<XJTaskEntity> mUploadTasks = new ArrayList<>();
     private boolean isAll = false;
 
@@ -359,9 +359,18 @@ public class XJTaskUploadActivity extends BaseRefreshRecyclerActivity<XJTaskGrou
 
                             XJTaskEntity taskEntity = xjTaskEntities.get(0);
 
-                            if(taskEntity.attrMap != null && taskEntity.attrMap.containsKey(XJ_TASK_STAFF_KEY)){
+                            if(taskEntity.attrMap != null ){
 //                                LogUtil.e(""+taskEntity.attrMap.get(XJ_TASK_STAFF_KEY));
-                                xjTaskGroupEntity.staffName = (String) taskEntity.attrMap.get(XJ_TASK_STAFF_KEY);
+  //                              xjTaskGroupEntity.staffName = (String) taskEntity.attrMap.get(XJ_TASK_STAFF_KEY);
+
+                                for(String keyset : taskEntity.attrMap.keySet()) {
+                                    String value = (String)    taskEntity.attrMap.get(keyset);
+                                    if (!TextUtils.isEmpty(value)){
+                                        xjTaskGroupEntity.staffName =value;
+                                    }
+                                }
+
+
                             }
                             else{
                                 xjTaskGroupEntity.staffName = taskEntity.staffName;

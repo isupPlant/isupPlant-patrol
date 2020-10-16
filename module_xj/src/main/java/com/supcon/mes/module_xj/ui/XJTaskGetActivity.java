@@ -36,6 +36,7 @@ import com.supcon.mes.module_xj.model.bean.XJTaskEntity;
 import com.supcon.mes.module_xj.model.bean.XJTaskGroupEntity;
 import com.supcon.mes.module_xj.model.contract.XJTaskContract;
 import com.supcon.mes.module_xj.model.contract.XJTaskStateContract;
+import com.supcon.mes.module_xj.presenter.XJRunningTaskPresenter;
 import com.supcon.mes.module_xj.presenter.XJTaskPresenter;
 import com.supcon.mes.module_xj.presenter.XJTaskStatePresenter;
 import com.supcon.mes.module_xj.ui.adapter.XJTaskGroupAdapter;
@@ -61,7 +62,7 @@ import io.reactivex.schedulers.Schedulers;
  */
 @Router(value = Constant.Router.XJ_TASK_GET)
 @Controller(value = {SystemCodeJsonController.class, DateFilterController.class})
-@Presenter(value = {XJTaskPresenter.class, XJTaskStatePresenter.class})
+@Presenter(value = {XJRunningTaskPresenter.class, XJTaskStatePresenter.class})
 @SystemCode(entityCodes = {
         Constant.SystemCode.PATROL_taskState
 
