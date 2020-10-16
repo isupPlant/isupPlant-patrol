@@ -47,6 +47,7 @@ import com.supcon.mes.middleware.constant.Constant;
 import com.supcon.mes.middleware.constant.TemperatureMode;
 import com.supcon.mes.middleware.constant.VibMode;
 import com.supcon.mes.middleware.controller.SystemCodeJsonController;
+import com.supcon.mes.middleware.model.bean.AreaEntity;
 import com.supcon.mes.middleware.model.bean.BAP5CommonListEntity;
 import com.supcon.mes.middleware.model.bean.ObjectEntity;
 import com.supcon.mes.middleware.model.bean.PopupWindowEntity;
@@ -182,18 +183,12 @@ public class XJWorkActivity extends BaseRefreshRecyclerActivity<XJWorkEntity> im
         if(!TextUtils.isEmpty(exceptionIdsStr))
             exceptionIds = Arrays.asList(exceptionIdsStr.split(","));
         //Todo: swap end
-////        String xjAreaEntityStr = getIntent().getStringExtra(Constant.IntentKey.XJ_AREA_ENTITY_STR);
-//        String xjAreaEntityStr = BundleSaveUtil.instance.getValue(Constant.IntentKey.XJ_AREA_ENTITY_STR);
-////        exceptionIdsStr = getIntent().getStringExtra(Constant.IntentKey.XJ_AREA_EXCEPTION_IDS);
-//        exceptionIdsStr = BundleSaveUtil.instance.getValue(Constant.IntentKey.XJ_AREA_EXCEPTION_IDS);
-//        if (!TextUtils.isEmpty(exceptionIdsStr))
-//            exceptionIds = Arrays.asList(exceptionIdsStr.split(","));
-        if (xjAreaEntityStr != null) {
-            mXJAreaEntity = GsonUtil.gsonToBean(xjAreaEntityStr, XJAreaEntity.class);
-        }
 
         String taskNo = getIntent().getStringExtra(Constant.IntentKey.XJ_TASK_NO_STR);
 
+        /*if (xjAreaEntityStr != null) {
+            mXJAreaEntity = GsonUtil.gsonToBean(xjAreaEntityStr, XJAreaEntity.class);
+        }*/
 
         if (!TextUtils.isEmpty(taskNo)) {
 
@@ -201,12 +196,16 @@ public class XJWorkActivity extends BaseRefreshRecyclerActivity<XJWorkEntity> im
             mXJTaskEntity = GsonUtil.gsonToBean(taskStr, XJTaskEntity.class);
         }
 
-////        String taskStr = getIntent().getStringExtra(Constant.IntentKey.XJ_TASK_ENTITY_STR);
-//        String taskStr = BundleSaveUtil.instance.getValue(Constant.IntentKey.XJ_TASK_ENTITY_STR);
-//
-//        if (!TextUtils.isEmpty(taskStr)) {
-//            mXJTaskEntity = GsonUtil.gsonToBean(taskStr, XJTaskEntity.class);
-//        }
+        if (xjAreaEntityStr != null && mXJTaskEntity != null) {
+
+            for(XJAreaEntity areaEntity: mXJTaskEntity.areas){
+                if(xjAreaEntityStr.equals(String.valueOf(areaEntity.id))){
+                    mXJAreaEntity = areaEntity;
+                    break;
+                }
+            }
+        }
+
         refreshListController.setPullDownRefreshEnabled(false);
         refreshListController.setAutoPullDownRefresh(true);
 
