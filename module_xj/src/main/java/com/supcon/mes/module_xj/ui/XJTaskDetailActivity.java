@@ -565,7 +565,7 @@ public class XJTaskDetailActivity extends BaseControllerActivity implements XJTa
         if (xjAreaEntity.isSigned && xjAreaEntity.cardTime != 0) {
             goArea(xjAreaEntity);
         } else {
-            if (signTypeInfoMap.size() <= 0) {
+            if (signTypeInfoMap == null || signTypeInfoMap.size() <= 0) {
                 ToastUtils.show(context, context.getResources().getString(R.string.xj_patrol_reason));
                 return;
             }
