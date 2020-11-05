@@ -336,7 +336,7 @@ public class XJWorkActivity extends BaseRefreshRecyclerActivity<XJWorkEntity> im
                 .throttleFirst(200, TimeUnit.MILLISECONDS)
                 .subscribe(o -> {
                     Bundle bundle = new Bundle();
-                    bundle.putString(Constant.IntentKey.XJ_AREA_ENTITY_STR, mXJAreaEntity.toString());
+                    bundle.putString(Constant.IntentKey.XJ_AREA_ENTITY_STR,  mXJAreaEntity.id+"");
                     bundle.putString(Constant.IntentKey.XJ_TASK_NO_STR, mXJTaskEntity.tableNo);
 
 //                    BundleSaveUtil.instance
