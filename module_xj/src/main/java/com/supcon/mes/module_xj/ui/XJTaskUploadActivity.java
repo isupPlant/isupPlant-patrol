@@ -24,6 +24,7 @@ import com.supcon.mes.mbap.utils.DateUtil;
 import com.supcon.mes.mbap.utils.GsonUtil;
 import com.supcon.mes.mbap.utils.SpaceItemDecoration;
 import com.supcon.mes.mbap.view.CustomImageButton;
+import com.supcon.mes.middleware.SupPlantApplication;
 import com.supcon.mes.middleware.constant.Constant;
 import com.supcon.mes.middleware.controller.DateFilterController;
 import com.supcon.mes.middleware.controller.SystemCodeJsonController;
@@ -465,7 +466,11 @@ public class XJTaskUploadActivity extends BaseRefreshRecyclerActivity<XJTaskGrou
 
     @Override
     public void uploadFileFailed(String errorMsg) {
-        onLoadFailed(ErrorMsgHelper.msgParse(errorMsg));
+        if (errorMsg.contains("SocketTimeoutException")) {
+            onLoadFailed( SupPlantApplication.getAppContext().getString(R.string.xj_patrol_upload_time_out));
+        }else{
+            onLoadFailed(ErrorMsgHelper.msgParse(errorMsg));
+        }
     }
 
     @Override
@@ -481,6 +486,11 @@ public class XJTaskUploadActivity extends BaseRefreshRecyclerActivity<XJTaskGrou
 
     @Override
     public void uploadXJDataFailed(String errorMsg) {
-        onLoadFailed(ErrorMsgHelper.msgParse(errorMsg));
+        if (errorMsg.contains("SocketTimeoutException")) {
+            onLoadFailed( SupPlantApplication.getAppContext().getString(R.string.xj_patrol_upload_time_out));
+        }else{
+            onLoadFailed(ErrorMsgHelper.msgParse(errorMsg));
+        }
+
     }
 }

@@ -122,4 +122,5 @@
     <string name="xj_patrol_no_route">未找到巡检线路，请检查基础数据！</string>
     <string name="xj_patrol_code_not_match">签到码不匹配</string>
     <string name="operate_succeed">操作成功</string>
+    <string name="xj_patrol_upload_time_out">一次性上传任务过大，请批量进行上传</string>
 </resources>
