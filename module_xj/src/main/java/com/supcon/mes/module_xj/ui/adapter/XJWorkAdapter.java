@@ -168,7 +168,11 @@ public class XJWorkAdapter extends BaseListDataRecyclerViewAdapter<XJWorkEntity>
         @Override
         protected void update(XJWorkEntity data) {
             itemXJWorkEamNum.setText(String.format("%d", data.eamNum));
-            itemXJWorkEamName.setText(data.eamName);
+            if (!TextUtils.isEmpty(data.areaNum)){
+                itemXJWorkEamName.setText(data.eamName+"("+data.areaNum+")");
+            }else{
+                itemXJWorkEamName.setText(data.eamName);
+            }
         }
     }
 
