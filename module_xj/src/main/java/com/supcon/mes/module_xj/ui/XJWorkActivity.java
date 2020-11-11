@@ -49,6 +49,8 @@ import com.supcon.mes.middleware.constant.VibMode;
 import com.supcon.mes.middleware.controller.SystemCodeJsonController;
 import com.supcon.mes.middleware.model.bean.AreaEntity;
 import com.supcon.mes.middleware.model.bean.BAP5CommonListEntity;
+import com.supcon.mes.middleware.model.bean.DeviceEntity;
+import com.supcon.mes.middleware.model.bean.DeviceEntityDao;
 import com.supcon.mes.middleware.model.bean.ObjectEntity;
 import com.supcon.mes.middleware.model.bean.PopupWindowEntity;
 import com.supcon.mes.middleware.model.bean.xj.XJAreaEntity;
@@ -161,7 +163,7 @@ public class XJWorkActivity extends BaseRefreshRecyclerActivity<XJWorkEntity> im
     private XJTaskEntity mXJTaskEntity;
     private ImageView viberStatusIv;
     private boolean isAll = true;
-
+    private List<DeviceEntity> deviceEntityList = new ArrayList<>();
     //Todo: swap from
     //Todo: swap begin
     private String exceptionIdsStr;
@@ -297,7 +299,6 @@ public class XJWorkActivity extends BaseRefreshRecyclerActivity<XJWorkEntity> im
         mSingPicker = new SinglePickController<>(this);
         mSingPicker.setCanceledOnTouchOutside(true);
 
-        initPopupWindowData();
 
     }
 
@@ -529,6 +530,7 @@ public class XJWorkActivity extends BaseRefreshRecyclerActivity<XJWorkEntity> im
 
         passReasonMap = getController(SystemCodeJsonController.class).getCodeMap(Constant.SystemCode.PATROL_passReason);
         realValueMap = getController(SystemCodeJsonController.class).getCodeMap(Constant.SystemCode.PATROL_realValue);
+        checkDeviceState();
         refreshListController.setOnRefreshListener(new OnRefreshListener() {
             @Override
             public void onRefresh() {
@@ -537,6 +539,27 @@ public class XJWorkActivity extends BaseRefreshRecyclerActivity<XJWorkEntity> im
                 }
             }
         });
+    }
+
+    public void checkDeviceState(){
+        if (mXJAreaEntity!=null&& mXJAreaEntity.works!=null){
+            deviceEntityList=new ArrayList<>();
+            for (XJWorkEntity xjWorkEntity : mXJAreaEntity.works) {
+                if (xjWorkEntity.eamId != null || xjWorkEntity.eamId.id != null) {
+                    //根据设备eamId获取CommonDeviceEntity
+                    try {
+                        DeviceEntity commonDeviceEntity = SupPlantApplication.dao().getDeviceEntityDao().queryBuilder()
+                                .where(DeviceEntityDao.Properties.Code.eq( xjWorkEntity.eamId.code)).unique();
+                        if (commonDeviceEntity!=null){
+                            deviceEntityList.add(commonDeviceEntity);
+                        }
+                    }catch (Exception e){
+
+                    }
+                }
+            }
+        }
+        initPopupWindowData();
     }
 
     @Override
@@ -585,6 +608,13 @@ public class XJWorkActivity extends BaseRefreshRecyclerActivity<XJWorkEntity> im
                             workEntity.isEamView = true;
                             workEntity.eamName = mDevice.name;
                             workEntity.eamNum = deviceNames.size() + 1;
+                            for (DeviceEntity deviceEntity:deviceEntityList){
+                                if (deviceEntity.id==workEntity.eamLongId) {
+                                    if (deviceEntity.areaNum != null) {
+                                        workEntity.areaNum = deviceEntity.areaNum;
+                                    }
+                                }
+                            }
                             mWorkEntities.add(workEntity);
 
                             deviceNames.add(workEntity.eamId.name);
