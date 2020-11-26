@@ -275,7 +275,7 @@ public class XJTaskListActivity extends BaseRefreshRecyclerActivity<XJTaskGroupE
         super.initListener();
 
         getController(CheckUserPermissionController.class)
-                .checkUserPermission(SupPlantApplication.getUserName(),
+                .checkUserPermission(SupPlantApplication.getAccountInfo().getUserId(),
                         "PATROL_1.0.0_patrolTask_tempTaskList", "start_ml5tgr8")
                 .setSuccessListener((OnSuccessListener<Boolean>) result -> {
                     if (result) {
