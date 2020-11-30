@@ -180,25 +180,26 @@ public class XJTaskSubmitPresenter extends XJTaskSubmitContract.Presenter {
                             commonEntity.msg = throwable.toString();
                             return commonEntity;
                         })
-                        .subscribe(commonEntity -> {
-                            Api.getInstance().setTimeOut(30);
-                            if (commonEntity.success) {
+                        .subscribe(new Consumer<BAP5CommonEntity<AttachmentEntity>>() {
+                            @Override
+                            public void accept(BAP5CommonEntity<AttachmentEntity> commonEntity) throws Exception {
+                                Api.getInstance().setTimeOut(30);
+                                if (commonEntity.success) {
 //                            if (null == commonEntity.message && 0 == commonEntity.code) {
 
-                                AttachmentEntity attachmentEntity = commonEntity.data;
+                                    AttachmentEntity attachmentEntity = commonEntity.data;
 
-                                if(isViewNonNull(getView())){
-                                    getView().uploadFileSuccess(attachmentEntity.path);
-                                }
-                                deleteXJZipFile();
-                            } else {
-                                if(isViewNonNull(getView())){
-                                    getView().uploadFileFailed(commonEntity.msg);
+                                    if(isViewNonNull(getView())){
+                                        getView().uploadFileSuccess(attachmentEntity.path);
+                                    }
+                                    deleteXJZipFile();
+                                } else {
+                                    if(isViewNonNull(getView())){
+                                        getView().uploadFileFailed(commonEntity.msg);
+                                    }
                                 }
                             }
-                        })
-
-        );
+                        }));
 
     }
 
