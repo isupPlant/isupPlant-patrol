@@ -173,20 +173,17 @@ public class XJTaskSubmitPresenter extends XJTaskSubmitContract.Presenter {
         mCompositeSubscription.add(
                 MiddlewareHttpClient.bapUploadFile(createZipFileForm(uploadZip))
                         .compose(RxSchedulers.io_main())
-                        .onErrorReturn(new Function<Throwable, BAP5CommonEntity<AttachmentEntity>>() {
-                            @Override
-                            public BAP5CommonEntity<AttachmentEntity> apply(Throwable throwable) throws Exception {
-                                Api.getInstance().setTimeOut(30);
-                                BAP5CommonEntity commonEntity = new BAP5CommonEntity();
-                                commonEntity.success = false;
-                                commonEntity.msg = throwable.toString();
-                                return commonEntity;
-                            }
+                        .onErrorReturn(throwable -> {
+                            Api.getInstance().setTimeOut(30);
+                            BAP5CommonEntity commonEntity = new BAP5CommonEntity();
+                            commonEntity.success = false;
+                            commonEntity.msg = throwable.toString();
+                            return commonEntity;
                         })
                         .subscribe(commonEntity -> {
                             Api.getInstance().setTimeOut(30);
-//                            if (commonEntity.success) {
-                            if (null == commonEntity.message && 0 == commonEntity.code) {
+                            if (commonEntity.success) {
+//                            if (null == commonEntity.message && 0 == commonEntity.code) {
 
                                 AttachmentEntity attachmentEntity = commonEntity.data;
 
