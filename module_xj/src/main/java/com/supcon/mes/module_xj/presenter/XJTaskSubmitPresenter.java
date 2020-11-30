@@ -186,7 +186,7 @@ public class XJTaskSubmitPresenter extends XJTaskSubmitContract.Presenter {
                         .subscribe(commonEntity -> {
                             Api.getInstance().setTimeOut(30);
 //                            if (commonEntity.success) {
-                            if (null == commonEntity.message && 200 == commonEntity.code) {
+                            if (null == commonEntity.message && 0 == commonEntity.code) {
 
                                 AttachmentEntity attachmentEntity = commonEntity.data;
 
