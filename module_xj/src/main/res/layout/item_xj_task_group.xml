@@ -25,7 +25,7 @@
             android:drawablePadding="@dimen/dp_5"
             />
 
-        <TextView
+        <com.supcon.mes.middleware.ui.view.search.CustomPopTextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:id="@+id/xjTaskGroupStaff"
@@ -40,7 +40,6 @@
             android:ellipsize="end"
             android:layout_marginTop="@dimen/dp_10"
             />
-
 
     </LinearLayout>
 

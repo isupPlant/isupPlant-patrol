@@ -12,6 +12,7 @@ import com.supcon.common.view.base.adapter.BaseListDataRecyclerViewAdapter;
 import com.supcon.common.view.base.adapter.viewholder.BaseRecyclerViewHolder;
 import com.supcon.common.view.listener.OnItemChildViewClickListener;
 import com.supcon.mes.mbap.utils.DateUtil;
+import com.supcon.mes.mbap.view.CustomContentTextDialog;
 import com.supcon.mes.module_xj.R;
 import com.supcon.mes.module_xj.model.bean.XJTaskEntity;
 import com.supcon.mes.module_xj.model.bean.XJTaskGroupEntity;
@@ -77,6 +78,11 @@ public class XJTaskGroupAdapter extends BaseListDataRecyclerViewAdapter<XJTaskGr
                             XJTaskRouterViewHolder.this.onItemChildViewClick(xjTaskGroupRecyclerView, action, obj);
                         }
                     });
+            xjTaskGroupStaff.setOnLongClickListener(v -> {
+                CustomContentTextDialog.showContent(context, xjTaskGroupStaff.getText().toString());
+                return true;
+            });
+
         }
 
         @Override
