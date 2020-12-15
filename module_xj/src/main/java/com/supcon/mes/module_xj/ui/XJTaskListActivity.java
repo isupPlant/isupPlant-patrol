@@ -626,9 +626,8 @@ public class XJTaskListActivity extends BaseRefreshRecyclerActivity<XJTaskGroupE
                             }
                         } else if (taskEntity.isTemp) {
                             xjTaskGroupEntity.staffName = taskEntity.staffName;
-                            xjTaskGroupEntity.isTemp = taskEntity.isTemp;
                         }
-
+                        xjTaskGroupEntity.isTemp = taskEntity.isTemp;
                         xjTaskGroupEntity.date = taskEntity.startTime;
 
                         if (taskEntity.workRoute != null) {
