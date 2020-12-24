@@ -25,7 +25,7 @@
             android:drawablePadding="@dimen/dp_5"
             />
 
-        <com.supcon.mes.middleware.ui.view.search.CustomPopTextView
+        <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:id="@+id/xjTaskGroupStaff"
