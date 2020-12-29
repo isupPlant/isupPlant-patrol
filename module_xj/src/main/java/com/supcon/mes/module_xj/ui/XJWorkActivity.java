@@ -1111,18 +1111,22 @@ public class XJWorkActivity extends BaseRefreshRecyclerActivity<XJWorkEntity> im
 
                     List<SheetEntity> sheetEntities = GsonUtil.jsonToList(obj.toString(), SheetEntity.class);
 
-                    if (sheetEntities != null && sheetEntities.size() > 0) {
+
 
                         xjWorkItemEntity.concluse = "";
+                    if (sheetEntities != null && sheetEntities.size() > 0) {
                         for (SheetEntity sheetEntity : sheetEntities) {
                             xjWorkItemEntity.concluse += sheetEntity.name + ",";
                         }
-
                         xjWorkItemEntity.concluse = xjWorkItemEntity.concluse.substring(0, xjWorkItemEntity.concluse.length() - 1);
+                    }else{
+                        xjWorkItemEntity.concluse = "";
+                    }
+
 
                         mXJWorkAdapter.notifyItemChanged(xjPosition);
 
-                    }
+
                 }).show();
 
     }
