@@ -5,6 +5,7 @@ import android.text.TextUtils;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.app.annotation.BindByTag;
@@ -56,6 +57,8 @@ public class XJAreaAdapter extends BaseListDataRecyclerViewAdapter<XJAreaEntity>
 
         @BindByTag("itemXJAreaYHTag")
         ImageView itemXJAreaYHTag;
+        @BindByTag("rlitemXJArea")
+        RelativeLayout rlitemXJArea;
 
         public XJAreaViewHolder(Context context) {
             super(context);
@@ -111,6 +114,7 @@ public class XJAreaAdapter extends BaseListDataRecyclerViewAdapter<XJAreaEntity>
                     data.process = "0 / 0";
                     itemXJAreaProcess.setText(data.process);
 //                    itemXJAreaTag.setImageResource(R.drawable.ic_xj_area_done);
+//                    rlitemXJArea.setVisibility(View.GONE);
                 }
 
             }
