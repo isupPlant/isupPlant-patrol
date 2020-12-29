@@ -8,6 +8,7 @@ import com.supcon.common.view.util.LogUtil;
 import com.supcon.mes.mbap.beans.GalleryBean;
 import com.supcon.mes.mbap.view.CustomGalleryView;
 import com.supcon.mes.middleware.controller.BaseCameraController;
+import com.supcon.mes.middleware.model.bean.xj.XJTaskWorkEntity;
 import com.supcon.mes.middleware.model.bean.xj.XJWorkEntity;
 import com.supcon.mes.middleware.model.event.ImageDeleteEvent;
 import com.supcon.mes.module_xj.util.FaultPicHelper;
@@ -26,7 +27,7 @@ import java.util.List;
  */
 public class XJCameraController extends BaseCameraController {
 
-    BaseListDataRecyclerViewAdapter<XJWorkEntity> mAdapter;
+    BaseListDataRecyclerViewAdapter<XJTaskWorkEntity> mAdapter;
 
     public XJCameraController(View rootView) {
         super(rootView);
@@ -57,7 +58,7 @@ public class XJCameraController extends BaseCameraController {
             customGalleryView.deletePic(position);
             deleteFile(imageDeleteEvent.getPicName());
 
-            XJWorkEntity xjWorkItemEntity = mAdapter.getItem(actionPosition);
+            XJTaskWorkEntity xjWorkItemEntity = mAdapter.getItem(actionPosition);
             String xjImgUrl = xjWorkItemEntity.xjImgName;
             if (xjImgUrl.startsWith(imageDeleteEvent.getPicName())) {
                 if (xjImgUrl.equals(imageDeleteEvent.getPicName())) {
@@ -90,7 +91,7 @@ public class XJCameraController extends BaseCameraController {
             LogUtil.e("actionPosition == -1");
             return;
         }
-        XJWorkEntity xjWorkItemEntity = mAdapter.getItem(actionPosition);
+        XJTaskWorkEntity xjWorkItemEntity = mAdapter.getItem(actionPosition);
 
         if(xjWorkItemEntity == null){
 
@@ -116,7 +117,7 @@ public class XJCameraController extends BaseCameraController {
             return;
         }
 
-        XJWorkEntity xjWorkItemEntity = mAdapter.getItem(actionPosition);
+        XJTaskWorkEntity xjWorkItemEntity = mAdapter.getItem(actionPosition);
         if(xjWorkItemEntity == null){
             return;
         }

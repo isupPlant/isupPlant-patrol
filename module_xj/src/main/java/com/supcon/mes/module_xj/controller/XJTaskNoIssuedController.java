@@ -6,12 +6,11 @@ import com.app.annotation.Presenter;
 import com.supcon.common.view.base.controller.BaseDataController;
 import com.supcon.mes.middleware.constant.Constant;
 import com.supcon.mes.middleware.model.bean.CommonBAPListEntity;
+import com.supcon.mes.middleware.model.bean.xj.XJTaskEntity;
 import com.supcon.mes.middleware.model.listener.OnAPIResultListener;
 import com.supcon.mes.module_xj.model.api.XJTaskAPI;
-import com.supcon.mes.module_xj.model.bean.XJTaskEntity;
 import com.supcon.mes.module_xj.model.contract.XJTaskContract;
 import com.supcon.mes.module_xj.presenter.XJRunningTaskPresenter;
-import com.supcon.mes.module_xj.presenter.XJTaskPresenter;
 
 import java.util.HashMap;
 import java.util.List;

@@ -25,7 +25,6 @@ import com.mes.supcon.expert_ewg01p.config.ViberMode;
 import com.mes.supcon.expert_ewg01p.controller.ExpertController;
 import com.supcon.common.view.base.activity.BaseRefreshRecyclerActivity;
 import com.supcon.common.view.base.adapter.IListAdapter;
-import com.supcon.common.view.listener.OnRefreshListener;
 import com.supcon.common.view.util.DisplayUtil;
 import com.supcon.common.view.util.LogUtil;
 import com.supcon.common.view.util.SharedPreferencesUtils;
@@ -47,7 +46,6 @@ import com.supcon.mes.middleware.constant.Constant;
 import com.supcon.mes.middleware.constant.TemperatureMode;
 import com.supcon.mes.middleware.constant.VibMode;
 import com.supcon.mes.middleware.controller.SystemCodeJsonController;
-import com.supcon.mes.middleware.model.bean.AreaEntity;
 import com.supcon.mes.middleware.model.bean.BAP5CommonListEntity;
 import com.supcon.mes.middleware.model.bean.DeviceEntity;
 import com.supcon.mes.middleware.model.bean.DeviceEntityDao;
@@ -56,7 +54,10 @@ import com.supcon.mes.middleware.model.bean.PopupWindowEntity;
 import com.supcon.mes.middleware.model.bean.xj.XJAreaEntity;
 import com.supcon.mes.middleware.model.bean.xj.XJInputTypeEntity;
 import com.supcon.mes.middleware.model.bean.xj.XJInputTypeEntityDao;
-import com.supcon.mes.middleware.model.bean.xj.XJWorkEntity;
+import com.supcon.mes.middleware.model.bean.xj.XJTaskAreaEntity;
+import com.supcon.mes.middleware.model.bean.xj.XJTaskEntity;
+import com.supcon.mes.middleware.model.bean.xj.XJTaskWorkEntity;
+import com.supcon.mes.middleware.model.bean.xj.XJTaskWorkEntity;
 import com.supcon.mes.middleware.model.inter.SystemCode;
 import com.supcon.mes.middleware.ui.view.CustomPopupWindow;
 import com.supcon.mes.middleware.util.AnimationUtil;
@@ -64,14 +65,13 @@ import com.supcon.mes.middleware.util.ErrorMsgHelper;
 import com.supcon.mes.middleware.util.SBTUtil;
 import com.supcon.mes.middleware.util.SnackbarHelper;
 import com.supcon.mes.middleware.util.SystemCodeManager;
-import com.supcon.mes.middleware.util.XJCacheUtil;
+import com.supcon.mes.middleware.util.XJTaskCacheUtil;
 import com.supcon.mes.module_xj.IntentRouter;
 import com.supcon.mes.module_xj.R;
 import com.supcon.mes.module_xj.controller.XJCameraController;
 import com.supcon.mes.module_xj.model.api.DeviceDCSParamQueryAPI;
 import com.supcon.mes.module_xj.model.api.XJTaskSubmitAPI;
 import com.supcon.mes.module_xj.model.bean.DeviceDCSEntity;
-import com.supcon.mes.module_xj.model.bean.XJTaskEntity;
 import com.supcon.mes.module_xj.model.contract.DeviceDCSParamQueryContract;
 import com.supcon.mes.module_xj.model.contract.XJTaskSubmitContract;
 import com.supcon.mes.module_xj.model.event.WorkItemLocationEvent;
@@ -79,6 +79,7 @@ import com.supcon.mes.module_xj.model.event.XJAreaRefreshEvent;
 import com.supcon.mes.module_xj.model.event.XJWorkRefreshEvent;
 import com.supcon.mes.module_xj.presenter.DeviceDCSParamQueryPresenter;
 import com.supcon.mes.module_xj.ui.adapter.XJWorkAdapter;
+import com.supcon.mes.module_xj.util.XLinearLayoutManager;
 import com.supcon.mes.mogu_viber.controller.MGViberController;
 import com.supcon.mes.sb2.model.event.ThermometerEvent;
 import com.supcon.mes.testo_805i.controller.InfraredEvent;
@@ -114,7 +115,7 @@ import io.reactivex.schedulers.Schedulers;
         Constant.SystemCode.PATROL_realValue
 
 })
-public class XJWorkActivity extends BaseRefreshRecyclerActivity<XJWorkEntity> implements
+public class XJWorkActivity extends BaseRefreshRecyclerActivity<XJTaskWorkEntity> implements
         XJTaskSubmitContract.View, DeviceDCSParamQueryContract.View {
 
     @BindByTag("titleTextMiddle")
@@ -138,7 +139,7 @@ public class XJWorkActivity extends BaseRefreshRecyclerActivity<XJWorkEntity> im
     XJWorkAdapter mXJWorkAdapter;
 
     ExpertController expertViberController;
-    XJAreaEntity mXJAreaEntity;
+    XJTaskAreaEntity mXJAreaEntity;
     ObjectEntity mDevice = null;
     List<String> deviceNames = new ArrayList<>();
     List<String> deviceNumber = new ArrayList<>();
@@ -157,7 +158,7 @@ public class XJWorkActivity extends BaseRefreshRecyclerActivity<XJWorkEntity> im
     private AV160Controller mAV160Controller;
     private CustomDialog mTesto805iDialog;
     private int mPosition;
-    private List<XJWorkEntity> mWorkEntities = new ArrayList<>();
+    private List<XJTaskWorkEntity> mWorkEntities = new ArrayList<>();
     private boolean needRefresh = false;//重录之后，需要刷新列表
     private TextView tempTv;
     private XJTaskEntity mXJTaskEntity;
@@ -194,18 +195,18 @@ public class XJWorkActivity extends BaseRefreshRecyclerActivity<XJWorkEntity> im
 
         if (!TextUtils.isEmpty(taskNo)) {
 
-            String taskStr = XJCacheUtil.getString(taskNo);
+            String taskStr = XJTaskCacheUtil.getString(taskNo);
             mXJTaskEntity = GsonUtil.gsonToBean(taskStr, XJTaskEntity.class);
         }
 
         if (xjAreaEntityStr != null && mXJTaskEntity != null) {
-
-            for(XJAreaEntity areaEntity: mXJTaskEntity.areas){
+            for(XJTaskAreaEntity areaEntity: mXJTaskEntity.areas){
                 if(xjAreaEntityStr.equals(String.valueOf(areaEntity.id))){
                     mXJAreaEntity = areaEntity;
                     break;
                 }
             }
+            mXJAreaEntity.works= XJTaskCacheUtil.getTaskWork(taskNo,Long.valueOf(xjAreaEntityStr));
         }
 
         refreshListController.setPullDownRefreshEnabled(false);
@@ -270,7 +271,7 @@ public class XJWorkActivity extends BaseRefreshRecyclerActivity<XJWorkEntity> im
             expertViberController.onDestroy();
 
         int finishNum = 0;
-        for (XJWorkEntity xjWorkEntity : mXJAreaEntity.works) {
+        for (XJTaskWorkEntity xjWorkEntity : mXJAreaEntity.works) {
             if (xjWorkEntity.isFinished) {
                 finishNum++;
             }
@@ -292,7 +293,7 @@ public class XJWorkActivity extends BaseRefreshRecyclerActivity<XJWorkEntity> im
         rightBtn.setImageResource(R.drawable.sl_xj_work_top_finish);
         rightBtn_sec.setImageResource(R.drawable.sl_top_more);
 
-        contentView.setLayoutManager(new LinearLayoutManager(context));
+        contentView.setLayoutManager(new XLinearLayoutManager(context));
         contentView.addItemDecoration(new SpaceItemDecoration(DisplayUtil.dip2px(1, context)));
         contentView.setAdapter(mXJWorkAdapter);
 
@@ -354,7 +355,7 @@ public class XJWorkActivity extends BaseRefreshRecyclerActivity<XJWorkEntity> im
                 });
 
         mXJWorkAdapter.setOnItemChildViewClickListener((childView, position, action, obj) -> {
-            XJWorkEntity xjWorkEntity = (XJWorkEntity) obj;
+            XJTaskWorkEntity xjWorkEntity = (XJTaskWorkEntity) obj;
             String tag = (String) childView.getTag();
             mPosition = position;
             switch (tag) {
@@ -431,7 +432,7 @@ public class XJWorkActivity extends BaseRefreshRecyclerActivity<XJWorkEntity> im
                 }, true)
                 .bindClickListener(R.id.redBtn, v -> {
                     //将本区域数据变成已完成
-                    for (XJWorkEntity xjWorkEntity : mXJAreaEntity.works) {
+                    for (XJTaskWorkEntity xjWorkEntity : mXJAreaEntity.works) {
                         xjWorkEntity.isFinished = true;
                     }
                     //拼接单个区域上传数据
@@ -447,7 +448,7 @@ public class XJWorkActivity extends BaseRefreshRecyclerActivity<XJWorkEntity> im
 
     private boolean checkAreaFinishState() {
         int finishNum = 0;
-        for (XJWorkEntity xjWorkEntity : mXJAreaEntity.works) {
+        for (XJTaskWorkEntity xjWorkEntity : mXJAreaEntity.works) {
             if (xjWorkEntity.isFinished) {
                 finishNum++;
             }
@@ -495,7 +496,7 @@ public class XJWorkActivity extends BaseRefreshRecyclerActivity<XJWorkEntity> im
     }
 
     @SuppressLint("CheckResult")
-    private void showEditDialog(XJWorkEntity xjWorkEntity, int position) {
+    private void showEditDialog(XJTaskWorkEntity xjWorkEntity, int position) {
 
 
         CustomDialog remarkDialog = new CustomDialog(context)
@@ -518,7 +519,7 @@ public class XJWorkActivity extends BaseRefreshRecyclerActivity<XJWorkEntity> im
     }
 
     @Override
-    protected IListAdapter<XJWorkEntity> createAdapter() {
+    protected IListAdapter<XJTaskWorkEntity> createAdapter() {
         mXJWorkAdapter = new XJWorkAdapter(context);
         return mXJWorkAdapter;
     }
@@ -544,7 +545,7 @@ public class XJWorkActivity extends BaseRefreshRecyclerActivity<XJWorkEntity> im
     public void checkDeviceState(){
         if (mXJAreaEntity!=null&& mXJAreaEntity.works!=null){
             deviceEntityList=new ArrayList<>();
-            for (XJWorkEntity xjWorkEntity : mXJAreaEntity.works) {
+            for (XJTaskWorkEntity xjWorkEntity : mXJAreaEntity.works) {
                 if (xjWorkEntity.eamId != null || xjWorkEntity.eamId.id != null) {
                     //根据设备eamId获取CommonDeviceEntity
                     try {
@@ -582,7 +583,7 @@ public class XJWorkActivity extends BaseRefreshRecyclerActivity<XJWorkEntity> im
 
     @SuppressLint("CheckResult")
     private void initWorks() {
-        List<XJWorkEntity> noEamWorks = new ArrayList<>();
+        List<XJTaskWorkEntity> noEamWorks = new ArrayList<>();
         //遍历当前巡检区域下的所有巡检项,过滤掉所有未启动的巡检项以及例外的巡检内容
         Flowable.fromIterable(mXJAreaEntity.works)
                 //Todo: 大金swap from
@@ -602,7 +603,7 @@ public class XJWorkActivity extends BaseRefreshRecyclerActivity<XJWorkEntity> im
                     } else {
                         if (mDevice == null || mDevice.id != xjWorkEntity.eamLongId) {
                             mDevice = xjWorkEntity.eamId;
-                            XJWorkEntity workEntity = new XJWorkEntity();
+                            XJTaskWorkEntity workEntity = new XJTaskWorkEntity();
                             workEntity.eamId = mDevice;
                             workEntity.eamLongId = mDevice.id;
                             workEntity.isEamView = true;
@@ -627,7 +628,7 @@ public class XJWorkActivity extends BaseRefreshRecyclerActivity<XJWorkEntity> im
 
                 }, () -> {
                     if (noEamWorks.size() != 0) {
-                        XJWorkEntity workEntity = new XJWorkEntity();
+                        XJTaskWorkEntity workEntity = new XJTaskWorkEntity();
                         workEntity.isEamView = true;
                         workEntity.eamNum = deviceNames.size() + 1;
                         if (deviceNames.size() == 0) {
@@ -656,7 +657,7 @@ public class XJWorkActivity extends BaseRefreshRecyclerActivity<XJWorkEntity> im
                     }
                 });
 
-        for (XJWorkEntity xjWorkEntity : mXJAreaEntity.works) {
+        for (XJTaskWorkEntity xjWorkEntity : mXJAreaEntity.works) {
             if (xjWorkEntity.itemNumber != null && !TextUtils.isEmpty(xjWorkEntity.itemNumber)) {
                 deviceNumber.add(xjWorkEntity.itemNumber.trim());
             }
@@ -674,7 +675,7 @@ public class XJWorkActivity extends BaseRefreshRecyclerActivity<XJWorkEntity> im
             refreshListController.refreshComplete(mWorkEntities);
             return;
         }
-        List<XJWorkEntity> workEntities = new ArrayList<>();
+        List<XJTaskWorkEntity> workEntities = new ArrayList<>();
         Flowable.fromIterable(mWorkEntities)
                 .subscribeOn(Schedulers.newThread())
                 .filter(xjWorkEntity -> xjWorkEntity.eamId != null && xjWorkEntity.eamId.name != null && xjWorkEntity.eamId.name.equals(deviceName))
@@ -683,7 +684,7 @@ public class XJWorkActivity extends BaseRefreshRecyclerActivity<XJWorkEntity> im
                 }, () -> refreshListController.refreshComplete(workEntities));
     }
 
-    private void showVibView(XJWorkEntity xjWorkEntity) {
+    private void showVibView(XJTaskWorkEntity xjWorkEntity) {
         int vibMode = SharedPreferencesUtils.getParam(context, Constant.SPKey.VIB_MODE, 0);
         if (vibMode == VibMode.AIC.getCode()) {
             showAICDialog(mPosition, xjWorkEntity, false);
@@ -710,7 +711,7 @@ public class XJWorkActivity extends BaseRefreshRecyclerActivity<XJWorkEntity> im
         }
     }
 
-    private void showAV160Dialog(int position, XJWorkEntity xjWorkItemEntity) {
+    private void showAV160Dialog(int position, XJTaskWorkEntity xjWorkItemEntity) {
 
 
         if (mAV160Controller == null) {
@@ -735,7 +736,7 @@ public class XJWorkActivity extends BaseRefreshRecyclerActivity<XJWorkEntity> im
 
     }
 
-    private void showMGViberDialog(int position, XJWorkEntity xjWorkItemEntity) {
+    private void showMGViberDialog(int position, XJTaskWorkEntity xjWorkItemEntity) {
         if (mMGViberDialog == null) {
             mMGViberDialog = new CustomDialog(context)
                     .layout(R.layout.ly_viber_dialog)
@@ -765,7 +766,7 @@ public class XJWorkActivity extends BaseRefreshRecyclerActivity<XJWorkEntity> im
         super.onStop();
         if (expertViberController != null) expertViberController.onStop();
     }
-    private void showTempView(XJWorkEntity xjWorkEntity) {
+    private void showTempView(XJTaskWorkEntity xjWorkEntity) {
         int tempMode = SharedPreferencesUtils.getParam(context, Constant.SPKey.TEMP_MODE, 0);
         if (tempMode == TemperatureMode.AIC.getCode()) {
             showAICDialog(mPosition, xjWorkEntity, true);
@@ -798,7 +799,7 @@ public class XJWorkActivity extends BaseRefreshRecyclerActivity<XJWorkEntity> im
 
     }
 
-    private void showTesto805iDialog(int position, XJWorkEntity xjWorkItemEntity) {
+    private void showTesto805iDialog(int position, XJTaskWorkEntity xjWorkItemEntity) {
         thermometervalue = null;
         mTesto805iDialog = new CustomDialog(context);
         mTesto805iDialog.layout(R.layout.v_temp_805i_dialog)
@@ -822,7 +823,7 @@ public class XJWorkActivity extends BaseRefreshRecyclerActivity<XJWorkEntity> im
 
     }
 
-    private void showAICDialog(int position, XJWorkEntity xjWorkItemEntity, boolean isTempTest) {
+    private void showAICDialog(int position, XJTaskWorkEntity xjWorkItemEntity, boolean isTempTest) {
 
 
         if(mAICVibController==null) {
@@ -866,7 +867,7 @@ public class XJWorkActivity extends BaseRefreshRecyclerActivity<XJWorkEntity> im
             ToastUtils.show(context, getString(R.string.xj_work_finish_warning3));
             return;
         }
-        List<XJWorkEntity> xjWorkEntities = new ArrayList<>();
+        List<XJTaskWorkEntity> xjWorkEntities = new ArrayList<>();
         isCanEndAll = true;
         Flowable.fromIterable(mWorkEntities)
                 .filter(xjWorkItemEntity -> {
@@ -915,7 +916,7 @@ public class XJWorkActivity extends BaseRefreshRecyclerActivity<XJWorkEntity> im
                                 return;
                             }
                             try {
-                                for (XJWorkEntity xjWorkItemEntity : xjWorkEntities) {
+                                for (XJTaskWorkEntity xjWorkItemEntity : xjWorkEntities) {
                                     doFinish(xjWorkItemEntity);
                                 }
 
@@ -945,7 +946,7 @@ public class XJWorkActivity extends BaseRefreshRecyclerActivity<XJWorkEntity> im
      * @description 一键完成巡检项
      * @author zhangwenshuai1 2018/12/29
      */
-    private boolean doFinish(XJWorkEntity xjWorkItemEntity) {
+    private boolean doFinish(XJTaskWorkEntity xjWorkItemEntity) {
         if (/*!OLXJConstant.MobileWiLinkState.EXEMPTION_STATE.equals(xjWorkItemEntity.linkState) && */!xjWorkItemEntity.isFinished) { //免检项过滤掉，因为在后续的循环中被免检的项没有从当前列表中移除
 
             xjWorkItemEntity.completeDate = new Date().getTime();
@@ -975,7 +976,7 @@ public class XJWorkActivity extends BaseRefreshRecyclerActivity<XJWorkEntity> im
             return;
         }
 
-        List<XJWorkEntity> workItemEntities = new ArrayList<>();
+        List<XJTaskWorkEntity> workItemEntities = new ArrayList<>();
 
         Flowable.fromIterable(mWorkEntities)
                 .observeOn(AndroidSchedulers.mainThread())
@@ -1009,7 +1010,7 @@ public class XJWorkActivity extends BaseRefreshRecyclerActivity<XJWorkEntity> im
      * @description 设备整体跳过原因筛选框
      */
     @SuppressLint("CheckResult")
-    private void showAllSkipReasonPicker(List<XJWorkEntity> xjWorkItemEntities) {
+    private void showAllSkipReasonPicker(List<XJTaskWorkEntity> xjWorkItemEntities) {
         if (passReasonMap == null || passReasonMap.size() <= 0) {
 
             return;
@@ -1077,7 +1078,7 @@ public class XJWorkActivity extends BaseRefreshRecyclerActivity<XJWorkEntity> im
      * @author zhangwenshuai1
      * @date 2018/5/2
      */
-    private void dialogMoreChoice(XJWorkEntity xjWorkItemEntity, int xjPosition) {
+    private void dialogMoreChoice(XJTaskWorkEntity xjWorkItemEntity, int xjPosition) {
 
         XJInputTypeEntity xjInputTypeEntity = SupPlantApplication.dao().getXJInputTypeEntityDao().queryBuilder().
                 where(XJInputTypeEntityDao.Properties.Id.eq(xjWorkItemEntity.inputStandardId.id)).unique();
@@ -1144,8 +1145,8 @@ public class XJWorkActivity extends BaseRefreshRecyclerActivity<XJWorkEntity> im
                     if (isFinish) {
                         mXJWorkAdapter.notifyItemRemoved(position);
                     } else if (workRefreshEvent.getXJWorkEntity() != null) {//来自巡检已完成重录
-                        XJWorkEntity workEntity = workRefreshEvent.getXJWorkEntity();
-                        for (XJWorkEntity xjWorkEntity : mXJAreaEntity.works) {
+                        XJTaskWorkEntity workEntity = workRefreshEvent.getXJWorkEntity();
+                        for (XJTaskWorkEntity xjWorkEntity : mXJAreaEntity.works) {
                             if (workEntity.id.equals(xjWorkEntity.id)) {
                                 mXJAreaEntity.works.set(mXJAreaEntity.works.indexOf(xjWorkEntity), workEntity);
                             }
@@ -1170,7 +1171,7 @@ public class XJWorkActivity extends BaseRefreshRecyclerActivity<XJWorkEntity> im
         if (pos == 0) {
             return;
         }
-        XJWorkEntity xjWorkEntity = mWorkEntities.get(pos);
+        XJTaskWorkEntity xjWorkEntity = mWorkEntities.get(pos);
         if (xjWorkEntity == null) {
             return;
         }
@@ -1192,7 +1193,7 @@ public class XJWorkActivity extends BaseRefreshRecyclerActivity<XJWorkEntity> im
         thermometervalue = thermometerEvent.getThermometerVal().replace("℃", "");
 
         if (mPosition != -1 && mXJWorkAdapter.getList() != null && mXJWorkAdapter.getList().size() >= mPosition + 1) {
-            XJWorkEntity xjWorkItemEntity = mXJWorkAdapter.getItem(mPosition);
+            XJTaskWorkEntity xjWorkItemEntity = mXJWorkAdapter.getItem(mPosition);
             xjWorkItemEntity.concluse = thermometervalue;
             mXJWorkAdapter.notifyItemChanged(mPosition);
             thermometervalue = null;

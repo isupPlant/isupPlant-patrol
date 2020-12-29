@@ -21,7 +21,7 @@ import com.supcon.mes.middleware.SupPlantApplication;
 import com.supcon.mes.middleware.constant.Constant;
 import com.supcon.mes.middleware.model.bean.xj.XJInputTypeEntity;
 import com.supcon.mes.middleware.model.bean.xj.XJInputTypeEntityDao;
-import com.supcon.mes.middleware.model.bean.xj.XJWorkEntity;
+import com.supcon.mes.middleware.model.bean.xj.XJTaskWorkEntity;
 import com.supcon.mes.module_xj.R;
 import com.supcon.mes.module_xj.controller.XJCameraController;
 import com.supcon.mes.module_xj.ui.XJWorkViewActivity;
@@ -37,7 +37,7 @@ import io.reactivex.functions.Consumer;
  * Created by wangshizhan on 2020/4/16
  * Email:wangshizhan@supcom.com
  */
-public class XJWorkViewAdapter extends BaseListDataRecyclerViewAdapter<XJWorkEntity> {
+public class XJWorkViewAdapter extends BaseListDataRecyclerViewAdapter<XJTaskWorkEntity> {
 
     private boolean isEditable = true;
 
@@ -50,13 +50,13 @@ public class XJWorkViewAdapter extends BaseListDataRecyclerViewAdapter<XJWorkEnt
         super(context);
     }
 
-    public XJWorkViewAdapter(Context context, List<XJWorkEntity> list) {
+    public XJWorkViewAdapter(Context context, List<XJTaskWorkEntity> list) {
         super(context, list);
     }
 
 
     @Override
-    protected BaseRecyclerViewHolder<XJWorkEntity> getViewHolder(int viewType) {
+    protected BaseRecyclerViewHolder<XJTaskWorkEntity> getViewHolder(int viewType) {
 
         if(viewType == 0){
             return new XJWorkItemEamViewholder(context, parent);
@@ -66,11 +66,11 @@ public class XJWorkViewAdapter extends BaseListDataRecyclerViewAdapter<XJWorkEnt
 
 
     @Override
-    public int getItemViewType(int position, XJWorkEntity xjWorkEntity) {
+    public int getItemViewType(int position, XJTaskWorkEntity xjWorkEntity) {
         return TextUtils.isEmpty(xjWorkEntity.content)?0:1;
     }
 
-    class XJWorkItemEamViewholder extends BaseRecyclerViewHolder<XJWorkEntity>{
+    class XJWorkItemEamViewholder extends BaseRecyclerViewHolder<XJTaskWorkEntity>{
 
         @BindByTag("itemXJWorkViewEamNum")
         TextView itemXJWorkViewEamNum;
@@ -104,7 +104,7 @@ public class XJWorkViewAdapter extends BaseListDataRecyclerViewAdapter<XJWorkEnt
             itemXJWorkViewEamNum.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    XJWorkEntity xjWorkItemEntity = getItem(getAdapterPosition());
+                    XJTaskWorkEntity xjWorkItemEntity = getItem(getAdapterPosition());
                     if (xjWorkItemEntity.eamId == null || xjWorkItemEntity.eamId.id == null) {
                         ToastUtils.show(context, context.getResources().getString(R.string.xj_patrol_no_device_look));
                         return;
@@ -120,7 +120,7 @@ public class XJWorkViewAdapter extends BaseListDataRecyclerViewAdapter<XJWorkEnt
         }
 
         @Override
-        protected void update(XJWorkEntity data) {
+        protected void update(XJTaskWorkEntity data) {
 
 
             itemXJWorkViewEamNum.setText(""+data.eamNum);
@@ -129,7 +129,7 @@ public class XJWorkViewAdapter extends BaseListDataRecyclerViewAdapter<XJWorkEnt
         }
     }
 
-    class XJWorkItemContentViewholder extends BaseRecyclerViewHolder<XJWorkEntity> implements OnChildViewClickListener {
+    class XJWorkItemContentViewholder extends BaseRecyclerViewHolder<XJTaskWorkEntity> implements OnChildViewClickListener {
 
 
         @BindByTag("itemXJWorkViewFlag")
@@ -220,7 +220,7 @@ public class XJWorkViewAdapter extends BaseListDataRecyclerViewAdapter<XJWorkEnt
         }
 
         @Override
-        protected void update(XJWorkEntity data) {
+        protected void update(XJTaskWorkEntity data) {
             mXJCameraController.addListener(itemXJWorkViewPics, getAdapterPosition(), XJWorkViewAdapter.this);
             XJInputTypeEntity xjInputTypeEntity = SupPlantApplication.dao().getXJInputTypeEntityDao().queryBuilder()
                     .where(XJInputTypeEntityDao.Properties.Id.eq(data.inputStandardId.id)).unique();
@@ -314,7 +314,7 @@ public class XJWorkViewAdapter extends BaseListDataRecyclerViewAdapter<XJWorkEnt
 
         @Override
         public void onChildViewClick(View childView, int action, Object obj) {
-            XJWorkEntity workItemEntity = getItem(getAdapterPosition());  //注：参数obj为空，实现的接口方法，接口中obj为null，非item对象
+            XJTaskWorkEntity workItemEntity = getItem(getAdapterPosition());  //注：参数obj为空，实现的接口方法，接口中obj为null，非item对象
             onItemChildViewClick(childView, action, workItemEntity);
         }
 

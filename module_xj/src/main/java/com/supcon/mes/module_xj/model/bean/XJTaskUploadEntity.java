@@ -9,6 +9,10 @@ import com.supcon.mes.middleware.model.bean.ObjectEntity;
 import com.supcon.mes.middleware.model.bean.SystemCodeEntity;
 import com.supcon.mes.middleware.model.bean.xj.XJAreaEntity;
 import com.supcon.mes.middleware.model.bean.xj.XJRouteEntity;
+import com.supcon.mes.middleware.model.bean.xj.XJTaskAreaEntity;
+import com.supcon.mes.middleware.model.bean.xj.XJTaskEntity;
+import com.supcon.mes.middleware.model.bean.xj.XJTaskRouteEntity;
+import com.supcon.mes.middleware.model.bean.xj.XJTaskWorkEntity;
 import com.supcon.mes.middleware.model.bean.xj.XJWorkEntity;
 
 import java.util.List;
@@ -128,7 +132,7 @@ import java.util.Map;
         }
    }
 
-    public void setWorkItems(List<XJWorkEntity> works) {
+    public void setWorkItems(List<XJTaskWorkEntity> works) {
 
        if(works == null){
            return;
@@ -144,7 +148,7 @@ import java.util.Map;
        }
     }
 
-    public void setWorkAreas(List<XJAreaEntity> areas) {
+    public void setWorkAreas(List<XJTaskAreaEntity> areas) {
 
         if(areas == null){
             return;
@@ -179,7 +183,7 @@ import java.util.Map;
        public long tableInfoId;
        public ObjectEntity completeStaff;
        public boolean isTemp;
-       public XJRouteEntity workRoute;
+       public XJTaskRouteEntity workRoute;
        public Long startTime;
        public Long endTime;
        public StringIdEntity source;

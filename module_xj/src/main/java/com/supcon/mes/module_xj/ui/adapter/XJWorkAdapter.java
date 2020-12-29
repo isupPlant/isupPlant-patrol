@@ -40,7 +40,7 @@ import com.supcon.mes.middleware.constant.TemperatureMode;
 import com.supcon.mes.middleware.constant.VibMode;
 import com.supcon.mes.middleware.model.bean.xj.XJInputTypeEntity;
 import com.supcon.mes.middleware.model.bean.xj.XJInputTypeEntityDao;
-import com.supcon.mes.middleware.model.bean.xj.XJWorkEntity;
+import com.supcon.mes.middleware.model.bean.xj.XJTaskWorkEntity;
 import com.supcon.mes.middleware.ui.view.SimpleSwitchView;
 import com.supcon.mes.middleware.ui.view.search.CustomPopTextView;
 import com.supcon.mes.middleware.util.SBTUtil;
@@ -70,7 +70,7 @@ import io.reactivex.android.schedulers.AndroidSchedulers;
  * Created by wangshizhan on 2020/4/16
  * Email:wangshizhan@supcom.com
  */
-public class XJWorkAdapter extends BaseListDataRecyclerViewAdapter<XJWorkEntity> {
+public class XJWorkAdapter extends BaseListDataRecyclerViewAdapter<XJTaskWorkEntity> {
 
     private SB2ThermometerHelper sb2ThermometerHelper;
 
@@ -93,7 +93,7 @@ public class XJWorkAdapter extends BaseListDataRecyclerViewAdapter<XJWorkEntity>
     }
 
     @Override
-    protected BaseRecyclerViewHolder<XJWorkEntity> getViewHolder(int viewType) {
+    protected BaseRecyclerViewHolder<XJTaskWorkEntity> getViewHolder(int viewType) {
 
         if (viewType == 0) {
             return new XJWorkItemEamViewHolder(context, parent);
@@ -103,7 +103,7 @@ public class XJWorkAdapter extends BaseListDataRecyclerViewAdapter<XJWorkEntity>
 
 
     @Override
-    public int getItemViewType(int position, XJWorkEntity xjWorkEntity) {
+    public int getItemViewType(int position, XJTaskWorkEntity xjWorkEntity) {
         return TextUtils.isEmpty(xjWorkEntity.content) ? 0 : 1;
     }
 
@@ -116,7 +116,7 @@ public class XJWorkAdapter extends BaseListDataRecyclerViewAdapter<XJWorkEntity>
         sb2ThermometerHelper = SB2ThermometerHelper.getInstance();
     }
 
-    class XJWorkItemEamViewHolder extends BaseRecyclerViewHolder<XJWorkEntity> {
+    class XJWorkItemEamViewHolder extends BaseRecyclerViewHolder<XJTaskWorkEntity> {
 
         @BindByTag("itemXJWorkEamNum")
         TextView itemXJWorkEamNum;
@@ -152,7 +152,7 @@ public class XJWorkAdapter extends BaseListDataRecyclerViewAdapter<XJWorkEntity>
                     .subscribe(o -> onItemChildViewClick(itemXJWorkFinish, 0, getItem(getAdapterPosition())));
 
             itemXJWorkEamName.setOnClickListener(v -> {
-                XJWorkEntity xjWorkItemEntity = getItem(getAdapterPosition());
+                XJTaskWorkEntity xjWorkItemEntity = getItem(getAdapterPosition());
                 if (xjWorkItemEntity.eamId == null || xjWorkItemEntity.eamId.id == null) {
                     ToastUtils.show(context, context.getResources().getString(R.string.xj_patrol_no_device_look));
                 }
@@ -166,7 +166,7 @@ public class XJWorkAdapter extends BaseListDataRecyclerViewAdapter<XJWorkEntity>
 
         @SuppressLint("DefaultLocale")
         @Override
-        protected void update(XJWorkEntity data) {
+        protected void update(XJTaskWorkEntity data) {
             itemXJWorkEamNum.setText(String.format("%d", data.eamNum));
             if (!TextUtils.isEmpty(data.areaNum)){
                 itemXJWorkEamName.setText(data.eamName+"("+data.areaNum+")");
@@ -176,7 +176,7 @@ public class XJWorkAdapter extends BaseListDataRecyclerViewAdapter<XJWorkEntity>
         }
     }
 
-    class XJWorkItemContentViewholder extends BaseRecyclerViewHolder<XJWorkEntity> implements OnChildViewClickListener {
+    class XJWorkItemContentViewholder extends BaseRecyclerViewHolder<XJTaskWorkEntity> implements OnChildViewClickListener {
         @BindByTag("itemXJWorkContent")
         CustomPopTextView itemXJWorkContent;
 
@@ -259,13 +259,13 @@ public class XJWorkAdapter extends BaseListDataRecyclerViewAdapter<XJWorkEntity>
 
 
             RxView.clicks(itemXJWorkRemarkBtn).throttleFirst(2, TimeUnit.SECONDS).subscribe(o -> {
-                XJWorkEntity xjWorkItemEntity = getItem(getAdapterPosition());
+                XJTaskWorkEntity xjWorkItemEntity = getItem(getAdapterPosition());
 
                 onItemChildViewClick(itemXJWorkRemarkBtn, 0, xjWorkItemEntity);
             });
 
             RxView.clicks(itemXJWorkYHBtn).throttleFirst(2, TimeUnit.SECONDS).subscribe(o -> {
-                XJWorkEntity xjWorkItemEntity = getItem(getAdapterPosition());
+                XJTaskWorkEntity xjWorkItemEntity = getItem(getAdapterPosition());
 
                 Bundle bundle = new Bundle();
 //                bundle.putSerializable(Constant.IntentKey.YHGL_ENTITY, yhEntityVo);
@@ -277,7 +277,7 @@ public class XJWorkAdapter extends BaseListDataRecyclerViewAdapter<XJWorkEntity>
                     .debounce(500, TimeUnit.MILLISECONDS)
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribe(charSequence -> {
-                        XJWorkEntity xjWorkItemEntity = getItem(getAdapterPosition());
+                        XJTaskWorkEntity xjWorkItemEntity = getItem(getAdapterPosition());
 
                         if (xjWorkItemEntity == null) {
                             return;
@@ -383,7 +383,7 @@ public class XJWorkAdapter extends BaseListDataRecyclerViewAdapter<XJWorkEntity>
                         sb2ThermometerHelper.startOrEnd(false);
                     }
 
-                    XJWorkEntity xjWorkItemEntity = getItem(getAdapterPosition());
+                    XJTaskWorkEntity xjWorkItemEntity = getItem(getAdapterPosition());
                     onItemChildViewClick(itemXJWorkTempBtn, 0, xjWorkItemEntity);
                     return true;
                 });
@@ -429,7 +429,7 @@ public class XJWorkAdapter extends BaseListDataRecyclerViewAdapter<XJWorkEntity>
             itemXJWorkResultSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
                 @Override
                 public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                    XJWorkEntity xjWorkItemEntity = getItem(getAdapterPosition());
+                    XJTaskWorkEntity xjWorkItemEntity = getItem(getAdapterPosition());
 
                     String value = (String) itemXJWorkResultSpinner.getSelectedItem();
                     if (xjWorkItemEntity == null) {
@@ -455,7 +455,7 @@ public class XJWorkAdapter extends BaseListDataRecyclerViewAdapter<XJWorkEntity>
             itemXJWorkConclusionSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
                 @Override
                 public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                    XJWorkEntity xjWorkItemEntity = getItem(getAdapterPosition());
+                    XJTaskWorkEntity xjWorkItemEntity = getItem(getAdapterPosition());
                     String value = (String) itemXJWorkConclusionSpinner.getSelectedItem();
                     if (TextUtils.isEmpty(value) || xjWorkItemEntity == null) {
                         return;
@@ -504,7 +504,7 @@ public class XJWorkAdapter extends BaseListDataRecyclerViewAdapter<XJWorkEntity>
 
             itemXJWorkResultSwitch.setOnChildViewClickListener((childView, action, obj) -> {
                 String result = (String) obj;
-                XJWorkEntity xjWorkEntity = getItem(getAdapterPosition());
+                XJTaskWorkEntity xjWorkEntity = getItem(getAdapterPosition());
 
                 if ("空".equals(result) || TextUtils.isEmpty(result)) {
                     xjWorkEntity.concluse = "";
@@ -516,7 +516,7 @@ public class XJWorkAdapter extends BaseListDataRecyclerViewAdapter<XJWorkEntity>
 
             itemXJWorkResultMultiSelect.setOnChildViewClickListener((childView, action, obj) -> {
                 LogUtil.d("" + obj);
-                XJWorkEntity xjWorkEntity = getItem(getAdapterPosition());
+                XJTaskWorkEntity xjWorkEntity = getItem(getAdapterPosition());
                 onItemChildViewClick(itemXJWorkResultMultiSelect, 0, xjWorkEntity);
             });
 
@@ -529,7 +529,7 @@ public class XJWorkAdapter extends BaseListDataRecyclerViewAdapter<XJWorkEntity>
 
         private void toggleFoldView() {
 
-            XJWorkEntity xjWorkEntity = getItem(getAdapterPosition());
+            XJTaskWorkEntity xjWorkEntity = getItem(getAdapterPosition());
             xjWorkEntity.isFold = !xjWorkEntity.isFold;
             if (xjWorkEntity.isFold) {
                 itemXJWorkMoreLayout.setVisibility(View.GONE);
@@ -541,7 +541,7 @@ public class XJWorkAdapter extends BaseListDataRecyclerViewAdapter<XJWorkEntity>
 
         }
 
-        private void autoJudge(XJWorkEntity xjWorkEntity) {
+        private void autoJudge(XJTaskWorkEntity xjWorkEntity) {
             if (xjWorkEntity.isAutoJudge && xjWorkEntity.normalRange != null && !TextUtils.isEmpty(xjWorkEntity.concluse)) {
 
                 String[] normalRangeArr = xjWorkEntity.normalRange.split(",");
@@ -554,7 +554,7 @@ public class XJWorkAdapter extends BaseListDataRecyclerViewAdapter<XJWorkEntity>
         }
 
         @Override
-        protected void update(XJWorkEntity data) {
+        protected void update(XJTaskWorkEntity data) {
             mXJCameraController.addListener(itemXJWorkPics, getAdapterPosition(), XJWorkAdapter.this);
 //            LogUtil.e("InputType"+SupPlantApplication.dao().getXJInputTypeEntityDao().loadAll());
             XJInputTypeEntity xjInputTypeEntity = SupPlantApplication.dao().getXJInputTypeEntityDao().queryBuilder()
@@ -811,7 +811,7 @@ public class XJWorkAdapter extends BaseListDataRecyclerViewAdapter<XJWorkEntity>
 
         @Override
         public void onChildViewClick(View childView, int action, Object obj) {
-            XJWorkEntity workItemEntity = getItem(getAdapterPosition());  //注：参数obj为空，实现的接口方法，接口中obj为null，非item对象
+            XJTaskWorkEntity workItemEntity = getItem(getAdapterPosition());  //注：参数obj为空，实现的接口方法，接口中obj为null，非item对象
             onItemChildViewClick(childView, action, workItemEntity);
         }
 
@@ -821,7 +821,7 @@ public class XJWorkAdapter extends BaseListDataRecyclerViewAdapter<XJWorkEntity>
          * @date 2018/4/11
          * @description 结论自动变动
          */
-        private boolean autoJudgeConclusion(XJWorkEntity xjWorkItemEntity, String charSequence) {
+        private boolean autoJudgeConclusion(XJTaskWorkEntity xjWorkItemEntity, String charSequence) {
 
             XJInputTypeEntity xjInputTypeEntity = SupPlantApplication.dao().getXJInputTypeEntityDao().queryBuilder()
                     .where(XJInputTypeEntityDao.Properties.Id.eq(xjWorkItemEntity.inputStandardId.id))
@@ -877,7 +877,7 @@ public class XJWorkAdapter extends BaseListDataRecyclerViewAdapter<XJWorkEntity>
          * @date 2018/4/12
          * @description 区间形式判定 eg: -12.45~-1.00
          */
-        private boolean intervalJudge(XJWorkEntity xjWorkItemEntity, String charSequence) {
+        private boolean intervalJudge(XJTaskWorkEntity xjWorkItemEntity, String charSequence) {
             String[] numArr = xjWorkItemEntity.normalRange.split("~");
             double small = Double.parseDouble(numArr[0]);
             double big = Double.parseDouble(numArr[1]);
@@ -895,19 +895,19 @@ public class XJWorkAdapter extends BaseListDataRecyclerViewAdapter<XJWorkEntity>
             return true;
         }
 
-        private void setAbnormal(XJWorkEntity xjWorkItemEntity) {
+        private void setAbnormal(XJTaskWorkEntity xjWorkItemEntity) {
             xjWorkItemEntity.conclusionID = "PATROL_realValue/abnormal";
             xjWorkItemEntity.conclusionName = realValueMap.get("PATROL_realValue/abnormal");
             itemXJWorkConclusionSpinner.setSelection(realValues.indexOf(xjWorkItemEntity.conclusionName));
         }
 
-        private void setDoubtful(XJWorkEntity xjWorkItemEntity) {
+        private void setDoubtful(XJTaskWorkEntity xjWorkItemEntity) {
             xjWorkItemEntity.conclusionID = "PATROL_realValue/doubtful";
             xjWorkItemEntity.conclusionName = realValueMap.get("PATROL_realValue/doubtful");
             itemXJWorkConclusionSpinner.setSelection(realValues.indexOf(xjWorkItemEntity.conclusionName));
         }
 
-        private void setNormal(XJWorkEntity xjWorkItemEntity) {
+        private void setNormal(XJTaskWorkEntity xjWorkItemEntity) {
             xjWorkItemEntity.conclusionID = "PATROL_realValue/normal";
             xjWorkItemEntity.conclusionName = realValueMap.get("PATROL_realValue/normal");
             itemXJWorkConclusionSpinner.setSelection(realValues.indexOf(xjWorkItemEntity.conclusionName));
@@ -919,7 +919,7 @@ public class XJWorkAdapter extends BaseListDataRecyclerViewAdapter<XJWorkEntity>
          * @date 2018/4/12
          * @description 区间形式判定 eg: ≥-15.5|≤-35.6，≤-35.6|≥-15.5
          */
-        private boolean orJudge(XJWorkEntity xjWorkItemEntity, String charSequence) {
+        private boolean orJudge(XJTaskWorkEntity xjWorkItemEntity, String charSequence) {
 
             String regExp = "(≥|≤|＞|＜)?";
 
@@ -973,7 +973,7 @@ public class XJWorkAdapter extends BaseListDataRecyclerViewAdapter<XJWorkEntity>
          * @date 2018/4/12
          * @description 区间形式判定 eg: ≥ 或 ≤ 或 ＞ 或 ＜
          */
-        private boolean unequalJudge(XJWorkEntity xjWorkItemEntity, String charSequence) {
+        private boolean unequalJudge(XJTaskWorkEntity xjWorkItemEntity, String charSequence) {
 
             String regExp = "(≥|≤|＞|＜)?";
             Pattern pattern = Pattern.compile(regExp);

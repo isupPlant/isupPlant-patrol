@@ -30,14 +30,16 @@ import com.supcon.mes.mbap.view.CustomImageButton;
 import com.supcon.mes.middleware.constant.Constant;
 import com.supcon.mes.middleware.model.bean.ObjectEntity;
 import com.supcon.mes.middleware.model.bean.xj.XJAreaEntity;
-import com.supcon.mes.middleware.model.bean.xj.XJWorkEntity;
+import com.supcon.mes.middleware.model.bean.xj.XJTaskAreaEntity;
+import com.supcon.mes.middleware.model.bean.xj.XJTaskEntity;
+import com.supcon.mes.middleware.model.bean.xj.XJTaskWorkEntity;
+import com.supcon.mes.middleware.model.bean.xj.XJTaskWorkEntity;
 import com.supcon.mes.middleware.util.ErrorMsgHelper;
 import com.supcon.mes.middleware.util.SystemCodeManager;
-import com.supcon.mes.middleware.util.XJCacheUtil;
+import com.supcon.mes.middleware.util.XJTaskCacheUtil;
 import com.supcon.mes.module_xj.R;
 import com.supcon.mes.module_xj.controller.XJCameraController;
 import com.supcon.mes.module_xj.model.api.XJTaskSubmitAPI;
-import com.supcon.mes.module_xj.model.bean.XJTaskEntity;
 import com.supcon.mes.module_xj.model.contract.XJTaskSubmitContract;
 import com.supcon.mes.module_xj.model.event.XJAreaRefreshEvent;
 import com.supcon.mes.module_xj.model.event.XJTempTaskUploadRefreshEvent;
@@ -49,7 +51,6 @@ import com.supcon.mes.testo_805i.controller.TestoController;
 import org.greenrobot.eventbus.EventBus;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -69,7 +70,7 @@ import io.reactivex.schedulers.Schedulers;
 @Router(Constant.Router.XJ_WORK_ITEM_VIEW)
 @Controller(value = {TestoController.class, XJCameraController.class})
 @Presenter({XJTaskSubmitPresenter.class})
-public class XJWorkViewActivity extends BaseRefreshRecyclerActivity<XJWorkEntity> implements XJTaskSubmitContract.View {
+public class XJWorkViewActivity extends BaseRefreshRecyclerActivity<XJTaskWorkEntity> implements XJTaskSubmitContract.View {
 
     @BindByTag("titleText")
     TextView titleText;
@@ -88,11 +89,11 @@ public class XJWorkViewActivity extends BaseRefreshRecyclerActivity<XJWorkEntity
 
     XJWorkViewAdapter mXJWorkItemAdapter;
 
-    XJAreaEntity mXJAreaEntity;
+    XJTaskAreaEntity mXJAreaEntity;
 
     ObjectEntity mDevice = null;
     List<String> deviceNames = new ArrayList<>();
-    private List<XJWorkEntity> mWorkEntities = new ArrayList<>();
+    private List<XJTaskWorkEntity> mWorkEntities = new ArrayList<>();
     private boolean isFromTask, isXJFinished;
     private XJTaskEntity mXJTaskEntity;
     @Override
@@ -115,13 +116,13 @@ public class XJWorkViewActivity extends BaseRefreshRecyclerActivity<XJWorkEntity
 
         if (!TextUtils.isEmpty(taskNo)) {
 
-            String taskStr = XJCacheUtil.getString(taskNo);
+            String taskStr = XJTaskCacheUtil.getString(taskNo);
             mXJTaskEntity = GsonUtil.gsonToBean(taskStr, XJTaskEntity.class);
         }
 
         if (xjAreaEntityStr != null && mXJTaskEntity != null) {
 
-            for(XJAreaEntity areaEntity: mXJTaskEntity.areas){
+            for(XJTaskAreaEntity areaEntity: mXJTaskEntity.areas){
                 if(xjAreaEntityStr.equals(String.valueOf(areaEntity.id))){
                     mXJAreaEntity = areaEntity;
                     break;
@@ -140,7 +141,7 @@ public class XJWorkViewActivity extends BaseRefreshRecyclerActivity<XJWorkEntity
         if(isFromTask){
 
             int finishNum = 0;
-            for(XJWorkEntity xjWorkEntity : mXJAreaEntity.works){
+            for(XJTaskWorkEntity xjWorkEntity : mXJAreaEntity.works){
                 if (xjWorkEntity.isFinished){
                     finishNum++;
                 }
@@ -212,13 +213,13 @@ public class XJWorkViewActivity extends BaseRefreshRecyclerActivity<XJWorkEntity
         mXJWorkItemAdapter.setOnItemChildViewClickListener(new OnItemChildViewClickListener() {
             @Override
             public void onItemChildViewClick(View childView, int position, int action, Object obj) {
-                XJWorkEntity xjWorkEntity;
+                XJTaskWorkEntity xjWorkEntity;
                 int imgIndex;
                 if (obj instanceof Integer){
                     imgIndex = (int)obj;
                     xjWorkEntity = null;
                 }else {
-                    xjWorkEntity = (XJWorkEntity)obj;
+                    xjWorkEntity = (XJTaskWorkEntity)obj;
                     imgIndex = 0;
 
                 }
@@ -278,7 +279,7 @@ public class XJWorkViewActivity extends BaseRefreshRecyclerActivity<XJWorkEntity
                 }, true)
                 .bindClickListener(R.id.redBtn, v -> {
                     //将本区域数据变成已完成
-                    for(XJWorkEntity xjWorkEntity : mXJAreaEntity.works){
+                    for(XJTaskWorkEntity xjWorkEntity : mXJAreaEntity.works){
                         xjWorkEntity.isFinished=true;
                     }
                     //拼接单个区域上传数据
@@ -292,7 +293,7 @@ public class XJWorkViewActivity extends BaseRefreshRecyclerActivity<XJWorkEntity
                 .show();
     }
 
-    private void redoWork(XJWorkEntity xjWorkEntity, int position) {
+    private void redoWork(XJTaskWorkEntity xjWorkEntity, int position) {
 
         if (!xjWorkEntity.isConclusionModify){  //禁修改(结论不可修改或免检)
 
@@ -329,12 +330,12 @@ public class XJWorkViewActivity extends BaseRefreshRecyclerActivity<XJWorkEntity
         boolean isAll;
         isAll = getString(R.string.xj_work_eam_all).equals(deviceName);
 
-        List<XJWorkEntity> workEntities = new ArrayList<>();
+        List<XJTaskWorkEntity> workEntities = new ArrayList<>();
         Flowable.fromIterable(mWorkEntities)
                 .subscribeOn(Schedulers.newThread())
-                .filter(new Predicate<XJWorkEntity>() {
+                .filter(new Predicate<XJTaskWorkEntity>() {
                     @Override
-                    public boolean test(XJWorkEntity xjWorkEntity) throws Exception {
+                    public boolean test(XJTaskWorkEntity xjWorkEntity) throws Exception {
 
                         if(isAll || xjWorkEntity.eamId!=null && xjWorkEntity.eamId.name!=null && xjWorkEntity.eamId.name.equals(deviceName)){
                             return true;
@@ -343,9 +344,9 @@ public class XJWorkViewActivity extends BaseRefreshRecyclerActivity<XJWorkEntity
                     }
                 })
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Consumer<XJWorkEntity>() {
+                .subscribe(new Consumer<XJTaskWorkEntity>() {
                     @Override
-                    public void accept(XJWorkEntity xjWorkEntity) throws Exception {
+                    public void accept(XJTaskWorkEntity xjWorkEntity) throws Exception {
                         workEntities.add(xjWorkEntity);
                     }
                 }, new Consumer<Throwable>() {
@@ -363,7 +364,7 @@ public class XJWorkViewActivity extends BaseRefreshRecyclerActivity<XJWorkEntity
 
 
     @Override
-    protected IListAdapter<XJWorkEntity> createAdapter() {
+    protected IListAdapter<XJTaskWorkEntity> createAdapter() {
         mXJWorkItemAdapter = new XJWorkViewAdapter(context, !getIntent().getBooleanExtra(Constant.IntentKey.XJ_IS_FINISHED, false));
         return mXJWorkItemAdapter;
     }
@@ -389,12 +390,12 @@ public class XJWorkViewActivity extends BaseRefreshRecyclerActivity<XJWorkEntity
 
     @SuppressLint("CheckResult")
     private void initWorks(){
-        List<XJWorkEntity> noEamWorks = new ArrayList<>();
+        List<XJTaskWorkEntity> noEamWorks = new ArrayList<>();
         Flowable.fromIterable(mXJAreaEntity.works)
                 .subscribeOn(Schedulers.newThread())
-                .filter(new Predicate<XJWorkEntity>() {
+                .filter(new Predicate<XJTaskWorkEntity>() {
                     @Override
-                    public boolean test(XJWorkEntity xjWorkEntity) throws Exception {
+                    public boolean test(XJTaskWorkEntity xjWorkEntity) throws Exception {
 
                         if(!xjWorkEntity.isFinished && !isXJFinished){
                             return false;
@@ -405,9 +406,9 @@ public class XJWorkViewActivity extends BaseRefreshRecyclerActivity<XJWorkEntity
                     }
                 })
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Consumer<XJWorkEntity>() {
+                .subscribe(new Consumer<XJTaskWorkEntity>() {
                     @Override
-                    public void accept(XJWorkEntity xjWorkEntity) throws Exception {
+                    public void accept(XJTaskWorkEntity xjWorkEntity) throws Exception {
 
 
                         if(xjWorkEntity.eamId == null || xjWorkEntity.eamId.id == null){
@@ -416,7 +417,7 @@ public class XJWorkViewActivity extends BaseRefreshRecyclerActivity<XJWorkEntity
                         else {
                             if (mDevice == null || mDevice.id != xjWorkEntity.eamLongId) {
                                 mDevice = xjWorkEntity.eamId;
-                                XJWorkEntity workEntity = new XJWorkEntity();
+                                XJTaskWorkEntity workEntity = new XJTaskWorkEntity();
                                 workEntity.eamId = mDevice;
                                 workEntity.eamLongId = mDevice.id;
                                 workEntity.isEamView = true;
@@ -438,7 +439,7 @@ public class XJWorkViewActivity extends BaseRefreshRecyclerActivity<XJWorkEntity
                     @Override
                     public void run() throws Exception {
                         if(noEamWorks.size() != 0){
-                            XJWorkEntity workEntity = new XJWorkEntity();
+                            XJTaskWorkEntity workEntity = new XJTaskWorkEntity();
                             workEntity.isEamView =true;
                             workEntity.eamNum = deviceNames.size() + 1;
 

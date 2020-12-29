@@ -5,11 +5,10 @@ import android.content.Context;
 
 import com.app.annotation.Presenter;
 import com.supcon.common.view.base.controller.BaseDataController;
-import com.supcon.common.view.util.LogUtil;
+import com.supcon.mes.middleware.model.bean.xj.XJTaskEntity;
 import com.supcon.mes.middleware.model.event.RefreshEvent;
 import com.supcon.mes.middleware.model.listener.OnAPIResultListener;
 import com.supcon.mes.module_xj.model.api.XJLocalTaskAPI;
-import com.supcon.mes.module_xj.model.bean.XJTaskEntity;
 import com.supcon.mes.module_xj.model.contract.XJLocalTaskContract;
 import com.supcon.mes.module_xj.presenter.XJLocalTaskPresenter;
 

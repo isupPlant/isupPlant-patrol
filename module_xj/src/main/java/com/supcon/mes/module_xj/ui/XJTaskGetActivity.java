@@ -25,19 +25,18 @@ import com.supcon.mes.middleware.constant.Constant;
 import com.supcon.mes.middleware.controller.DateFilterController;
 import com.supcon.mes.middleware.controller.SystemCodeJsonController;
 import com.supcon.mes.middleware.model.bean.CommonBAPListEntity;
+import com.supcon.mes.middleware.model.bean.xj.XJTaskEntity;
 import com.supcon.mes.middleware.model.event.RefreshEvent;
 import com.supcon.mes.middleware.model.inter.SystemCode;
 import com.supcon.mes.middleware.util.ErrorMsgHelper;
-import com.supcon.mes.middleware.util.XJCacheUtil;
+import com.supcon.mes.middleware.util.XJTaskCacheUtil;
 import com.supcon.mes.module_xj.R;
 import com.supcon.mes.module_xj.model.api.XJTaskAPI;
 import com.supcon.mes.module_xj.model.api.XJTaskStateAPI;
-import com.supcon.mes.module_xj.model.bean.XJTaskEntity;
 import com.supcon.mes.module_xj.model.bean.XJTaskGroupEntity;
 import com.supcon.mes.module_xj.model.contract.XJTaskContract;
 import com.supcon.mes.module_xj.model.contract.XJTaskStateContract;
 import com.supcon.mes.module_xj.presenter.XJRunningTaskPresenter;
-import com.supcon.mes.module_xj.presenter.XJTaskPresenter;
 import com.supcon.mes.module_xj.presenter.XJTaskStatePresenter;
 import com.supcon.mes.module_xj.ui.adapter.XJTaskGroupAdapter;
 
@@ -312,8 +311,8 @@ public class XJTaskGetActivity extends BaseRefreshRecyclerActivity<XJTaskGroupEn
                         taskMap.put(key, new ArrayList<>());
                     }
 
-                    if (XJCacheUtil.check(context, xjTaskEntity.tableNo)) {//清除历史数据
-                        XJCacheUtil.remove(xjTaskEntity.tableNo);
+                    if (XJTaskCacheUtil.check(xjTaskEntity.tableNo)) {//清除历史数据
+                        XJTaskCacheUtil.remove(xjTaskEntity.tableNo);
                     }
 
                     return true;
