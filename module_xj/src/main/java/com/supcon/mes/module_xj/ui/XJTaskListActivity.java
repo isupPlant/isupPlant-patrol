@@ -567,6 +567,9 @@ public class XJTaskListActivity extends BaseRefreshRecyclerActivity<XJTaskGroupE
                     if (taskStatusPosition == 1 && taskEntity != null && taskEntity.isFinished) {//待检过滤
                         return false;
                     }
+                    if (taskEntity != null){
+                        xjTaskEntity = taskEntity;
+                    }
 
                     String key = xjTaskEntity.workRoute.code + "" + DateUtil.dateFormat(xjTaskEntity.startTime);
 

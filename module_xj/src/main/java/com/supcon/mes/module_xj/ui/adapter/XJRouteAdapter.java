@@ -65,11 +65,18 @@ public class XJRouteAdapter extends BaseListDataRecyclerViewAdapter<XJRouteEntit
                 xjRouteType.setText(data.dept.name);
             else xjRouteType.setText("");
 
-            if(!TextUtils.isEmpty(data.remark)){
+//            if(!TextUtils.isEmpty(data.remark)){
+//                xjRouteRemark.setVisibility(View.VISIBLE);
+//                xjRouteRemark.setText(data.remark);
+//            }
+//            else{
+//                xjRouteRemark.setVisibility(View.GONE);
+//                xjRouteRemark.setText("");
+//            }
+            if (data.patrolType != null && !TextUtils.isEmpty(data.patrolType.value)){
                 xjRouteRemark.setVisibility(View.VISIBLE);
-                xjRouteRemark.setText(data.remark);
-            }
-            else{
+                xjRouteRemark.setText(data.patrolType.value);
+            } else {
                 xjRouteRemark.setVisibility(View.GONE);
                 xjRouteRemark.setText("");
             }
