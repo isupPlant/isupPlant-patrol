@@ -1,6 +1,7 @@
 package com.supcon.mes.module_xj.model.event;
 
 import com.supcon.mes.middleware.model.bean.xj.XJAreaEntity;
+import com.supcon.mes.middleware.model.bean.xj.XJTaskAreaEntity;
 import com.supcon.mes.middleware.model.event.BaseEvent;
 
 /**
@@ -9,13 +10,13 @@ import com.supcon.mes.middleware.model.event.BaseEvent;
  */
 public class XJAreaRefreshEvent extends BaseEvent {
 
-    private XJAreaEntity mXJAreaEntity;
+    private XJTaskAreaEntity mXJAreaEntity;
 
-    public XJAreaRefreshEvent(XJAreaEntity xjAreaEntity){
+    public XJAreaRefreshEvent(XJTaskAreaEntity xjAreaEntity){
         mXJAreaEntity = xjAreaEntity;
     }
 
-    public XJAreaEntity getXJAreaEntity() {
+    public XJTaskAreaEntity getXJAreaEntity() {
         return mXJAreaEntity;
     }
 }

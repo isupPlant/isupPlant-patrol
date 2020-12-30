@@ -1,6 +1,7 @@
 package com.supcon.mes.module_xj.model.bean;
 
 import com.supcon.common.com_http.BaseEntity;
+import com.supcon.mes.middleware.model.bean.xj.XJTaskEntity;
 
 import java.util.List;
 

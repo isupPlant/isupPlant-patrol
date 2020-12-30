@@ -6,9 +6,9 @@ import android.util.ArrayMap;
 
 import com.app.annotation.Presenter;
 import com.supcon.common.view.base.controller.BaseDataController;
-import com.supcon.mes.middleware.util.XJCacheUtil;
+import com.supcon.mes.middleware.model.bean.xj.XJTaskEntity;
+import com.supcon.mes.middleware.util.XJTaskCacheUtil;
 import com.supcon.mes.module_xj.model.api.XJLocalTaskAPI;
-import com.supcon.mes.module_xj.model.bean.XJTaskEntity;
 import com.supcon.mes.module_xj.model.contract.XJLocalTaskContract;
 import com.supcon.mes.module_xj.model.event.XJTaskRefreshEvent;
 import com.supcon.mes.module_xj.presenter.XJLocalTaskPresenter;
@@ -105,12 +105,12 @@ public class XJLocalTaskController extends BaseDataController implements XJLocal
     public void save(XJTaskEntity xjLocalTaskEntity) {
         String key = xjLocalTaskEntity.tableNo;
         mXJLocalTaskMap.put(key, xjLocalTaskEntity);
-        XJCacheUtil.putString(key, xjLocalTaskEntity.toString());
+        XJTaskCacheUtil.putString( xjLocalTaskEntity.toString());
     }
 
     public void add(XJTaskEntity xjLocalTaskEntity) {
         String key = xjLocalTaskEntity.tableNo;
         mXJLocalTaskMap.put(key, xjLocalTaskEntity);
-        XJCacheUtil.putString(key, xjLocalTaskEntity.toString());
+        XJTaskCacheUtil.putString(xjLocalTaskEntity.toString());
     }
 }

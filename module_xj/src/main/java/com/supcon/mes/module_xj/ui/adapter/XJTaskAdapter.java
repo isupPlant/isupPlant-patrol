@@ -11,8 +11,8 @@ import com.app.annotation.BindByTag;
 import com.supcon.common.view.base.adapter.BaseListDataRecyclerViewAdapter;
 import com.supcon.common.view.base.adapter.viewholder.BaseRecyclerViewHolder;
 import com.supcon.mes.mbap.utils.DateUtil;
+import com.supcon.mes.middleware.model.bean.xj.XJTaskEntity;
 import com.supcon.mes.module_xj.R;
-import com.supcon.mes.module_xj.model.bean.XJTaskEntity;
 
 import java.util.List;
 

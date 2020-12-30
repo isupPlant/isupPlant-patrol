@@ -11,9 +11,11 @@ import android.widget.TextView;
 import com.app.annotation.BindByTag;
 import com.supcon.common.view.base.adapter.BaseListDataRecyclerViewAdapter;
 import com.supcon.common.view.base.adapter.viewholder.BaseRecyclerViewHolder;
+import com.supcon.mes.mbap.utils.GsonUtil;
 import com.supcon.mes.middleware.SupPlantApplication;
-import com.supcon.mes.middleware.model.bean.xj.XJAreaEntity;
-import com.supcon.mes.middleware.model.bean.xj.XJAreaEntityDao;
+import com.supcon.mes.middleware.model.bean.xj.XJTaskAreaEntity;
+import com.supcon.mes.middleware.model.bean.xj.XJTaskWorkEntity;
+import com.supcon.mes.middleware.model.bean.xj.XJTaskWorkEntityDao;
 import com.supcon.mes.middleware.model.bean.xj.XJWorkEntity;
 import com.supcon.mes.middleware.model.bean.xj.XJWorkEntityDao;
 import com.supcon.mes.module_xj.R;
@@ -25,26 +27,26 @@ import java.util.List;
  * 巡检区域列表适配器,用于显示区域信息
  * Email:wangshizhan@supcom.com
  */
-public class XJAreaAdapter extends BaseListDataRecyclerViewAdapter<XJAreaEntity> {
+public class XJAreaAdapter extends BaseListDataRecyclerViewAdapter<XJTaskAreaEntity> {
 
 
     public XJAreaAdapter(Context context) {
         super(context);
     }
 
-    public XJAreaAdapter(Context context, List<XJAreaEntity> list) {
+    public XJAreaAdapter(Context context, List<XJTaskAreaEntity> list) {
         super(context, list);
     }
 
     public String exceptionIds;
     @Override
-    protected BaseRecyclerViewHolder<XJAreaEntity> getViewHolder(int viewType) {
+    protected BaseRecyclerViewHolder<XJTaskAreaEntity> getViewHolder(int viewType) {
 
         return new XJAreaViewHolder(context, parent);
     }
 
 
-    class XJAreaViewHolder extends BaseRecyclerViewHolder<XJAreaEntity>{
+    class XJAreaViewHolder extends BaseRecyclerViewHolder<XJTaskAreaEntity>{
 
         @BindByTag("itemXJAreaTag")
         ImageView itemXJAreaTag;
@@ -85,7 +87,7 @@ public class XJAreaAdapter extends BaseListDataRecyclerViewAdapter<XJAreaEntity>
 
 
         @Override
-        protected void update(XJAreaEntity data) {
+        protected void update(XJTaskAreaEntity data) {
             itemXJAreaName.setText(" "+(getAdapterPosition()+1)+" - "+data.name);
 
             if(data.hasYH){
@@ -101,8 +103,13 @@ public class XJAreaAdapter extends BaseListDataRecyclerViewAdapter<XJAreaEntity>
                         .where(XJWorkEntityDao.Properties.Ip.eq(SupPlantApplication.getIp()))
                         .orderAsc(XJWorkEntityDao.Properties.Sort)
                         .list();
+                String s= GsonUtil.gsonString(xjWorkEntities);
 
-                data.works = xjWorkEntities;
+                List<XJTaskWorkEntity> xjTaskWorkEntities=GsonUtil.jsonToList(s,XJTaskWorkEntity.class);
+                data.works = xjTaskWorkEntities;
+
+                //          XJTaskCacheUtil.insertTasksWork(data.tableNo,data.id,data.works);
+
                 if(xjWorkEntities!=null && xjWorkEntities.size()!=0){
 //                    data.process = String.format(context.getString(R.string.xj_area_process), "0",""+xjWorkEntities.size());
                     data.process = String.format(context.getString(R.string.xj_area_process), "0",""+data.getTotalNum(exceptionIds));
@@ -119,6 +126,24 @@ public class XJAreaAdapter extends BaseListDataRecyclerViewAdapter<XJAreaEntity>
 
             }
             else{
+                List<XJTaskWorkEntity> xjTaskWorkEntities = SupPlantApplication.dao().getXJTaskWorkEntityDao().queryBuilder()
+                        .where(XJTaskWorkEntityDao.Properties.AreaLongId.eq(data.id))
+                        .where(XJTaskWorkEntityDao.Properties.TableNo.eq(data.tableNo))
+                        .where(XJTaskWorkEntityDao.Properties.Ip.eq(SupPlantApplication.getIp()))
+                        .orderAsc(XJTaskWorkEntityDao.Properties.Sort)
+                        .list();
+
+                if (data.works==null){
+                    List<XJWorkEntity> xjWorkEntities = SupPlantApplication.dao().getXJWorkEntityDao().queryBuilder()
+                            .where(XJWorkEntityDao.Properties.AreaLongId.eq(data.id))
+                            .where(XJWorkEntityDao.Properties.Ip.eq(SupPlantApplication.getIp()))
+                            .orderAsc(XJWorkEntityDao.Properties.Sort)
+                            .list();
+                    String s= GsonUtil.gsonString(xjWorkEntities);
+
+                    xjTaskWorkEntities=GsonUtil.jsonToList(s,XJTaskWorkEntity.class);
+                }
+                data.works = xjTaskWorkEntities;
                 data.process = String.format(context.getString(R.string.xj_area_process), ""+data.finishNum,""+data.getTotalNum(exceptionIds));
                 itemXJAreaProcess.setText(data.process);
 

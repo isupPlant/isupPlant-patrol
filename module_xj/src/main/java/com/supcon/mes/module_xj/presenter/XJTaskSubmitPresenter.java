@@ -12,13 +12,16 @@ import com.supcon.mes.middleware.constant.Constant;
 import com.supcon.mes.middleware.model.bean.AttachmentEntity;
 import com.supcon.mes.middleware.model.bean.BAP5CommonEntity;
 import com.supcon.mes.middleware.model.bean.xj.XJAreaEntity;
+import com.supcon.mes.middleware.model.bean.xj.XJTaskAreaEntity;
+import com.supcon.mes.middleware.model.bean.xj.XJTaskEntity;
+import com.supcon.mes.middleware.model.bean.xj.XJTaskWorkEntity;
 import com.supcon.mes.middleware.model.bean.xj.XJWorkEntity;
 import com.supcon.mes.middleware.model.network.MiddlewareHttpClient;
 import com.supcon.mes.middleware.util.FileUtil;
 import com.supcon.mes.middleware.util.Util;
+import com.supcon.mes.middleware.util.XJTaskCacheUtil;
 import com.supcon.mes.middleware.util.ZipUtils;
 import com.supcon.mes.module_xj.R;
-import com.supcon.mes.module_xj.model.bean.XJTaskEntity;
 import com.supcon.mes.module_xj.model.bean.XJTaskUploadEntity;
 import com.supcon.mes.module_xj.model.bean.XJUploadEntity;
 import com.supcon.mes.module_xj.model.contract.XJTaskSubmitContract;
@@ -83,43 +86,49 @@ public class XJTaskSubmitPresenter extends XJTaskSubmitContract.Presenter {
         List<String> includeFiles = new ArrayList<>();
         includeFiles.add(XJ_UPLOAD_JSON_FILE_NAME);
 
-       for(XJTaskEntity xjTaskEntity : xjTaskEntities){
 
-           XJTaskUploadEntity xjTaskUploadEntity = new XJTaskUploadEntity(xjTaskEntity, isArea?"PATROL_taskState/running":"PATROL_taskState/completed");
-           xjTaskUploadEntity.actualStartTime = xjTaskEntity.realStartTime;
-           xjTaskUploadEntity.actualEndTime = xjTaskEntity.realEndTime;
+
+        for(XJTaskEntity xjTaskEntity : xjTaskEntities){
+            List<XJTaskAreaEntity> xjTaskAreaEntityList= XJTaskCacheUtil.getTaskArea(xjTaskEntity);
+            if (xjTaskAreaEntityList!=null){
+                xjTaskEntity.areas=new ArrayList<>();
+                xjTaskEntity.areas.addAll(xjTaskAreaEntityList);
+            }
+            XJTaskUploadEntity xjTaskUploadEntity = new XJTaskUploadEntity(xjTaskEntity, isArea?"PATROL_taskState/running":"PATROL_taskState/completed");
+            xjTaskUploadEntity.actualStartTime = xjTaskEntity.realStartTime;
+            xjTaskUploadEntity.actualEndTime = xjTaskEntity.realEndTime;
 
            if(xjTaskEntity.areas == null || xjTaskEntity.areas.size() == 0){
                continue;
            }
 
+            List<XJTaskAreaEntity> areaEntities = new ArrayList<>();
+            List<XJTaskWorkEntity> workEntities = new ArrayList<>();
 
-           List<XJAreaEntity> areaEntities = new ArrayList<>();
-           List<XJWorkEntity> workEntities = new ArrayList<>();
+            for(XJTaskAreaEntity xjAreaEntity : xjTaskEntity.areas){
+                if(xjAreaEntity.works!=null && xjAreaEntity.works.size()!=0){
+                    areaEntities.add(xjAreaEntity);
+                    workEntities.addAll(xjAreaEntity.works);
+                }
+            }
 
-           for(XJAreaEntity xjAreaEntity : xjTaskEntity.areas){
-               if(xjAreaEntity.works!=null && xjAreaEntity.works.size()!=0){
-                   areaEntities.add(xjAreaEntity);
-                   workEntities.addAll(xjAreaEntity.works);
-               }
-           }
+            //TODO...处理图片、json文件的压缩
+            for (XJTaskWorkEntity xjWorkEntity : workEntities) {
+                if(xjWorkEntity.xjImgName == null){
+                    continue;
+                }
+                xjWorkEntity.xjImgName = xjWorkEntity.xjImgName.replaceAll("/storage/emulated/0/isupPlant/xj/pics/", "");
+                String imgUrl = xjWorkEntity.xjImgName;
 
-           //TODO...处理图片、json文件的压缩
-           for (XJWorkEntity xjWorkEntity : workEntities) {
-               if(xjWorkEntity.xjImgName == null){
-                   continue;
-               }
-               xjWorkEntity.xjImgName = xjWorkEntity.xjImgName.replaceAll("/storage/emulated/0/isupPlant/xj/pics/", "");
-               String imgUrl = xjWorkEntity.xjImgName;
+                if (!TextUtils.isEmpty(imgUrl)) {
+                    if (imgUrl.contains(",")) {
+                        includeFiles.addAll(Arrays.asList(imgUrl.split(",")));
+                    } else {
+                        includeFiles.add(imgUrl);
+                    }
+                }
+            }
 
-               if (!TextUtils.isEmpty(imgUrl)) {
-                   if (imgUrl.contains(",")) {
-                       includeFiles.addAll(Arrays.asList(imgUrl.split(",")));
-                   } else {
-                       includeFiles.add(imgUrl);
-                   }
-               }
-           }
 
            if(areaEntities.size() !=0 ){
                xjTaskUploadEntity.setWorkAreas(areaEntities);

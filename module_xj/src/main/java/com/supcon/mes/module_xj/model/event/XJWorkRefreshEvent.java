@@ -1,5 +1,6 @@
 package com.supcon.mes.module_xj.model.event;
 
+import com.supcon.mes.middleware.model.bean.xj.XJTaskWorkEntity;
 import com.supcon.mes.middleware.model.bean.xj.XJWorkEntity;
 import com.supcon.mes.middleware.model.event.BaseEvent;
 
@@ -11,16 +12,16 @@ public class XJWorkRefreshEvent extends BaseEvent {
 
     private int position;
     private boolean isFinish = false;
-    private XJWorkEntity mXJWorkEntity;
+    private XJTaskWorkEntity mXJWorkEntity;
     public XJWorkRefreshEvent(){
 
     }
 
-    public XJWorkRefreshEvent(XJWorkEntity xjWorkEntity){
+    public XJWorkRefreshEvent(XJTaskWorkEntity xjWorkEntity){
         mXJWorkEntity = xjWorkEntity;
     }
 
-    public XJWorkEntity getXJWorkEntity() {
+    public XJTaskWorkEntity getXJWorkEntity() {
         return mXJWorkEntity;
     }
 

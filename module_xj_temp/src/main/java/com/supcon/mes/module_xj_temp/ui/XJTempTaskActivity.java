@@ -14,8 +14,6 @@ import com.app.annotation.apt.Router;
 import com.jakewharton.rxbinding2.view.RxView;
 import com.supcon.common.view.base.activity.BaseControllerActivity;
 import com.supcon.common.view.listener.OnChildViewClickListener;
-import com.supcon.common.view.util.LogUtil;
-import com.supcon.common.view.util.SharedPreferencesUtils;
 import com.supcon.common.view.util.StatusBarUtils;
 import com.supcon.common.view.util.ToastUtils;
 import com.supcon.mes.mbap.constant.ViewAction;
@@ -26,16 +24,18 @@ import com.supcon.mes.mbap.view.CustomImageButton;
 import com.supcon.mes.mbap.view.CustomTextView;
 import com.supcon.mes.middleware.SupPlantApplication;
 import com.supcon.mes.middleware.constant.Constant;
-import com.supcon.mes.middleware.model.bean.xj.XJAreaEntity;
-import com.supcon.mes.middleware.model.bean.xj.XJAreaEntityDao;
+import com.supcon.mes.middleware.model.bean.xj.XJTaskAreaEntity;
+import com.supcon.mes.middleware.model.bean.xj.XJTaskAreaEntityDao;
 import com.supcon.mes.middleware.model.bean.xj.XJRouteEntity;
+import com.supcon.mes.middleware.model.bean.xj.XJTaskAreaEntity;
+import com.supcon.mes.middleware.model.bean.xj.XJTaskEntity;
+import com.supcon.mes.middleware.model.bean.xj.XJTaskRouteEntity;
 import com.supcon.mes.middleware.model.bean.xj.XJWorkEntity;
 import com.supcon.mes.middleware.model.bean.xj.XJWorkEntityDao;
 import com.supcon.mes.middleware.model.event.SelectDataEvent;
 import com.supcon.mes.middleware.model.listener.DateSelectListener;
 import com.supcon.mes.middleware.util.SystemCodeManager;
-import com.supcon.mes.middleware.util.XJCacheUtil;
-import com.supcon.mes.module_xj.model.bean.XJTaskEntity;
+import com.supcon.mes.middleware.util.XJTaskCacheUtil;
 import com.supcon.mes.module_xj.model.event.XJTempTaskAddEvent;
 import com.supcon.mes.module_xj_temp.IntentRouter;
 import com.supcon.mes.module_xj_temp.R;
@@ -107,7 +107,7 @@ public class XJTempTaskActivity extends BaseControllerActivity {
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onDataSelect(SelectDataEvent event) {
         if ("selectRoute".equals(event.getSelectTag())) {
-            mXJTaskEntity.workRoute = (XJRouteEntity) event.getEntity();
+            mXJTaskEntity.workRoute = (XJTaskRouteEntity) event.getEntity();
             mXJTaskEntity.patrolType = SystemCodeManager.getInstance().getSystemCodeEntity(mXJTaskEntity.workRoute.patrolType.id);
 //            mXJTaskEntity.workRoute.name = mXJTaskEntity.workRoute.name+"Temp";
        //     mXJTaskEntity.tableNo = getResources().getString(R.string.xj_temp_task);
@@ -115,13 +115,13 @@ public class XJTempTaskActivity extends BaseControllerActivity {
             mXJTaskEntity.staffName = SupPlantApplication.getAccountInfo().staffName;
 
             xjTempTaskRouteSelect.setContent(mXJTaskEntity.workRoute.name + getResources().getString(R.string.xj_temp_task));
-            List<XJAreaEntity> areaEntities = SupPlantApplication.dao().getXJAreaEntityDao().queryBuilder()
-                    .where(XJAreaEntityDao.Properties.WorkRouteId.eq(mXJTaskEntity.workRoute.id))
-                    .where(XJAreaEntityDao.Properties.Valid.eq(true))
-                    .where(XJAreaEntityDao.Properties.Ip.eq(SupPlantApplication.getIp()))
+            List<XJTaskAreaEntity> areaEntities = SupPlantApplication.dao().getXJTaskAreaEntityDao().queryBuilder()
+                    .where(XJTaskAreaEntityDao.Properties.WorkRouteId.eq(mXJTaskEntity.workRoute.id))
+                    .where(XJTaskAreaEntityDao.Properties.Valid.eq(true))
+                    .where(XJTaskAreaEntityDao.Properties.Ip.eq(SupPlantApplication.getIp()))
                     .list();
 
-            List<XJAreaEntity> xjAreaData = null;
+            List<XJTaskAreaEntity> xjAreaData = null;
             //过滤设备相关巡检区域
             if (eamId != -1) {
                 xjAreaData = getDeviceXJData(areaEntities);
@@ -142,8 +142,8 @@ public class XJTempTaskActivity extends BaseControllerActivity {
      * @return
      */
     @SuppressLint("CheckResult")
-    private List<XJAreaEntity> getDeviceXJData(List<XJAreaEntity> areaEntities) {
-        List<XJAreaEntity> deviceAreaEntity = new ArrayList<>();
+    private List<XJTaskAreaEntity> getDeviceXJData(List<XJTaskAreaEntity> areaEntities) {
+        List<XJTaskAreaEntity> deviceAreaEntity = new ArrayList<>();
         for (int i = 0; i < areaEntities.size(); i++) {
             List<XJWorkEntity> deviceWork = new ArrayList<>();
             List<XJWorkEntity> works = SupPlantApplication.dao().getXJWorkEntityDao().queryBuilder()
@@ -208,7 +208,7 @@ public class XJTempTaskActivity extends BaseControllerActivity {
                             return;
                         }
                         boolean isHaveAreas = false;
-                        for (XJAreaEntity xjAreaEntity : mXJTaskEntity.areas) {
+                        for (XJTaskAreaEntity xjAreaEntity : mXJTaskEntity.areas) {
                             if (xjAreaEntity.isChecked) {
                                 isHaveAreas = true;
                             }
@@ -220,7 +220,7 @@ public class XJTempTaskActivity extends BaseControllerActivity {
 
                         for (int i = mXJTaskEntity.areas.size() - 1; i >= 0; i--) {
 
-                            XJAreaEntity xjAreaEntity = mXJTaskEntity.areas.get(i);
+                            XJTaskAreaEntity xjAreaEntity = mXJTaskEntity.areas.get(i);
                             if (!xjAreaEntity.isChecked) {
                                 mXJTaskEntity.areas.remove(i);
                             }
@@ -234,7 +234,7 @@ public class XJTempTaskActivity extends BaseControllerActivity {
                                 .bindClickListener(R.id.redBtn, new View.OnClickListener() {
                                             @Override
                                             public void onClick(View view) {
-                                                XJCacheUtil.putString(mXJTaskEntity.tableNo, mXJTaskEntity.toString());
+                                                XJTaskCacheUtil.putString( mXJTaskEntity.toString());
                                                 EventBus.getDefault().post(new XJTempTaskAddEvent(mXJTaskEntity));
                                                 back();
                                             }

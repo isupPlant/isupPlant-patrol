@@ -1,8 +1,7 @@
 package com.supcon.mes.module_xj.model.api;
 
 import com.app.annotation.apt.ContractFactory;
-import com.supcon.common.com_http.NullEntity;
-import com.supcon.mes.module_xj.model.bean.XJTaskEntity;
+import com.supcon.mes.middleware.model.bean.xj.XJTaskEntity;
 
 import java.util.List;
 import java.util.Map;

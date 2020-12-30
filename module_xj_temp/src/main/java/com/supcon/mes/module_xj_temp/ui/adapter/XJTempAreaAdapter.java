@@ -11,8 +11,10 @@ import com.app.annotation.BindByTag;
 import com.jakewharton.rxbinding2.view.RxView;
 import com.supcon.common.view.base.adapter.BaseListDataRecyclerViewAdapter;
 import com.supcon.common.view.base.adapter.viewholder.BaseRecyclerViewHolder;
+import com.supcon.mes.mbap.utils.GsonUtil;
 import com.supcon.mes.middleware.SupPlantApplication;
-import com.supcon.mes.middleware.model.bean.xj.XJAreaEntity;
+import com.supcon.mes.middleware.model.bean.xj.XJTaskAreaEntity;
+import com.supcon.mes.middleware.model.bean.xj.XJTaskWorkEntity;
 import com.supcon.mes.middleware.model.bean.xj.XJWorkEntity;
 import com.supcon.mes.middleware.model.bean.xj.XJWorkEntityDao;
 import com.supcon.mes.module_xj_temp.R;
@@ -26,24 +28,24 @@ import io.reactivex.functions.Consumer;
  * Created by wangshizhan on 2020/3/24
  * Email:wangshizhan@supcom.com
  */
-public class XJTempAreaAdapter extends BaseListDataRecyclerViewAdapter<XJAreaEntity> {
+public class XJTempAreaAdapter extends BaseListDataRecyclerViewAdapter<XJTaskAreaEntity> {
 
     public XJTempAreaAdapter(Context context) {
         super(context);
     }
 
-    public XJTempAreaAdapter(Context context, List<XJAreaEntity> list) {
+    public XJTempAreaAdapter(Context context, List<XJTaskAreaEntity> list) {
         super(context, list);
     }
 
     @Override
-    protected BaseRecyclerViewHolder<XJAreaEntity> getViewHolder(int viewType) {
+    protected BaseRecyclerViewHolder<XJTaskAreaEntity> getViewHolder(int viewType) {
 
         return new XJTempAreaViewHolder(context, parent);
     }
 
 
-    class XJTempAreaViewHolder extends BaseRecyclerViewHolder<XJAreaEntity>{
+    class XJTempAreaViewHolder extends BaseRecyclerViewHolder<XJTaskAreaEntity>{
 
         @BindByTag("itemXJTempAreaTag")
         ImageView itemXJTempAreaTag;
@@ -90,7 +92,7 @@ public class XJTempAreaAdapter extends BaseListDataRecyclerViewAdapter<XJAreaEnt
                     .subscribe(new Consumer<Object>() {
                         @Override
                         public void accept(Object o) throws Exception {
-                            XJAreaEntity xjAreaEntity = getItem(getAdapterPosition());
+                            XJTaskAreaEntity xjAreaEntity = getItem(getAdapterPosition());
                             if(xjAreaEntity != null){
                                 xjAreaEntity.isChecked = !xjAreaEntity.isChecked;
                                 notifyItemChanged(getAdapterPosition());
@@ -103,7 +105,7 @@ public class XJTempAreaAdapter extends BaseListDataRecyclerViewAdapter<XJAreaEnt
                     .subscribe(new Consumer<Object>() {
                         @Override
                         public void accept(Object o) throws Exception {
-                            XJAreaEntity xjAreaEntity = getItem(getAdapterPosition());
+                            XJTaskAreaEntity xjAreaEntity = getItem(getAdapterPosition());
                             if(xjAreaEntity != null){
                                 xjAreaEntity.isChecked = !xjAreaEntity.isChecked;
                                 notifyItemChanged(getAdapterPosition());
@@ -115,7 +117,7 @@ public class XJTempAreaAdapter extends BaseListDataRecyclerViewAdapter<XJAreaEnt
 
 
         @Override
-        protected void update(XJAreaEntity data) {
+        protected void update(XJTaskAreaEntity data) {
             itemXJTempAreaName.setText(String.valueOf((getAdapterPosition() + 1) + " - " + data.name));
 
             if (data.isChecked) {
@@ -141,7 +143,9 @@ public class XJTempAreaAdapter extends BaseListDataRecyclerViewAdapter<XJAreaEnt
                     itemXJTempAreaWorkNum.setText("0");
                 }
 
-                data.works = xjWorkEntities;
+                String s= GsonUtil.gsonString(xjWorkEntities);
+                List<XJTaskWorkEntity> xjTaskWorkEntities=GsonUtil.jsonToList(s,XJTaskWorkEntity.class);
+                data.works = xjTaskWorkEntities;
             }
 
 

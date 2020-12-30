@@ -1,7 +1,5 @@
 package com.supcon.mes.module_xj.model.event;
 
-import com.supcon.mes.middleware.model.bean.xj.XJAreaEntity;
-import com.supcon.mes.module_xj.model.bean.XJTaskEntity;
 import com.supcon.mes.sb2.model.event.BaseEvent;
 
 /**

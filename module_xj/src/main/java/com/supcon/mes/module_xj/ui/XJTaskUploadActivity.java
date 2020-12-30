@@ -19,32 +19,23 @@ import com.supcon.common.view.util.DisplayUtil;
 import com.supcon.common.view.util.LogUtil;
 import com.supcon.common.view.util.StatusBarUtils;
 import com.supcon.common.view.util.ToastUtils;
-import com.supcon.common.view.view.loader.base.OnLoaderFinishListener;
 import com.supcon.mes.mbap.utils.DateUtil;
-import com.supcon.mes.mbap.utils.GsonUtil;
 import com.supcon.mes.mbap.utils.SpaceItemDecoration;
 import com.supcon.mes.mbap.view.CustomImageButton;
 import com.supcon.mes.middleware.SupPlantApplication;
 import com.supcon.mes.middleware.constant.Constant;
 import com.supcon.mes.middleware.controller.DateFilterController;
-import com.supcon.mes.middleware.controller.SystemCodeJsonController;
+import com.supcon.mes.middleware.model.bean.xj.XJTaskEntity;
 import com.supcon.mes.middleware.model.event.RefreshEvent;
-import com.supcon.mes.middleware.model.inter.SystemCode;
-import com.supcon.mes.middleware.model.listener.DateSelectListener;
 import com.supcon.mes.middleware.util.ErrorMsgHelper;
-import com.supcon.mes.middleware.util.XJCacheUtil;
-import com.supcon.mes.module_xj.IntentRouter;
+import com.supcon.mes.middleware.util.XJTaskCacheUtil;
 import com.supcon.mes.module_xj.R;
 import com.supcon.mes.module_xj.model.api.XJLocalTaskAPI;
-import com.supcon.mes.module_xj.model.api.XJTaskStateAPI;
 import com.supcon.mes.module_xj.model.api.XJTaskSubmitAPI;
-import com.supcon.mes.module_xj.model.bean.XJTaskEntity;
 import com.supcon.mes.module_xj.model.bean.XJTaskGroupEntity;
 import com.supcon.mes.module_xj.model.contract.XJLocalTaskContract;
-import com.supcon.mes.module_xj.model.contract.XJTaskStateContract;
 import com.supcon.mes.module_xj.model.contract.XJTaskSubmitContract;
 import com.supcon.mes.module_xj.presenter.XJLocalTaskPresenter;
-import com.supcon.mes.module_xj.presenter.XJTaskStatePresenter;
 import com.supcon.mes.module_xj.presenter.XJTaskSubmitPresenter;
 import com.supcon.mes.module_xj.ui.adapter.XJTaskGroupAdapter;
 
@@ -477,7 +468,7 @@ public class XJTaskUploadActivity extends BaseRefreshRecyclerActivity<XJTaskGrou
     public void uploadXJDataSuccess(Long id) {
         onLoadSuccess(context.getResources().getString(R.string.operate_succeed));
         for(XJTaskEntity xjTaskEntity : mUploadTasks){
-            XJCacheUtil.remove(xjTaskEntity.tableNo);
+            XJTaskCacheUtil.remove(xjTaskEntity.tableNo);
         }
         refreshListController.refreshBegin();
 
