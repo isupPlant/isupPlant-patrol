@@ -59,7 +59,6 @@ import com.supcon.mes.module_xj.model.event.XJTempTaskUploadRefreshEvent;
 import com.supcon.mes.module_xj.presenter.XJTaskSubmitPresenter;
 import com.supcon.mes.module_xj.presenter.XJUpdateTaskStatusPresenter;
 import com.supcon.mes.module_xj.ui.adapter.XJAreaAdapter;
-import com.supcon.mes.module_xj.util.BundleSaveUtil;
 import com.supcon.mes.nfc.model.bean.NFCEntity;
 import com.supcon.mes.sb2.model.event.BarcodeEvent;
 import com.supcon.mes.sb2.model.event.SB2AttachEvent;
@@ -74,10 +73,8 @@ import org.greenrobot.eventbus.ThreadMode;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 import io.reactivex.Flowable;
@@ -85,7 +82,6 @@ import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.functions.Consumer;
 import io.reactivex.functions.Function;
 import io.reactivex.schedulers.Schedulers;
-import retrofit2.http.HEAD;
 
 
 /**
@@ -101,7 +97,7 @@ import retrofit2.http.HEAD;
         Constant.SystemCode.PATROL_passReason
 })
 public class XJTaskDetailActivity extends BaseControllerActivity implements XJTaskSubmitContract.View
-        , IMap ,
+        , IMap,
         XJUpdateStatusContract.View {
 
     @BindByTag("xjTaskDetailRouteName")
@@ -357,12 +353,12 @@ public class XJTaskDetailActivity extends BaseControllerActivity implements XJTa
                     + " - " + DateUtil.dateFormat(mXJTaskEntity.endTime, "MM-dd HH:mm"));
 
             if (mXJTaskEntity.attrMap != null)
-            for(String key : mXJTaskEntity.attrMap.keySet()) {
-                String value = (String) mXJTaskEntity.attrMap.get(key);
-                if (!TextUtils.isEmpty(value)){
-                    xjTaskDetailStaff.setText("" + value);
+                for (String key : mXJTaskEntity.attrMap.keySet()) {
+                    String value = (String) mXJTaskEntity.attrMap.get(key);
+                    if (!TextUtils.isEmpty(value)) {
+                        xjTaskDetailStaff.setText("" + value);
+                    }
                 }
-            }
             else if (mXJTaskEntity.isTemp) {
                 xjTaskDetailStaff.setText(mXJTaskEntity.staffName);
             }
@@ -384,22 +380,6 @@ public class XJTaskDetailActivity extends BaseControllerActivity implements XJTa
 
             mXJTaskEntity.areas = areaEntities;
 
-
-            //过滤没有巡检项的巡检区域，不显示
-            List<Integer> noAreaList = new ArrayList<>();
-            for (int i = 0; i < mXJTaskEntity.areas.size(); i++) {
-                List<XJWorkEntity> xjWorkEntities = SupPlantApplication.dao().getXJWorkEntityDao().queryBuilder()
-                        .where(XJWorkEntityDao.Properties.AreaLongId.eq(mXJTaskEntity.areas.get(i).id))
-                        .where(XJWorkEntityDao.Properties.Ip.eq(SupPlantApplication.getIp()))
-                        .orderAsc(XJWorkEntityDao.Properties.Sort)
-                        .list();
-                if (xjWorkEntities == null || xjWorkEntities.size() == 0) {
-                    noAreaList.add(i);
-                }
-            }
-            for (int d:noAreaList){
-                mXJTaskEntity.areas.remove(d);
-            }
         }
 
 
@@ -408,7 +388,21 @@ public class XJTaskDetailActivity extends BaseControllerActivity implements XJTa
             ToastUtils.show(context, getString(R.string.xj_area_empty_warning));
 
         }
-
+        //过滤没有巡检项的巡检区域，不显示
+        List<Integer> noAreaList = new ArrayList<>();
+        for (int i = 0; i < mXJTaskEntity.areas.size(); i++) {
+            List<XJWorkEntity> xjWorkEntities = SupPlantApplication.dao().getXJWorkEntityDao().queryBuilder()
+                    .where(XJWorkEntityDao.Properties.AreaLongId.eq(mXJTaskEntity.areas.get(i).id))
+                    .where(XJWorkEntityDao.Properties.Ip.eq(SupPlantApplication.getIp()))
+                    .orderAsc(XJWorkEntityDao.Properties.Sort)
+                    .list();
+            if (xjWorkEntities == null || xjWorkEntities.size() == 0) {
+                noAreaList.add(i);
+            }
+        }
+        for (int d : noAreaList) {
+            mXJTaskEntity.areas.remove(d);
+        }
         mXJAreaAdapter = new XJAreaAdapter(context);
 
         xjTaskDetailContentView.setLayoutManager(new LinearLayoutManager(context));
@@ -454,28 +448,28 @@ public class XJTaskDetailActivity extends BaseControllerActivity implements XJTa
                     .subscribe(o -> {
                         if (mXJTaskEntity.realStartTime == 0) {
 
-                        if (mXJTaskEntity.areas == null || mXJTaskEntity.areas.size() == 0) {
-                            //                   ToastUtils.show(context, getString(R.string.xj_area_sign_warning2));
-                            showDialog();
-                            return;
-                        }
-
-                        mXJTaskEntity.realStartTime = System.currentTimeMillis();
-                        XJCacheUtil.putStringAsync(mXJTaskEntity.tableNo, mXJTaskEntity.toString(), new XJCacheUtil.Callback() {
-                            @Override
-                            public void apply() {
-                                LogUtil.d("保存成功");
+                            if (mXJTaskEntity.areas == null || mXJTaskEntity.areas.size() == 0) {
+                                //                   ToastUtils.show(context, getString(R.string.xj_area_sign_warning2));
+                                showDialog();
+                                return;
                             }
-                        });
-                        //开始巡检
-                        xjTaskDetailTaskBtn.setBackgroundResource(R.drawable.sl_xj_task_red);
-                        xjTaskDetailTaskBtn.setText(getString(R.string.xj_task_end));
-                        if (mXJTaskEntity.id != null) {//临时巡检不需要上传任务状态
-                            presenterRouter.create(XJUpdateStatusAPI.class).updateXJTaskStatus(mXJTaskEntity.id, "PATROL_taskState/running");
+
+                            mXJTaskEntity.realStartTime = System.currentTimeMillis();
+                            XJCacheUtil.putStringAsync(mXJTaskEntity.tableNo, mXJTaskEntity.toString(), new XJCacheUtil.Callback() {
+                                @Override
+                                public void apply() {
+                                    LogUtil.d("保存成功");
+                                }
+                            });
+                            //开始巡检
+                            xjTaskDetailTaskBtn.setBackgroundResource(R.drawable.sl_xj_task_red);
+                            xjTaskDetailTaskBtn.setText(getString(R.string.xj_task_end));
+                            if (mXJTaskEntity.id != null) {//临时巡检不需要上传任务状态
+                                presenterRouter.create(XJUpdateStatusAPI.class).updateXJTaskStatus(mXJTaskEntity.id, "PATROL_taskState/running");
+                            }
+                        } else {
+                            showFinishDialog();
                         }
-                    } else {
-                        showFinishDialog();
-                    }
 //                            if (mXJTaskEntity.areas == null || mXJTaskEntity.areas.size() == 0) {
 //                                //                   ToastUtils.show(context, getString(R.string.xj_area_sign_warning2));
 //                                showDialog();
@@ -667,10 +661,11 @@ public class XJTaskDetailActivity extends BaseControllerActivity implements XJTa
                 });
 
     }
+
     @SuppressLint("CheckResult")
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onTempTaskUploadRefresh(XJTempTaskUploadRefreshEvent event) {
-        mXJTaskEntity.id=event.getId();
+        mXJTaskEntity.id = event.getId();
         XJCacheUtil.putStringAsync(mXJTaskEntity.tableNo, mXJTaskEntity.toString(), new XJCacheUtil.Callback() {
             @Override
             public void apply() {
@@ -719,6 +714,7 @@ public class XJTaskDetailActivity extends BaseControllerActivity implements XJTa
 //    }
 
 //    private Set<String> scannedCodeSet = new HashSet<>();
+
     /**
      * @param
      * @return
