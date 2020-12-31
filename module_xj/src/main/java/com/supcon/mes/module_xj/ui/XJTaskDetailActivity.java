@@ -620,7 +620,6 @@ public class XJTaskDetailActivity extends BaseControllerActivity implements XJTa
     private void doGoArea(XJTaskAreaEntity xjAreaEntity) {
         Bundle bundle = new Bundle();
 //        LogUtil.e("ciruy", TextUtils.isEmpty(mXJTaskEntity.exceptinWorkIds)?"":mXJTaskEntity.exceptinWorkIds);
-        Collections.sort(xjAreaEntity.works);
         bundle.putString(Constant.IntentKey.XJ_AREA_ENTITY_STR, String.valueOf(xjAreaEntity.id));
         bundle.putString(Constant.IntentKey.XJ_TASK_NO_STR, mXJTaskEntity.tableNo);
         bundle.putString(Constant.IntentKey.XJ_AREA_EXCEPTION_IDS, mXJTaskEntity.exceptinWorkIds);
