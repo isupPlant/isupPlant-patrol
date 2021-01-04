@@ -18,12 +18,15 @@ import com.supcon.common.view.util.StatusBarUtils;
 import com.supcon.common.view.util.ToastUtils;
 import com.supcon.mes.mbap.constant.ViewAction;
 import com.supcon.mes.mbap.utils.DateUtil;
+import com.supcon.mes.mbap.utils.GsonUtil;
 import com.supcon.mes.mbap.utils.SpaceItemDecoration;
 import com.supcon.mes.mbap.view.CustomDialog;
 import com.supcon.mes.mbap.view.CustomImageButton;
 import com.supcon.mes.mbap.view.CustomTextView;
 import com.supcon.mes.middleware.SupPlantApplication;
 import com.supcon.mes.middleware.constant.Constant;
+import com.supcon.mes.middleware.model.bean.xj.XJAreaEntity;
+import com.supcon.mes.middleware.model.bean.xj.XJAreaEntityDao;
 import com.supcon.mes.middleware.model.bean.xj.XJTaskAreaEntity;
 import com.supcon.mes.middleware.model.bean.xj.XJTaskAreaEntityDao;
 import com.supcon.mes.middleware.model.bean.xj.XJRouteEntity;
@@ -107,7 +110,9 @@ public class XJTempTaskActivity extends BaseControllerActivity {
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onDataSelect(SelectDataEvent event) {
         if ("selectRoute".equals(event.getSelectTag())) {
-            mXJTaskEntity.workRoute = (XJTaskRouteEntity) event.getEntity();
+            String s= GsonUtil.gsonString(event.getEntity());
+            XJTaskRouteEntity xjTaskRouteEntity=GsonUtil.gsonToBean(s,XJTaskRouteEntity.class);
+            mXJTaskEntity.workRoute = (xjTaskRouteEntity) ;
             mXJTaskEntity.patrolType = SystemCodeManager.getInstance().getSystemCodeEntity(mXJTaskEntity.workRoute.patrolType.id);
 //            mXJTaskEntity.workRoute.name = mXJTaskEntity.workRoute.name+"Temp";
        //     mXJTaskEntity.tableNo = getResources().getString(R.string.xj_temp_task);
@@ -115,11 +120,17 @@ public class XJTempTaskActivity extends BaseControllerActivity {
             mXJTaskEntity.staffName = SupPlantApplication.getAccountInfo().staffName;
 
             xjTempTaskRouteSelect.setContent(mXJTaskEntity.workRoute.name + getResources().getString(R.string.xj_temp_task));
-            List<XJTaskAreaEntity> areaEntities = SupPlantApplication.dao().getXJTaskAreaEntityDao().queryBuilder()
-                    .where(XJTaskAreaEntityDao.Properties.WorkRouteId.eq(mXJTaskEntity.workRoute.id))
-                    .where(XJTaskAreaEntityDao.Properties.Valid.eq(true))
-                    .where(XJTaskAreaEntityDao.Properties.Ip.eq(SupPlantApplication.getIp()))
+
+            List<XJAreaEntity> xjTaskAreaEntities = SupPlantApplication.dao().getXJAreaEntityDao().queryBuilder()
+                    .where(XJAreaEntityDao.Properties.WorkRouteId.eq(mXJTaskEntity.workRoute.id))
+                    .where(XJAreaEntityDao.Properties.Valid.eq(true))
+                    .where(XJAreaEntityDao.Properties.Ip.eq(SupPlantApplication.getIp()))
+                    .orderAsc(XJAreaEntityDao.Properties.Sort)
                     .list();
+
+
+            String areaString=GsonUtil.gsonString(xjTaskAreaEntities);
+            List<XJTaskAreaEntity> areaEntities=GsonUtil.jsonToList(areaString,XJTaskAreaEntity.class);
 
             List<XJTaskAreaEntity> xjAreaData = null;
             //过滤设备相关巡检区域
