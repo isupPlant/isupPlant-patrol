@@ -128,6 +128,7 @@ public class XJWorkViewActivity extends BaseRefreshRecyclerActivity<XJTaskWorkEn
                     break;
                 }
             }
+            mXJAreaEntity.works= XJTaskCacheUtil.getTaskWork(taskNo,Long.valueOf(xjAreaEntityStr));
         }
 
         refreshListController.setPullDownRefreshEnabled(false);
