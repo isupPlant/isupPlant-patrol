@@ -271,6 +271,12 @@ public class XJWorkActivity extends BaseRefreshRecyclerActivity<XJTaskWorkEntity
         if (expertViberController != null)
             expertViberController.onDestroy();
 
+        checkFinishNum();
+
+        EventBus.getDefault().post(new XJAreaRefreshEvent(mXJAreaEntity));
+    }
+
+    public void checkFinishNum(){
         int finishNum = 0;
         for (XJTaskWorkEntity xjWorkEntity : mXJAreaEntity.works) {
             if (xjWorkEntity.isFinished) {
@@ -280,8 +286,6 @@ public class XJWorkActivity extends BaseRefreshRecyclerActivity<XJTaskWorkEntity
 
         mXJAreaEntity.finishNum = finishNum;
         mXJAreaEntity.isFinished = mXJAreaEntity.finishNum == mXJAreaEntity.works.size();
-
-        EventBus.getDefault().post(new XJAreaRefreshEvent(mXJAreaEntity));
     }
 
     @Override
@@ -584,6 +588,9 @@ public class XJWorkActivity extends BaseRefreshRecyclerActivity<XJTaskWorkEntity
 
     @SuppressLint("CheckResult")
     private void initWorks() {
+        if (mXJAreaEntity.isFinished){
+            back();
+        }
         List<XJTaskWorkEntity> noEamWorks = new ArrayList<>();
         //遍历当前巡检区域下的所有巡检项,过滤掉所有未启动的巡检项以及例外的巡检内容
         Flowable.fromIterable(mXJAreaEntity.works)
@@ -938,6 +945,7 @@ public class XJWorkActivity extends BaseRefreshRecyclerActivity<XJTaskWorkEntity
         mDevice = null;
         deviceNames.clear();
         mWorkEntities.clear();
+        checkFinishNum();
         initWorks();
     }
 
