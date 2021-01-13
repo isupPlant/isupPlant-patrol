@@ -386,20 +386,18 @@ public class XJTaskDetailActivity extends BaseControllerActivity implements XJTa
             ToastUtils.show(context, getString(R.string.xj_area_empty_warning));
         }
         //过滤没有巡检项的巡检区域，不显示
-        List<Integer> noAreaList = new ArrayList<>();
+         List<XJTaskAreaEntity> areas=new ArrayList<>();
         for (int i = 0; i < mXJTaskEntity.areas.size(); i++) {
             List<XJWorkEntity> xjWorkEntities = SupPlantApplication.dao().getXJWorkEntityDao().queryBuilder()
                     .where(XJWorkEntityDao.Properties.AreaLongId.eq(mXJTaskEntity.areas.get(i).id))
                     .where(XJWorkEntityDao.Properties.Ip.eq(SupPlantApplication.getIp()))
                     .orderAsc(XJWorkEntityDao.Properties.Sort)
                     .list();
-            if (xjWorkEntities == null || xjWorkEntities.size() == 0) {
-                noAreaList.add(i);
+            if (xjWorkEntities != null && xjWorkEntities.size() >0) {
+                areas.add(mXJTaskEntity.areas.get(i));
             }
         }
-        for (int d : noAreaList) {
-            mXJTaskEntity.areas.remove(d);
-        }
+        mXJTaskEntity.areas=areas;
         mXJAreaAdapter = new XJAreaAdapter(context);
 
         xjTaskDetailContentView.setLayoutManager(new LinearLayoutManager(context));
