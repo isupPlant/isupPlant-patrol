@@ -24,8 +24,13 @@ import java.util.List;
  * Email:wangshizhan@supcom.com
  */
 public class XJTaskGroupAdapter extends BaseListDataRecyclerViewAdapter<XJTaskGroupEntity> {
+    private int type = 0;//type 0/1:巡检管理列表展示 2:上传任务列表展示页面
     public XJTaskGroupAdapter(Context context) {
         super(context);
+    }
+    public XJTaskGroupAdapter(Context context, int type) {
+        super(context);
+        this.type = type;
     }
 
     @Override
@@ -52,6 +57,7 @@ public class XJTaskGroupAdapter extends BaseListDataRecyclerViewAdapter<XJTaskGr
         RecyclerView xjTaskGroupRecyclerView;
 
         private XJTaskAdapter mXJTaskAdapter;
+        private XJTaskUploadAdapter xjTaskUploadAdapter;
 
         public XJTaskRouterViewHolder(Context context, ViewGroup parent) {
             super(context, parent);
@@ -65,24 +71,33 @@ public class XJTaskGroupAdapter extends BaseListDataRecyclerViewAdapter<XJTaskGr
         @Override
         protected void initView() {
             super.initView();
-            mXJTaskAdapter = new XJTaskAdapter(context);
+            if (type == 2){
+                xjTaskUploadAdapter = new XJTaskUploadAdapter(context);
+            } else {
+                mXJTaskAdapter = new XJTaskAdapter(context);
+            }
         }
 
         @Override
         protected void initListener() {
             super.initListener();
-            mXJTaskAdapter.setOnItemChildViewClickListener(
-                    new OnItemChildViewClickListener() {
-                        @Override
-                        public void onItemChildViewClick(View childView, int position, int action, Object obj) {
-                            XJTaskRouterViewHolder.this.onItemChildViewClick(xjTaskGroupRecyclerView, action, obj);
-                        }
-                    });
-            xjTaskGroupStaff.setOnLongClickListener(v -> {
-                CustomContentTextDialog.showContent(context, xjTaskGroupStaff.getText().toString());
-                return true;
-            });
-
+            if (type == 2){
+                xjTaskUploadAdapter.setOnItemChildViewClickListener(
+                        new OnItemChildViewClickListener() {
+                            @Override
+                            public void onItemChildViewClick(View childView, int position, int action, Object obj) {
+                                XJTaskRouterViewHolder.this.onItemChildViewClick(xjTaskGroupRecyclerView, action, obj);
+                            }
+                        });
+            } else {
+                mXJTaskAdapter.setOnItemChildViewClickListener(
+                        new OnItemChildViewClickListener() {
+                            @Override
+                            public void onItemChildViewClick(View childView, int position, int action, Object obj) {
+                                XJTaskRouterViewHolder.this.onItemChildViewClick(xjTaskGroupRecyclerView, action, obj);
+                            }
+                        });
+            }
         }
 
         @Override
@@ -107,9 +122,15 @@ public class XJTaskGroupAdapter extends BaseListDataRecyclerViewAdapter<XJTaskGr
 //                    xjTaskGroupRecyclerView.setAdapter(mXJTaskAdapter);
 //                }
                 xjTaskGroupRecyclerView.setLayoutManager(new GridLayoutManager(context, data.spanCount));
-                xjTaskGroupRecyclerView.setAdapter(mXJTaskAdapter);
-                mXJTaskAdapter.setList(data.taskEntities);
-                mXJTaskAdapter.notifyDataSetChanged();
+                if (type == 2){
+                    xjTaskGroupRecyclerView.setAdapter(xjTaskUploadAdapter);
+                    xjTaskUploadAdapter.setList(data.taskEntities);
+                    xjTaskUploadAdapter.notifyDataSetChanged();
+                } else {
+                    xjTaskGroupRecyclerView.setAdapter(mXJTaskAdapter);
+                    mXJTaskAdapter.setList(data.taskEntities);
+                    mXJTaskAdapter.notifyDataSetChanged();
+                }
                 setXJTaskEntity(data.taskEntities);
             }
 
