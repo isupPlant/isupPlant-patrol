@@ -4,6 +4,7 @@ import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
+import android.support.annotation.CheckResult;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
@@ -37,6 +38,7 @@ import com.supcon.mes.middleware.model.bean.BAP5CommonEntity;
 import com.supcon.mes.middleware.model.bean.xj.XJAreaEntity;
 import com.supcon.mes.middleware.model.bean.xj.XJAreaEntityDao;
 import com.supcon.mes.middleware.model.bean.xj.XJTaskAreaEntity;
+import com.supcon.mes.middleware.model.bean.xj.XJTaskAreaEntityDao;
 import com.supcon.mes.middleware.model.bean.xj.XJTaskEntity;
 import com.supcon.mes.middleware.model.bean.xj.XJWorkEntity;
 import com.supcon.mes.middleware.model.bean.xj.XJWorkEntityDao;
@@ -98,7 +100,7 @@ import io.reactivex.schedulers.Schedulers;
         Constant.SystemCode.PATROL_passReason
 })
 public class XJTaskDetailActivity extends BaseControllerActivity implements XJTaskSubmitContract.View
-        , IMap,
+        , IMap ,
         XJUpdateStatusContract.View {
 
     @BindByTag("xjTaskDetailRouteName")
@@ -136,7 +138,6 @@ public class XJTaskDetailActivity extends BaseControllerActivity implements XJTa
     private ExpertUHFRFIDController mExpertUHFRFIDController;
     private int enterPosition = -1;
     private SoundHelper mSoundHelper = new SoundHelper();
-
     @Override
     protected int getLayoutID() {
         return R.layout.ac_xj_task_detail;
@@ -181,19 +182,15 @@ public class XJTaskDetailActivity extends BaseControllerActivity implements XJTa
 
         String taskNo = getIntent().getStringExtra(Constant.IntentKey.XJ_TASK_NO_STR);
         String taskStr = getIntent().getStringExtra(Constant.IntentKey.XJ_TASK_ENTITY_STR);
-
         if (!TextUtils.isEmpty(taskNo)) {
-            if (XJTaskCacheUtil.check(taskNo)) {//检查本地缓存
-                taskStr = XJTaskCacheUtil.getString(taskNo);
-            }
+            //检查本地缓存
+            taskStr = XJTaskCacheUtil.getString(taskNo);
+        }
 //        String taskStr = BundleSaveUtil.instance.getValue(Constant.IntentKey.XJ_TASK_ENTITY_STR);
 //
 //        if (!TextUtils.isEmpty(taskStr)) {
 //            mXJTaskEntity = GsonUtil.gsonToBean(taskStr, XJTaskEntity.class);
-        }
         mXJTaskEntity = GsonUtil.gsonToBean(taskStr, XJTaskEntity.class);
-
-
         if (SBTUtil.isSupportUHF() && SharedPreferencesUtils.getParam(context, Constant.SPKey.UHF_ENABLE, false)) {
             em55UHFRFIDHelper = EM55UHFRFIDHelper.getInstance();
             openDevice();
@@ -291,6 +288,7 @@ public class XJTaskDetailActivity extends BaseControllerActivity implements XJTa
                 EventBus.getDefault().post(new UhfRfidEvent(stringBuilder.toString()));
             }
         });
+        onAreaUpdate();
     }
 
     @Override
@@ -354,9 +352,9 @@ public class XJTaskDetailActivity extends BaseControllerActivity implements XJTa
                     + " - " + DateUtil.dateFormat(mXJTaskEntity.endTime, "MM-dd HH:mm"));
 
             if (mXJTaskEntity.attrMap != null)
-                for (String key : mXJTaskEntity.attrMap.keySet()) {
+                for(String key : mXJTaskEntity.attrMap.keySet()) {
                     String value = (String) mXJTaskEntity.attrMap.get(key);
-                    if (!TextUtils.isEmpty(value)) {
+                    if (!TextUtils.isEmpty(value)){
                         xjTaskDetailStaff.setText("" + value);
                     }
                 }
@@ -368,7 +366,10 @@ public class XJTaskDetailActivity extends BaseControllerActivity implements XJTa
     }
 
     private void initArea() {
+
+
         if (mXJTaskEntity.areas == null) {
+
             List<XJAreaEntity> areaEntities = SupPlantApplication.dao().getXJAreaEntityDao().queryBuilder()
                     .where(XJAreaEntityDao.Properties.WorkRouteId.eq(mXJTaskEntity.workRoute.id))
                     .where(XJAreaEntityDao.Properties.Valid.eq(true))
@@ -376,28 +377,24 @@ public class XJTaskDetailActivity extends BaseControllerActivity implements XJTa
                     .orderAsc(XJAreaEntityDao.Properties.Sort)
                     .list();
 
+
             String s=GsonUtil.gsonString(areaEntities);
+
             List<XJTaskAreaEntity> xjTaskAreaEntities=GsonUtil.jsonToList(s,XJTaskAreaEntity.class);
             mXJTaskEntity.areas = xjTaskAreaEntities;
+            XJTaskCacheUtil.insertTasksAreas(mXJTaskEntity);
+
+            mXJTaskEntity.areas = SupPlantApplication.dao().getXJTaskAreaEntityDao().queryBuilder()
+                    .where(XJTaskAreaEntityDao.Properties.TableNo.eq(mXJTaskEntity.tableNo)).list();
 
         }
 
         if (mXJTaskEntity.areas.size() == 0) {
+
             ToastUtils.show(context, getString(R.string.xj_area_empty_warning));
+
         }
-        //过滤没有巡检项的巡检区域，不显示
-         List<XJTaskAreaEntity> areas=new ArrayList<>();
-        for (int i = 0; i < mXJTaskEntity.areas.size(); i++) {
-            List<XJWorkEntity> xjWorkEntities = SupPlantApplication.dao().getXJWorkEntityDao().queryBuilder()
-                    .where(XJWorkEntityDao.Properties.AreaLongId.eq(mXJTaskEntity.areas.get(i).id))
-                    .where(XJWorkEntityDao.Properties.Ip.eq(SupPlantApplication.getIp()))
-                    .orderAsc(XJWorkEntityDao.Properties.Sort)
-                    .list();
-            if (xjWorkEntities != null && xjWorkEntities.size() >0) {
-                areas.add(mXJTaskEntity.areas.get(i));
-            }
-        }
-        mXJTaskEntity.areas=areas;
+
         mXJAreaAdapter = new XJAreaAdapter(context);
 
         xjTaskDetailContentView.setLayoutManager(new LinearLayoutManager(context));
@@ -449,23 +446,17 @@ public class XJTaskDetailActivity extends BaseControllerActivity implements XJTa
                                 return;
                             }
 
-
                             mXJTaskEntity.realStartTime = System.currentTimeMillis();
-                            XJTaskCacheUtil.putStringAsync(mXJTaskEntity.toString(), new XJTaskCacheUtil.Callback() {
-                                @Override
-                                public void apply() {
-                                    LogUtil.d("保存成功");
-                                }
-                            });
+                            XJTaskCacheUtil.putString(mXJTaskEntity.toString());
                             //开始巡检
                             xjTaskDetailTaskBtn.setBackgroundResource(R.drawable.sl_xj_task_red);
                             xjTaskDetailTaskBtn.setText(getString(R.string.xj_task_end));
                             if (mXJTaskEntity.id != null) {//临时巡检不需要上传任务状态
                                 presenterRouter.create(XJUpdateStatusAPI.class).updateXJTaskStatus(mXJTaskEntity.id, "PATROL_taskState/running");
                             }
-                        }else {
-                                showFinishDialog();
-                             }
+                        } else {
+                            showFinishDialog();
+                        }
 //                            if (mXJTaskEntity.areas == null || mXJTaskEntity.areas.size() == 0) {
 //                                //                   ToastUtils.show(context, getString(R.string.xj_area_sign_warning2));
 //                                showDialog();
@@ -500,6 +491,8 @@ public class XJTaskDetailActivity extends BaseControllerActivity implements XJTa
 
                 }, true)
                 .show();
+
+
     }
 
     private void showFinishDialog() {
@@ -579,12 +572,14 @@ public class XJTaskDetailActivity extends BaseControllerActivity implements XJTa
                 xjAreaEntity.isSigned = true;
                 xjAreaEntity.payCardType = SystemCodeManager.getInstance().getSystemCodeEntity("PATROL_payCardType/signIn");
                 xjAreaEntity.cardTime = new Date().getTime();
-                XJTaskCacheUtil.putStringAsync(mXJTaskEntity.toString(), new XJTaskCacheUtil.Callback() {
-                    @Override
-                    public void apply() {
-                        LogUtil.d("557 保存成功");
-                    }
-                });
+//                XJTaskCacheUtil.putStringAsync(mXJTaskEntity.toString(), new XJTaskCacheUtil.Callback() {
+//                    @Override
+//                    public void apply() {
+//                        LogUtil.d("557 保存成功");
+//                    }
+//                });
+//                SupPlantApplication.dao().getXJTaskAreaEntityDao().update(xjAreaEntity);
+                XJTaskCacheUtil.insertTasksArea(xjAreaEntity);
                 goArea(xjAreaEntity);
 
             }).show();
@@ -634,27 +629,19 @@ public class XJTaskDetailActivity extends BaseControllerActivity implements XJTa
             IntentRouter.go(context, Constant.Router.XJ_WORK_ITEM, bundle);
     }
 
-    @SuppressLint("CheckResult")
-    @Subscribe(threadMode = ThreadMode.MAIN)
-    public void onAreaUpdate(XJAreaRefreshEvent areaEntity) {
-        Flowable.timer(0, TimeUnit.MILLISECONDS)
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(aLong -> {
-                    if (enterPosition != -1) {
-                        mXJTaskEntity.areas.set(enterPosition, areaEntity.getXJAreaEntity());
-                        mXJAreaAdapter.notifyItemChanged(enterPosition);
-                        XJTaskAreaEntity xjTaskAreaEntity= areaEntity.getXJAreaEntity();
-                        XJTaskCacheUtil.putOperateStringAsync(xjTaskAreaEntity.id,mXJTaskEntity.toString(),xjTaskAreaEntity, new XJTaskCacheUtil.Callback() {
-                            @Override
-                            public void apply() {
-                                LogUtil.d("618 保存成功");
-                            }
-                        });
-                    }
-                });
-
+    @SuppressLint("SupportAnnotationUsage")
+    @CheckResult
+    public void onAreaUpdate() {
+        if (enterPosition != -1) {
+            XJTaskAreaEntity xjTaskAreaEntity = SupPlantApplication.dao().getXJTaskAreaEntityDao()
+                    .queryBuilder()
+                    .where(XJTaskAreaEntityDao.Properties.Id.eq(mXJTaskEntity.areas.get(enterPosition).id))
+                    .where(XJTaskAreaEntityDao.Properties.TableNo.eq(mXJTaskEntity.tableNo))
+                    .unique();
+            mXJTaskEntity.areas.set(enterPosition, xjTaskAreaEntity);
+            mXJAreaAdapter.notifyDataSetChanged();
+        }
     }
-
     @SuppressLint("CheckResult")
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onTempTaskUploadRefresh(XJTempTaskUploadRefreshEvent event) {
@@ -707,7 +694,6 @@ public class XJTaskDetailActivity extends BaseControllerActivity implements XJTa
 //    }
 
 //    private Set<String> scannedCodeSet = new HashSet<>();
-
     /**
      * @param
      * @return
@@ -767,9 +753,11 @@ public class XJTaskDetailActivity extends BaseControllerActivity implements XJTa
      * @date 2018/6/15
      */
     private void updateXJAreaEntity(XJTaskAreaEntity xjAreaEntity) {
-        xjAreaEntity.payCardType = SystemCodeManager.getInstance().getSystemCodeEntity("PATROL_payCardType/signIn");
+        xjAreaEntity.payCardType = SystemCodeManager.getInstance().getSystemCodeEntity("PATROL_payCardType/card");
         xjAreaEntity.isSigned = true;
         xjAreaEntity.cardTime = new Date().getTime();
+//        SupPlantApplication.dao().getXJTaskAreaEntityDao().update(xjAreaEntity);
+        XJTaskCacheUtil.insertTasksArea(xjAreaEntity);
     }
 
 

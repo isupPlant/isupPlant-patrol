@@ -70,7 +70,7 @@ public class XJTaskGetActivity extends BaseRefreshRecyclerActivity<XJTaskGroupEn
         implements XJTaskContract.View,
         XJTaskStateContract.View {
 
-   // private static final String XJ_TASK_STAFF_KEY = "PATROL_1_0_0_patrolTask_potrolTaskList_LISTPT_ASSO_3a556662_35fb_4884_a6ab_1aff5d055ac7";
+    // private static final String XJ_TASK_STAFF_KEY = "PATROL_1_0_0_patrolTask_potrolTaskList_LISTPT_ASSO_3a556662_35fb_4884_a6ab_1aff5d055ac7";
     @BindByTag("titleText")
     TextView titleText;
     @BindByTag("contentView")
@@ -101,7 +101,7 @@ public class XJTaskGetActivity extends BaseRefreshRecyclerActivity<XJTaskGroupEn
 
     @Override
     protected IListAdapter<XJTaskGroupEntity> createAdapter() {
-        mXJTaskGroupAdapter = new XJTaskGroupAdapter(context);
+        mXJTaskGroupAdapter = new XJTaskGroupAdapter(context,2);
         return mXJTaskGroupAdapter;
     }
 
