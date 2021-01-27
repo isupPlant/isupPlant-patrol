@@ -975,7 +975,7 @@ public class XJWorkAdapter extends BaseListDataRecyclerViewAdapter<XJTaskWorkEnt
          */
         private boolean unequalJudge(XJTaskWorkEntity xjWorkItemEntity, String charSequence) {
 
-            String regExp = "(≥|≤|＞|＜)?";
+            String regExp = "(≥|≤|>|<)?";
             Pattern pattern = Pattern.compile(regExp);
             Matcher matcher = pattern.matcher(xjWorkItemEntity.normalRange);
             if (!Str2NumUtil.isDoubleOrFloat(matcher.replaceAll(""))) {
