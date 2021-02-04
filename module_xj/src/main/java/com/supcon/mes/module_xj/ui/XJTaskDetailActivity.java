@@ -769,7 +769,7 @@ public class XJTaskDetailActivity extends BaseControllerActivity implements XJTa
      * @date 2018/6/15
      */
     private void updateXJAreaEntity(XJTaskAreaEntity xjAreaEntity) {
-        xjAreaEntity.payCardType = SystemCodeManager.getInstance().getSystemCodeEntity("PATROL_payCardType/signIn");
+        xjAreaEntity.payCardType = SystemCodeManager.getInstance().getSystemCodeEntity("PATROL_payCardType/card");
         xjAreaEntity.isSigned = true;
         xjAreaEntity.cardTime = new Date().getTime();
     }
