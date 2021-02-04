@@ -59,8 +59,6 @@ public class XJAreaAdapter extends BaseListDataRecyclerViewAdapter<XJTaskAreaEnt
 
         @BindByTag("itemXJAreaYHTag")
         ImageView itemXJAreaYHTag;
-        @BindByTag("rlitemXJArea")
-        RelativeLayout rlitemXJArea;
 
         public XJAreaViewHolder(Context context) {
             super(context);
@@ -121,23 +119,30 @@ public class XJAreaAdapter extends BaseListDataRecyclerViewAdapter<XJTaskAreaEnt
                     data.process = "0 / 0";
                     itemXJAreaProcess.setText(data.process);
 //                    itemXJAreaTag.setImageResource(R.drawable.ic_xj_area_done);
-//                    rlitemXJArea.setVisibility(View.GONE);
                 }
 
             }
             else{
                 List<XJTaskWorkEntity> xjTaskWorkEntities = SupPlantApplication.dao().getXJTaskWorkEntityDao().queryBuilder()
-                        .where(XJTaskWorkEntityDao.Properties.AreaLongId.eq(data.id))
-                        .where(XJTaskWorkEntityDao.Properties.TableNo.eq(data.tableNo))
+                        .where(XJTaskWorkEntityDao.Properties.AreaLongId.eq(data.id == null ? "" : data.id))
+                        .where(XJTaskWorkEntityDao.Properties.TableNo.eq(data.tableNo == null ? "" : data.tableNo))
                         .where(XJTaskWorkEntityDao.Properties.Ip.eq(SupPlantApplication.getIp()))
-                        .orderAsc(XJTaskWorkEntityDao.Properties.Sort)
                         .list();
+                if(data.isFinished){
+                    itemXJAreaTag.setImageResource(R.drawable.ic_xj_area_done);
+                    itemXJAreaProcess.setTextColor(context.getResources().getColor(R.color.xjBtnColor));
+                }
+                else if(xjTaskWorkEntities==null||xjTaskWorkEntities.size()==0){
+                    itemXJAreaTag.setImageResource(R.drawable.ic_xj_area_undone);
+                }
+                else{
+                    itemXJAreaTag.setImageResource(R.drawable.ic_xj_area_halfdone);
+                }
 
-                if (data.works==null){
+                if (xjTaskWorkEntities==null||xjTaskWorkEntities.size()==0){
                     List<XJWorkEntity> xjWorkEntities = SupPlantApplication.dao().getXJWorkEntityDao().queryBuilder()
                             .where(XJWorkEntityDao.Properties.AreaLongId.eq(data.id))
                             .where(XJWorkEntityDao.Properties.Ip.eq(SupPlantApplication.getIp()))
-                            .orderAsc(XJWorkEntityDao.Properties.Sort)
                             .list();
                     String s= GsonUtil.gsonString(xjWorkEntities);
 
@@ -147,17 +152,7 @@ public class XJAreaAdapter extends BaseListDataRecyclerViewAdapter<XJTaskAreaEnt
                 data.process = String.format(context.getString(R.string.xj_area_process), ""+data.finishNum,""+data.getTotalNum(exceptionIds));
                 itemXJAreaProcess.setText(data.process);
 
-                if(data.isFinished){
-                    itemXJAreaTag.setImageResource(R.drawable.ic_xj_area_done);
-                    itemXJAreaProcess.setTextColor(context.getResources().getColor(R.color.xjBtnColor));
-                }
-                else if(data.cardTime == 0){
-                    itemXJAreaTag.setImageResource(R.drawable.ic_xj_area_undone);
-                }
-                else{
-                    itemXJAreaTag.setImageResource(R.drawable.ic_xj_area_halfdone);
 
-                }
             }
         }
 

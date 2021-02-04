@@ -133,20 +133,18 @@ public class XJTempTaskActivity extends BaseControllerActivity {
             List<XJTaskAreaEntity> areaEntities=GsonUtil.jsonToList(areaString,XJTaskAreaEntity.class);
 
             //过滤没有巡检项的巡检区域，不显示
-            List<Integer> noAreaList = new ArrayList<>();
+            List<XJTaskAreaEntity> areas=new ArrayList<>();
             for (int i = 0; i <areaEntities.size(); i++) {
                 List<XJWorkEntity> xjWorkEntities = SupPlantApplication.dao().getXJWorkEntityDao().queryBuilder()
                         .where(XJWorkEntityDao.Properties.AreaLongId.eq(areaEntities.get(i).id))
                         .where(XJWorkEntityDao.Properties.Ip.eq(SupPlantApplication.getIp()))
                         .orderAsc(XJWorkEntityDao.Properties.Sort)
                         .list();
-                if (xjWorkEntities == null || xjWorkEntities.size() == 0) {
-                    noAreaList.add(i);
+                if (xjWorkEntities != null && xjWorkEntities.size() >0) {
+                    areas.add(areaEntities.get(i));
                 }
             }
-            for (int d : noAreaList) {
-                areaEntities.remove(d);
-            }
+            areaEntities=areas;
 
             List<XJTaskAreaEntity> xjAreaData = null;
             //过滤设备相关巡检区域

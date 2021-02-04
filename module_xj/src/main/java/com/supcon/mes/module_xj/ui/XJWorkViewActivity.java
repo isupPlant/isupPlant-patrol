@@ -27,6 +27,7 @@ import com.supcon.mes.mbap.utils.GsonUtil;
 import com.supcon.mes.mbap.utils.SpaceItemDecoration;
 import com.supcon.mes.mbap.view.CustomDialog;
 import com.supcon.mes.mbap.view.CustomImageButton;
+import com.supcon.mes.middleware.SupPlantApplication;
 import com.supcon.mes.middleware.constant.Constant;
 import com.supcon.mes.middleware.model.bean.ObjectEntity;
 import com.supcon.mes.middleware.model.bean.xj.XJAreaEntity;
@@ -128,7 +129,7 @@ public class XJWorkViewActivity extends BaseRefreshRecyclerActivity<XJTaskWorkEn
                     break;
                 }
             }
-            mXJAreaEntity.works= XJTaskCacheUtil.getTaskWork(taskNo,Long.valueOf(xjAreaEntityStr));
+            mXJAreaEntity.works = XJTaskCacheUtil.getTaskWork(taskNo, Long.valueOf(xjAreaEntityStr));
         }
 
         refreshListController.setPullDownRefreshEnabled(false);
@@ -138,27 +139,26 @@ public class XJWorkViewActivity extends BaseRefreshRecyclerActivity<XJTaskWorkEn
     @Override
     protected void onDestroy() {
         super.onDestroy();
-
-        if(isFromTask){
-
-            int finishNum = 0;
-            for(XJTaskWorkEntity xjWorkEntity : mXJAreaEntity.works){
-                if (xjWorkEntity.isFinished){
-                    finishNum++;
-                }
-            }
-
-            mXJAreaEntity.finishNum = finishNum;
-            if(mXJAreaEntity.finishNum != mXJAreaEntity.works.size()){
-                mXJAreaEntity.isFinished = false;
-            }
-
-
-            EventBus.getDefault().post(new XJAreaRefreshEvent(mXJAreaEntity));
-        }
-        else{
-            EventBus.getDefault().post(new XJWorkRefreshEvent());
-        }
+//
+//        if(isFromTask){
+//
+//            int finishNum = 0;
+//            for(XJTaskWorkEntity xjWorkEntity : mXJAreaEntity.works){
+//                if (xjWorkEntity.isFinished){
+//                    finishNum++;
+//                }
+//            }
+//
+//            mXJAreaEntity.finishNum = finishNum;
+//            if(mXJAreaEntity.finishNum != mXJAreaEntity.works.size()){
+//                mXJAreaEntity.isFinished = false;
+//            }
+//        SupPlantApplication.dao().getXJTaskAreaEntityDao().update(mXJAreaEntity);
+//        XJTaskCacheUtil.insertTasksWork(mXJTaskEntity.tableNo, mXJAreaEntity.id, mXJAreaEntity.works);
+//       }
+//        else{
+//            EventBus.getDefault().post(new XJWorkRefreshEvent());
+//        }
     }
 
     @Override
@@ -314,10 +314,15 @@ public class XJWorkViewActivity extends BaseRefreshRecyclerActivity<XJTaskWorkEn
                         xjWorkEntity.completeDate = 0;
                         xjWorkEntity.taskDetailState = SystemCodeManager.getInstance().getSystemCodeEntity("PATROL_taskDetailState/uncheck");
                         xjWorkEntity.isRealPass = false;
+                        if (mXJAreaEntity.isFinished){
+                            mXJAreaEntity.isFinished=false;
+//                            SupPlantApplication.dao().getXJTaskAreaEntityDao().update(mXJAreaEntity);
+                            XJTaskCacheUtil.insertTasksArea(mXJAreaEntity);
+                        }
 
-                        EventBus.getDefault().post(new XJWorkRefreshEvent(xjWorkEntity));
+                        SupPlantApplication.dao().getXJTaskWorkEntityDao().update(xjWorkEntity);
                         refreshWorkList();
-
+                        EventBus.getDefault().post(new XJWorkRefreshEvent());
                     },true)
                     .show();
         }

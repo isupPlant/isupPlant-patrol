@@ -860,7 +860,7 @@ public class XJWorkAdapter extends BaseListDataRecyclerViewAdapter<XJTaskWorkEnt
 
                         return orJudge(xjWorkItemEntity, charSequence);
 
-                    } else {  // ≥ 或 ≤ 或 ＞ 或 ＜
+                    } else {  // ≥ 或 ≤ 或 ＞ 或 ＜ 或 =
 
                         return unequalJudge(xjWorkItemEntity, charSequence);
 
@@ -921,7 +921,7 @@ public class XJWorkAdapter extends BaseListDataRecyclerViewAdapter<XJTaskWorkEnt
          */
         private boolean orJudge(XJTaskWorkEntity xjWorkItemEntity, String charSequence) {
 
-            String regExp = "(≥|≤|＞|＜)?";
+            String regExp = "(=|≥|≤|>|<)?";
 
             Pattern pattern = Pattern.compile(regExp);
 
@@ -945,13 +945,13 @@ public class XJWorkAdapter extends BaseListDataRecyclerViewAdapter<XJTaskWorkEnt
                 } else {  //正常
                     setNormal(xjWorkItemEntity);
                 }
-            } else if (xjWorkItemEntity.normalRange.contains("≥") && xjWorkItemEntity.normalRange.contains("＜")) {
+            } else if (xjWorkItemEntity.normalRange.contains("≥") && xjWorkItemEntity.normalRange.contains("<")) {
                 if (inputResult >= small && inputResult < big) {  //区间内、异常
                     setAbnormal(xjWorkItemEntity);
                 } else {  //正常
                     setNormal(xjWorkItemEntity);
                 }
-            } else if (xjWorkItemEntity.normalRange.contains("＞") && xjWorkItemEntity.normalRange.contains("≤")) {
+            } else if (xjWorkItemEntity.normalRange.contains(">") && xjWorkItemEntity.normalRange.contains("≤")) {
                 if (inputResult > small && inputResult <= big) {  //区间内、异常
                     setAbnormal(xjWorkItemEntity);
                 } else {  //正常
@@ -975,7 +975,7 @@ public class XJWorkAdapter extends BaseListDataRecyclerViewAdapter<XJTaskWorkEnt
          */
         private boolean unequalJudge(XJTaskWorkEntity xjWorkItemEntity, String charSequence) {
 
-            String regExp = "(≥|≤|＞|＜)?";
+            String regExp = "(=|≥|≤|>|<)?";
             Pattern pattern = Pattern.compile(regExp);
             Matcher matcher = pattern.matcher(xjWorkItemEntity.normalRange);
             if (!Str2NumUtil.isDoubleOrFloat(matcher.replaceAll(""))) {
@@ -992,7 +992,7 @@ public class XJWorkAdapter extends BaseListDataRecyclerViewAdapter<XJTaskWorkEnt
                 } else {  //正常
                     setNormal(xjWorkItemEntity);
                 }
-            } else if (xjWorkItemEntity.normalRange.contains("＞")) {
+            } else if (xjWorkItemEntity.normalRange.contains(">")) {
                 if (inputResult <= num) {  //异常
                     setAbnormal(xjWorkItemEntity);
                 } else {  //正常
@@ -1004,7 +1004,13 @@ public class XJWorkAdapter extends BaseListDataRecyclerViewAdapter<XJTaskWorkEnt
                 } else {  //正常
                     setNormal(xjWorkItemEntity);
                 }
-            } else {
+            }else if (xjWorkItemEntity.normalRange.contains("=")) {
+                if (inputResult != num) {  //异常
+                    setAbnormal(xjWorkItemEntity);
+                } else {  //正常
+                    setNormal(xjWorkItemEntity);
+                }
+            }  else {
                 if (inputResult >= num) {  //异常
                     setAbnormal(xjWorkItemEntity);
                 } else {  //正常

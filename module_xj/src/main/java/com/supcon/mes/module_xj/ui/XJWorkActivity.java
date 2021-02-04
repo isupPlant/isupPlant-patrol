@@ -222,10 +222,10 @@ public class XJWorkActivity extends BaseRefreshRecyclerActivity<XJTaskWorkEntity
                 contentView.findViewById(R.id.viberFinishBtn).setOnClickListener(v -> expertViberController.hide());
                 expertViberController = new ExpertController(contentView, true);
                 expertViberController.onInit();
-                expertViberController.initView();
-                expertViberController.initListener();
-                expertViberController.initData();
-                registerController(MGViberController.class.getSimpleName(), mMGViberController);
+//                expertViberController.initView();
+//                expertViberController.initListener();
+//                expertViberController.initData();
+                registerController(ExpertController.class.getSimpleName(), expertViberController);
             } else {
                 expertViberController.initData();
             }
@@ -233,7 +233,7 @@ public class XJWorkActivity extends BaseRefreshRecyclerActivity<XJTaskWorkEntity
         if (tempMode == TemperatureMode.AIC.getCode() || vibMode == VibMode.AIC.getCode()) {
 
 //            if (mAICVibController == null) {
-                AICVibService.start(context);
+            AICVibService.start(context);
 //                mAICVibController = new AICVibServiceController(AICVibServiceController.getLayoutView(context), true);
 //                mAICVibController.onInit();
 //                registerController(AICVibController.class.getSimpleName(), mAICVibController);
@@ -242,6 +242,9 @@ public class XJWorkActivity extends BaseRefreshRecyclerActivity<XJTaskWorkEntity
 
         if (tempMode == TemperatureMode.SBT.getCode() && SBTUtil.isSupportTemp()) {
             mXJWorkAdapter.setSb2ThermometerHelper();
+        }
+        if (mXJAreaEntity!=null&&!TextUtils.isEmpty(mXJAreaEntity.name)){
+            titleTextMiddle.setText(mXJAreaEntity.name);
         }
     }
 
@@ -268,16 +271,10 @@ public class XJWorkActivity extends BaseRefreshRecyclerActivity<XJTaskWorkEntity
             mAV160Controller.onDestroy();
         }
 
-        if (expertViberController != null)
-            expertViberController.onDestroy();
+//        if (expertViberController != null)
+//            expertViberController.onDestroy();
 
-        checkFinishNum();
-
-        EventBus.getDefault().post(new XJAreaRefreshEvent(mXJAreaEntity));
-    }
-
-    public void checkFinishNum(){
-        int finishNum = 0;
+/*        int finishNum = 0;
         for (XJTaskWorkEntity xjWorkEntity : mXJAreaEntity.works) {
             if (xjWorkEntity.isFinished) {
                 finishNum++;
@@ -286,6 +283,9 @@ public class XJWorkActivity extends BaseRefreshRecyclerActivity<XJTaskWorkEntity
 
         mXJAreaEntity.finishNum = finishNum;
         mXJAreaEntity.isFinished = mXJAreaEntity.finishNum == mXJAreaEntity.works.size();
+//        SupPlantApplication.dao().getXJTaskAreaEntityDao().update(mXJAreaEntity);
+        XJTaskCacheUtil.insertTasksArea(mXJAreaEntity);*/
+
     }
 
     @Override
@@ -294,11 +294,11 @@ public class XJWorkActivity extends BaseRefreshRecyclerActivity<XJTaskWorkEntity
         StatusBarUtils.setWindowStatusBarColor(this, R.color.themeColor);
         titleTextMiddle.setVisibility(View.VISIBLE);
 //        titleTextMiddle.setText(getString(R.string.xj_work));
-        titleTextMiddle.setText(mXJAreaEntity.name);
+
         rightBtn.setImageResource(R.drawable.sl_xj_work_top_finish);
         rightBtn_sec.setImageResource(R.drawable.sl_top_more);
-
-        contentView.setLayoutManager(new XLinearLayoutManager(context));
+        LinearLayoutManager mLayoutManager=new XLinearLayoutManager(this, LinearLayoutManager.VERTICAL, false);
+        contentView.setLayoutManager(mLayoutManager);
         contentView.addItemDecoration(new SpaceItemDecoration(DisplayUtil.dip2px(1, context)));
         contentView.setAdapter(mXJWorkAdapter);
 
@@ -537,12 +537,9 @@ public class XJWorkActivity extends BaseRefreshRecyclerActivity<XJTaskWorkEntity
         passReasonMap = getController(SystemCodeJsonController.class).getCodeMap(Constant.SystemCode.PATROL_passReason);
         realValueMap = getController(SystemCodeJsonController.class).getCodeMap(Constant.SystemCode.PATROL_realValue);
         checkDeviceState();
-        refreshListController.setOnRefreshListener(new OnRefreshListener() {
-            @Override
-            public void onRefresh() {
-                if (mXJAreaEntity != null && mXJAreaEntity.works != null) {
-                    refreshWorkList();
-                }
+        refreshListController.setOnRefreshListener(() -> {
+            if (mXJAreaEntity != null && mXJAreaEntity.works != null) {
+                refreshWorkList();
             }
         });
     }
@@ -571,15 +568,11 @@ public class XJWorkActivity extends BaseRefreshRecyclerActivity<XJTaskWorkEntity
     @Override
     protected void onResume() {
         super.onResume();
-
-
         setDefaultAnimation();
         if (needRefresh) {
-
             refreshWorkList();
             needRefresh = false;
         }
-
     }
 
     private void setDefaultAnimation() {
@@ -588,9 +581,6 @@ public class XJWorkActivity extends BaseRefreshRecyclerActivity<XJTaskWorkEntity
 
     @SuppressLint("CheckResult")
     private void initWorks() {
-        if (mXJAreaEntity.isFinished){
-            back();
-        }
         List<XJTaskWorkEntity> noEamWorks = new ArrayList<>();
         //遍历当前巡检区域下的所有巡检项,过滤掉所有未启动的巡检项以及例外的巡检内容
         Flowable.fromIterable(mXJAreaEntity.works)
@@ -703,7 +693,7 @@ public class XJWorkActivity extends BaseRefreshRecyclerActivity<XJTaskWorkEntity
         } else if (SBTUtil.isSupportTemp()) {
 
         } else if (vibMode == VibMode.EXPERT.getCode()) {
-            SharedPreferencesUtils.setParam(context, com.mes.supcon.expert_ewg01p.config.ModuleConfig.IS_VIBER, true);
+            SharedPreferencesUtils.setParam(context, ModuleConfig.IS_VIBER, true);
             expertViberController.initView();
             SharedPreferencesUtils.setParam(context, ModuleConfig.CURRENT_MODE,
                     ViberMode.DISTANCE.name());
@@ -795,7 +785,6 @@ public class XJWorkActivity extends BaseRefreshRecyclerActivity<XJTaskWorkEntity
 //                expertViberController.setOnDataSelectListener(data ->
 //                        LogUtil.d("onDataSelect:" + data));
 //            }
-            expertViberController.show();
             expertViberController.setOnFinishListener(result -> {
                 xjWorkEntity.concluse = result.second;
                 mXJWorkAdapter.notifyItemChanged(mPosition);
@@ -803,6 +792,7 @@ public class XJWorkActivity extends BaseRefreshRecyclerActivity<XJTaskWorkEntity
             expertViberController.run(result -> {
                 if (result.first != null) return;
             });
+            expertViberController.show();
         }
 
     }
@@ -927,10 +917,14 @@ public class XJWorkActivity extends BaseRefreshRecyclerActivity<XJTaskWorkEntity
                                 for (XJTaskWorkEntity xjWorkItemEntity : xjWorkEntities) {
                                     doFinish(xjWorkItemEntity);
                                 }
-
+                                mXJAreaEntity.finishNum += xjWorkEntities.size();
+                                XJTaskCacheUtil.insertTasksWork(mXJTaskEntity.tableNo, mXJAreaEntity.id, mXJAreaEntity.works);
+                                mXJAreaEntity.isFinished = mXJAreaEntity.finishNum == mXJAreaEntity.works.size();
+                                XJTaskCacheUtil.insertTasksArea(mXJAreaEntity);
                                 if (xjWorkEntities.size() == mXJAreaEntity.works.size()) {
                                     onLoadSuccessAndExit(context.getResources().getString(R.string.xj_patrol_over), this::finish);
                                 } else {
+
                                     refreshWorkList();
                                 }
                             } catch (Exception e) {
@@ -945,7 +939,6 @@ public class XJWorkActivity extends BaseRefreshRecyclerActivity<XJTaskWorkEntity
         mDevice = null;
         deviceNames.clear();
         mWorkEntities.clear();
-        checkFinishNum();
         initWorks();
     }
 
@@ -1058,13 +1051,14 @@ public class XJWorkActivity extends BaseRefreshRecyclerActivity<XJTaskWorkEntity
                     }, throwable -> {
 
                     }, () -> {
-                        mXJAreaEntity.finishNum = xjWorkItemEntities.size();
-
+                        mXJAreaEntity.finishNum += xjWorkItemEntities.size();
+                        XJTaskCacheUtil.insertTasksWork(mXJTaskEntity.tableNo, mXJAreaEntity.id, mXJAreaEntity.works);
+                        mXJAreaEntity.isFinished = mXJAreaEntity.finishNum == mXJAreaEntity.works.size();
+                        XJTaskCacheUtil.insertTasksArea(mXJAreaEntity);
                         if (xjWorkItemEntities.size() == mXJAreaEntity.works.size()) {
                             mXJAreaEntity.isFinished = true;
                             back();
                         } else {
-
                             refreshWorkList();
                         }
                         ToastUtils.show(context, String.format(getResources().getString(R.string.xj_work_skip_toast), "" + (xjWorkItemEntities.size())));
@@ -1121,22 +1115,18 @@ public class XJWorkActivity extends BaseRefreshRecyclerActivity<XJTaskWorkEntity
 
                     List<SheetEntity> sheetEntities = GsonUtil.jsonToList(obj.toString(), SheetEntity.class);
 
-
+                    if (sheetEntities != null && sheetEntities.size() > 0) {
 
                         xjWorkItemEntity.concluse = "";
-                    if (sheetEntities != null && sheetEntities.size() > 0) {
                         for (SheetEntity sheetEntity : sheetEntities) {
                             xjWorkItemEntity.concluse += sheetEntity.name + ",";
                         }
-                        xjWorkItemEntity.concluse = xjWorkItemEntity.concluse.substring(0, xjWorkItemEntity.concluse.length() - 1);
-                    }else{
-                        xjWorkItemEntity.concluse = "";
-                    }
 
+                        xjWorkItemEntity.concluse = xjWorkItemEntity.concluse.substring(0, xjWorkItemEntity.concluse.length() - 1);
 
                         mXJWorkAdapter.notifyItemChanged(xjPosition);
 
-
+                    }
                 }).show();
 
     }
@@ -1148,22 +1138,25 @@ public class XJWorkActivity extends BaseRefreshRecyclerActivity<XJTaskWorkEntity
         Flowable.timer(0, TimeUnit.MILLISECONDS)
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(aLong -> {
-                    int position = workRefreshEvent.getPosition();
-                    boolean isFinish = workRefreshEvent.isFinish();
+//                    int position = workRefreshEvent.getPosition();
+//                    boolean isFinish = workRefreshEvent.isFinish();
+//
+//                    if (isFinish) {
+//                        mXJWorkAdapter.notifyItemRemoved(position);
+//                    } else if (workRefreshEvent.getXJWorkEntity() != null) {//来自巡检已完成重录
+//                        XJTaskWorkEntity workEntity = workRefreshEvent.getXJWorkEntity();
+//                        for (XJTaskWorkEntity xjWorkEntity : mXJAreaEntity.works) {
+//                            if (workEntity.id.equals(xjWorkEntity.id)) {
+//                                mXJAreaEntity.works.set(mXJAreaEntity.works.indexOf(xjWorkEntity), workEntity);
+//                            }
+//                        }
 
-                    if (isFinish) {
-                        mXJWorkAdapter.notifyItemRemoved(position);
-                    } else if (workRefreshEvent.getXJWorkEntity() != null) {//来自巡检已完成重录
-                        XJTaskWorkEntity workEntity = workRefreshEvent.getXJWorkEntity();
-                        for (XJTaskWorkEntity xjWorkEntity : mXJAreaEntity.works) {
-                            if (workEntity.id.equals(xjWorkEntity.id)) {
-                                mXJAreaEntity.works.set(mXJAreaEntity.works.indexOf(xjWorkEntity), workEntity);
-                            }
-                        }
-                        needRefresh = true;
-                    } else {
-                        mXJWorkAdapter.notifyDataSetChanged();
-                    }
+//                    } else {
+                    mXJAreaEntity.works= XJTaskCacheUtil.getTaskWork(mXJTaskEntity.tableNo,mXJAreaEntity.id);
+                    needRefresh = true;
+
+                    //                      mXJWorkAdapter.notifyDataSetChanged();
+                    // }
                 });
     }
 
@@ -1190,7 +1183,7 @@ public class XJWorkActivity extends BaseRefreshRecyclerActivity<XJTaskWorkEntity
 
 //        ToastUtils.show(context, String.format(getResources().getString(R.string.xj_work_unfinish_warning), xjWorkEntity.content));
         contentView.scrollToPosition(pos);
-        LinearLayoutManager mLayoutManager = (LinearLayoutManager) contentView.getLayoutManager();
+        XLinearLayoutManager mLayoutManager = (XLinearLayoutManager) contentView.getLayoutManager();
         mLayoutManager.scrollToPositionWithOffset(pos, 0);
 
     }
