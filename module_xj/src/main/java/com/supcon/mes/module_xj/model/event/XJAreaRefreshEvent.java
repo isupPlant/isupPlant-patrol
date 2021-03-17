@@ -10,13 +10,5 @@ import com.supcon.mes.middleware.model.event.BaseEvent;
  */
 public class XJAreaRefreshEvent extends BaseEvent {
 
-    private XJTaskAreaEntity mXJAreaEntity;
 
-    public XJAreaRefreshEvent(XJTaskAreaEntity xjAreaEntity){
-        mXJAreaEntity = xjAreaEntity;
-    }
-
-    public XJTaskAreaEntity getXJAreaEntity() {
-        return mXJAreaEntity;
-    }
 }

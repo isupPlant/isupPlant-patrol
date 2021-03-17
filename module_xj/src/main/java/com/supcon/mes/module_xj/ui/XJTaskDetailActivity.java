@@ -73,6 +73,7 @@ import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
@@ -288,7 +289,6 @@ public class XJTaskDetailActivity extends BaseControllerActivity implements XJTa
                 EventBus.getDefault().post(new UhfRfidEvent(stringBuilder.toString()));
             }
         });
-        onAreaUpdate();
     }
 
     @Override
@@ -445,7 +445,23 @@ public class XJTaskDetailActivity extends BaseControllerActivity implements XJTa
                                 showDialog();
                                 return;
                             }
+                            if (mXJTaskEntity.advanceStartTime!=null) {
+                                double advanceStartTime=mXJTaskEntity.advanceStartTime*(60*60*1000);
+                                long currentTime =System.currentTimeMillis();
+                                if ((mXJTaskEntity.startTime-advanceStartTime)>currentTime){
 
+                                    ToastUtils.show(this, context.getResources().getString(R.string .xj_no_allow_advance)+new DecimalFormat("0.00").format(mXJTaskEntity.advanceStartTime)+context.getResources().getString(R.string.hour_begins));
+                                    return;
+                                }
+                            }
+                            if (mXJTaskEntity.delayStartTime!=null){
+                                double delayStartTime=mXJTaskEntity.delayStartTime*(60*60*1000);
+                                long currentTime =System.currentTimeMillis();
+                                if ((mXJTaskEntity.startTime+delayStartTime)<currentTime){
+                                    ToastUtils.show(this, context.getResources().getString(R.string.xj_no_allow_delay)+new DecimalFormat("0.00").format(mXJTaskEntity.delayStartTime)+context.getResources().getString(R.string.hour_begins));
+                                    return;
+                                }
+                            }
                             mXJTaskEntity.realStartTime = System.currentTimeMillis();
                             XJTaskCacheUtil.putString(mXJTaskEntity.toString());
                             //开始巡检
@@ -455,6 +471,15 @@ public class XJTaskDetailActivity extends BaseControllerActivity implements XJTa
                                 presenterRouter.create(XJUpdateStatusAPI.class).updateXJTaskStatus(mXJTaskEntity.id, "PATROL_taskState/running");
                             }
                         } else {
+                            if (mXJTaskEntity.delayEndTime!=null){
+                                double delayEndTime=mXJTaskEntity.delayEndTime*(60*60*1000);
+                                long currentTime =System.currentTimeMillis();
+
+                                if ((mXJTaskEntity.endTime+delayEndTime)<currentTime){
+                                    ToastUtils.show(this, context.getResources().getString(R.string.xj_no_allow_delay)+new DecimalFormat("0.00").format(mXJTaskEntity.delayEndTime)+context.getResources().getString(R.string.hour_end));
+                                    return;
+                                }
+                            }
                             showFinishDialog();
                         }
 //                            if (mXJTaskEntity.areas == null || mXJTaskEntity.areas.size() == 0) {
@@ -631,7 +656,8 @@ public class XJTaskDetailActivity extends BaseControllerActivity implements XJTa
 
     @SuppressLint("SupportAnnotationUsage")
     @CheckResult
-    public void onAreaUpdate() {
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onAreaUpdate(XJAreaRefreshEvent areaEntity) {
         if (enterPosition != -1) {
             XJTaskAreaEntity xjTaskAreaEntity = SupPlantApplication.dao().getXJTaskAreaEntityDao()
                     .queryBuilder()
@@ -640,18 +666,33 @@ public class XJTaskDetailActivity extends BaseControllerActivity implements XJTa
                     .unique();
             mXJTaskEntity.areas.set(enterPosition, xjTaskAreaEntity);
             mXJAreaAdapter.notifyDataSetChanged();
+
         }
     }
+
+
     @SuppressLint("CheckResult")
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onTempTaskUploadRefresh(XJTempTaskUploadRefreshEvent event) {
-        mXJTaskEntity.id=event.getId();
-        XJTaskCacheUtil.putStringAsync( mXJTaskEntity.toString(), new XJTaskCacheUtil.Callback() {
-            @Override
-            public void apply() {
-                LogUtil.d("493 保存成功");
-            }
-        });
+        if (event.getId()!=0){
+            mXJTaskEntity.id=event.getId();
+            XJTaskCacheUtil.putStringAsync( mXJTaskEntity.toString(), new XJTaskCacheUtil.Callback() {
+                @Override
+                public void apply() {
+                    LogUtil.d("493 保存成功");
+                }
+            });
+        }
+        if (enterPosition != -1) {
+            XJTaskAreaEntity xjTaskAreaEntity = SupPlantApplication.dao().getXJTaskAreaEntityDao()
+                    .queryBuilder()
+                    .where(XJTaskAreaEntityDao.Properties.Id.eq(mXJTaskEntity.areas.get(enterPosition).id))
+                    .where(XJTaskAreaEntityDao.Properties.TableNo.eq(mXJTaskEntity.tableNo))
+                    .unique();
+            mXJTaskEntity.areas.set(enterPosition, xjTaskAreaEntity);
+            mXJAreaAdapter.notifyDataSetChanged();
+
+        }
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)

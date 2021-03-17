@@ -140,7 +140,9 @@ public class XJWorkViewActivity extends BaseRefreshRecyclerActivity<XJTaskWorkEn
     protected void onDestroy() {
         super.onDestroy();
 //
-//        if(isFromTask){
+        if(isFromTask){
+            EventBus.getDefault().post(new XJAreaRefreshEvent());
+        }
 //
 //            int finishNum = 0;
 //            for(XJTaskWorkEntity xjWorkEntity : mXJAreaEntity.works){
@@ -512,11 +514,14 @@ public class XJWorkViewActivity extends BaseRefreshRecyclerActivity<XJTaskWorkEn
 
     @Override
     public void uploadXJDataSuccess(Long id) {
-        onLoadSuccess(context.getResources().getString(R.string.xj_patrol_upload_succeed));
-        if (id!=null){
-            mXJTaskEntity.id = id;
-            EventBus.getDefault().post(new XJTempTaskUploadRefreshEvent(id));
+        if (id==null){
+            id=0l;
         }
+        onLoadSuccess(context.getResources().getString(R.string.xj_patrol_upload_succeed));
+        mXJAreaEntity.isUpload=true;
+        XJTaskCacheUtil.insertTasksArea(mXJAreaEntity);
+        mXJTaskEntity.id = id;
+        EventBus.getDefault().post(new XJTempTaskUploadRefreshEvent(id));
     }
 
     @Override

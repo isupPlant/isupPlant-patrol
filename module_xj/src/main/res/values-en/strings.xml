@@ -123,4 +123,9 @@
 	<string name="xj_patrol_code_not_match">Check in code does not match</string>
 	<string name="operate_succeed">Operate succeed</string>
 	<string name="xj_patrol_upload_time_out">One time upload task is too large, please upload in batches</string>
+	<string name="xj_no_allow_delay">Delay of inspection is not allowed</string>
+	<string name="xj_no_allow_advance">No advance inspection is allowed</string>
+	<string name="hour_begins">hour begins</string>
+	<string name="hour_end">hour end</string>
+	<string name="uploaded">uploaded</string>
 </resources>

@@ -60,6 +60,9 @@ public class XJAreaAdapter extends BaseListDataRecyclerViewAdapter<XJTaskAreaEnt
         @BindByTag("itemXJAreaYHTag")
         ImageView itemXJAreaYHTag;
 
+        @BindByTag("itemXJAreaUploadState")
+        TextView itemXJAreaUploadState;
+
         public XJAreaViewHolder(Context context) {
             super(context);
         }
@@ -93,6 +96,11 @@ public class XJAreaAdapter extends BaseListDataRecyclerViewAdapter<XJTaskAreaEnt
             }
             else{
                 itemXJAreaYHTag.setVisibility(View.GONE);
+            }
+            if (data.isUpload){
+                itemXJAreaUploadState.setVisibility(View.VISIBLE);
+            }else{
+                itemXJAreaUploadState.setVisibility(View.GONE);
             }
             itemXJAreaProcess.setTextColor(context.getResources().getColor(R.color.xjTextColor));
             if(TextUtils.isEmpty(data.process)){

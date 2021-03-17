@@ -270,9 +270,21 @@ public class XJWorkActivity extends BaseRefreshRecyclerActivity<XJTaskWorkEntity
         if (mAV160Controller != null) {
             mAV160Controller.onDestroy();
         }
-
 //        if (expertViberController != null)
 //            expertViberController.onDestroy();
+
+        int finishNum = 0;
+        for (XJTaskWorkEntity xjWorkEntity : mXJAreaEntity.works) {
+            if (xjWorkEntity.isFinished) {
+                finishNum++;
+            }
+        }
+
+        mXJAreaEntity.finishNum = finishNum;
+        mXJAreaEntity.isFinished = mXJAreaEntity.finishNum == mXJAreaEntity.works.size();
+        XJTaskCacheUtil.insertTasksArea(mXJAreaEntity);
+        EventBus.getDefault().post(new XJAreaRefreshEvent());
+
 
 /*        int finishNum = 0;
         for (XJTaskWorkEntity xjWorkEntity : mXJAreaEntity.works) {
@@ -918,7 +930,12 @@ public class XJWorkActivity extends BaseRefreshRecyclerActivity<XJTaskWorkEntity
                                     doFinish(xjWorkItemEntity);
                                 }
                                 mXJAreaEntity.finishNum += xjWorkEntities.size();
-                                XJTaskCacheUtil.insertTasksWork(mXJTaskEntity.tableNo, mXJAreaEntity.id, mXJAreaEntity.works);
+                                XJTaskCacheUtil.putWorkAsync(mXJTaskEntity.tableNo, mXJAreaEntity.id, mXJAreaEntity.works, new XJTaskCacheUtil.Callback() {
+                                    @Override
+                                    public void apply() {
+                                        LogUtil.d("保存巡检项成功");
+                                    }
+                                });
                                 mXJAreaEntity.isFinished = mXJAreaEntity.finishNum == mXJAreaEntity.works.size();
                                 XJTaskCacheUtil.insertTasksArea(mXJAreaEntity);
                                 if (xjWorkEntities.size() == mXJAreaEntity.works.size()) {
@@ -1052,7 +1069,12 @@ public class XJWorkActivity extends BaseRefreshRecyclerActivity<XJTaskWorkEntity
 
                     }, () -> {
                         mXJAreaEntity.finishNum += xjWorkItemEntities.size();
-                        XJTaskCacheUtil.insertTasksWork(mXJTaskEntity.tableNo, mXJAreaEntity.id, mXJAreaEntity.works);
+                        XJTaskCacheUtil.putWorkAsync(mXJTaskEntity.tableNo, mXJAreaEntity.id, mXJAreaEntity.works, new XJTaskCacheUtil.Callback() {
+                            @Override
+                            public void apply() {
+                                LogUtil.d("保存巡检项成功");
+                            }
+                        });
                         mXJAreaEntity.isFinished = mXJAreaEntity.finishNum == mXJAreaEntity.works.size();
                         XJTaskCacheUtil.insertTasksArea(mXJAreaEntity);
                         if (xjWorkItemEntities.size() == mXJAreaEntity.works.size()) {

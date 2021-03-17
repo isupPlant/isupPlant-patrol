@@ -26,6 +26,20 @@
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="30dp"
+        android:text="@string/uploaded"
+        android:id="@+id/itemXJAreaUploadState"
+        android:textColor="@color/xjTextColor"
+        android:textSize="14sp"
+        android:tag="itemXJAreaUploadState"
+        android:gravity="center"
+        android:layout_centerVertical="true"
+        android:layout_marginRight="@dimen/dp_20"
+        android:layout_toLeftOf="@+id/itemXJAreaProcess"
+        android:visibility="gone"
+        />
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="30dp"
         android:text="06/06"
         android:id="@+id/itemXJAreaProcess"
         android:textColor="@color/xjTextColor"
