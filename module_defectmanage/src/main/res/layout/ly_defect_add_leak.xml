@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:id="@+id/leak_ly"
+    android:tag="leak_ly"
+    android:orientation="vertical">
+
+
+    <com.supcon.mes.mbap.view.CustomEditText
+        android:id="@+id/leak_name"
+        android:layout_width="match_parent"
+        android:layout_height="46dp"
+        android:tag="leak_name"
+        app:edit_hint="@string/defect_leak_name"
+        app:text="@string/defect_leak_name" />
+
+
+    <com.supcon.mes.mbap.view.CustomTextView
+        android:id="@+id/leak_status"
+        style="@style/psc_edit_date_horizontal_style_text_view"
+        android:tag="leak_status"
+        android:translationZ="1dp"
+        app:icon_res="@drawable/ic_unfold66"
+        app:key="@string/defect_leak_status" />
+
+    <com.supcon.mes.mbap.view.CustomEditText
+        android:id="@+id/leak_number"
+        android:layout_width="match_parent"
+        android:layout_height="46dp"
+        android:tag="leak_number"
+        app:edit_hint="@string/defect_leak_status"
+        app:text="@string/defect_leak_number" />
+
+
+    <com.supcon.mes.mbap.view.CustomDateView
+        android:id="@+id/leak_time"
+        style="@style/psc_edit_date_horizontal_style_text_view"
+        android:tag="leak_time"
+        app:key="@string/defect_leak_time" />
+
+
+</LinearLayout>
