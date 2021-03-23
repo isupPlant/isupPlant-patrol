@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/leak_ly"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:id="@+id/leak_ly"
-    android:tag="leak_ly"
-    android:orientation="vertical">
+    android:orientation="vertical"
+    android:tag="leak_ly">
 
 
     <com.supcon.mes.mbap.view.CustomEditText
@@ -16,6 +16,8 @@
         app:edit_hint="@string/defect_leak_name"
         app:text="@string/defect_leak_name" />
 
+    <include layout="@layout/v_divider_gray" />
+
 
     <com.supcon.mes.mbap.view.CustomTextView
         android:id="@+id/leak_status"
@@ -23,6 +25,7 @@
         android:tag="leak_status"
         android:translationZ="1dp"
         app:icon_res="@drawable/ic_unfold66"
+        app:editable="true"
         app:key="@string/defect_leak_status" />
 
     <com.supcon.mes.mbap.view.CustomEditText
@@ -30,8 +33,10 @@
         android:layout_width="match_parent"
         android:layout_height="46dp"
         android:tag="leak_number"
-        app:edit_hint="@string/defect_leak_status"
+        app:edit_hint="@string/defect_leak_number"
         app:text="@string/defect_leak_number" />
+
+    <include layout="@layout/v_divider_gray" />
 
 
     <com.supcon.mes.mbap.view.CustomDateView

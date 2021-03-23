@@ -43,6 +43,9 @@
     <string name="defect_data_is_not_complete">请补全信息后上传</string>
     <string name="defect_data_is_need_edit">待完善</string>
     <string name="defect_data_batch_upload">批量上传</string>
+    <string name="defect_yes">否</string>
+    <string name="defect_no">是</string>
+
 
 
     <string name="defect_data_choose_is_null">没有选择数据</string>

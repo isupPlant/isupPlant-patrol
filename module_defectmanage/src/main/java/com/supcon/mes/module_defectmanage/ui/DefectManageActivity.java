@@ -126,12 +126,11 @@ public class DefectManageActivity extends BaseControllerActivity implements AddD
     @BindByTag("titleText")
     TextView titleText;
 
-
-
     private SinglePickController mSinglePickController;
     private MyPickerController mDatePickController;
 
     SystemCodeEntity selectedType, selectLevel;
+    boolean selectedLeaklist;
     BaseCodeIdNameEntity selectSource;
     BaseCodeIdNameEntity selectedEamInfo;
 
@@ -139,7 +138,7 @@ public class DefectManageActivity extends BaseControllerActivity implements AddD
     BaseIntIdNameEntity selectedAssor, selectedFinder;
 
     BaseCodeIdNameEntity  selectedArea;
-    long findTimeLong, handleTimeLong;
+    long findTimeLong, handleTimeLong, leakTimeLong;
     DefectModelEntity defectModelEntity;
     Long tableNo;
 
@@ -287,6 +286,20 @@ public class DefectManageActivity extends BaseControllerActivity implements AddD
             }
         });
 
+        leak_time.setOnChildViewClickListener((childView, action, obj) -> {
+            if (action == -1) {
+            } else {
+                mDatePickController
+                        .listener((year, month, day, hour, minute, second) -> {
+
+                            String dateStr = year + "-" + month + "-" + day + " " + hour + ":" + minute + ":" + second;
+                            leakTimeLong = DateUtil.dateFormat(dateStr, "yyyy-MM-dd HH:mm:ss");
+                            leak_time.setDate(DateUtil.dateFormat(leakTimeLong, "yyyy-MM-dd HH:mm:ss"));
+                        })
+                        .show(leakTimeLong);
+            }
+        });
+
         source.setOnChildViewClickListener(new OnChildViewClickListener() {
             @Override
             public void onChildViewClick(View childView, int action, Object obj) {
@@ -309,6 +322,33 @@ public class DefectManageActivity extends BaseControllerActivity implements AddD
                 }
             }
         });
+
+        leak_status.setOnChildViewClickListener(new OnChildViewClickListener() {
+            @Override
+            public void onChildViewClick(View childView, int action, Object obj) {
+                if (action == -1) {
+                    selectedLeaklist = false;
+                } else {
+                    //如果选择的是泄漏的话
+                    List<String> nameList = new ArrayList<>();
+                    nameList.add(getString(R.string.defect_yes));
+                    nameList.add(getString(R.string.defect_no));
+
+                    SinglePickController<String> stringSinglePickController = mSinglePickController
+                            .list(nameList)
+                            .listener((index, item) -> {
+                                if (index == 0) {
+                                    selectedLeaklist = false;
+                                } else {
+                                    selectedLeaklist = true;
+                                }
+                                leak_status.setContent((String) item);
+                            });
+                    stringSinglePickController.show(leak_status.getContent());
+                }
+            }
+        });
+
 
         type.setOnChildViewClickListener(new OnChildViewClickListener() {
             @Override
@@ -366,11 +406,6 @@ public class DefectManageActivity extends BaseControllerActivity implements AddD
                             .listener((index, item) -> {
                                 selectLevel = systemCodeEntityList.get(index);
                                 level.setContent((String) item);
-                                if (selectLevel != null && StringUtil.contains(selectLevel.code, "Leak")) {
-                                    leak_ly.setVisibility(View.VISIBLE);
-                                } else {
-                                    leak_ly.setVisibility(View.GONE);
-                                }
                             });
                     stringSinglePickController.show(level.getContent());
                 }
@@ -474,6 +509,21 @@ public class DefectManageActivity extends BaseControllerActivity implements AddD
         selectedFinder = new BaseIntIdNameEntity();
         selectedFinder.setId(defectModelEntity.finderId);
         selectedFinder.setName(defectModelEntity.finderName);
+
+        //泄漏的
+        selectedLeaklist = defectModelEntity.listed;
+        if (selectedLeaklist) {
+            leak_status.setContent(getString(R.string.defect_yes));
+        } else {
+            leak_status.setContent(getString(R.string.defect_no));
+        }
+        leak_time.setContent(defectModelEntity.listedTime);
+        if (!StringUtil.isBlank(defectModelEntity.listedTime)) {
+            leakTimeLong = DateUtil.dateFormat(defectModelEntity.listedTime, "yyyy-MM-dd HH:mm:ss");
+        }
+
+        leak_name.setContent(defectModelEntity.leakName);
+        leak_number.setContent(defectModelEntity.listedNumber);
     }
 
     private void swithLeakly(String code) {
@@ -503,6 +553,9 @@ public class DefectManageActivity extends BaseControllerActivity implements AddD
         calendar.add(Calendar.HOUR, 8);
         handleTimeLong = calendar.getTimeInMillis();
         planhandletime.setDate(DateUtil.dateFormat(handleTimeLong, "yyyy-MM-dd HH:mm:ss"));
+
+        leakTimeLong = calendar.getTimeInMillis();
+        leak_time.setDate(DateUtil.dateFormat(handleTimeLong, "yyyy-MM-dd HH:mm:ss"));
     }
 
     /**
