@@ -182,7 +182,11 @@ public class DefectManageActivity extends BaseControllerActivity implements AddD
         initDatePickController();
         initSinglePickController();
 
-        initByEditInfo();
+        if (tableNo != null && tableNo.longValue() > 0) {
+            initByEmpty();
+        } else {
+            initByEditInfo();
+        }
     }
 
     @Override
@@ -417,11 +421,6 @@ public class DefectManageActivity extends BaseControllerActivity implements AddD
      */
     private void initByEditInfo() {
         //UI全部初始化
-        if (tableNo != null || defectModelEntity == null) {
-            initByEmpty();
-            return;
-        }
-        LogUtil.e("ffffff");
 
         name.setContent(defectModelEntity.getName());
         describe.setContent(defectModelEntity.getHiddenApperance());
@@ -434,6 +433,7 @@ public class DefectManageActivity extends BaseControllerActivity implements AddD
             for (SystemCodeEntity systemCodeEntity : systemCodeEntityList) {
                 if (StringUtil.contains(systemCodeEntity.getCode(), defectModelEntity.defectType)) {
                     selectedType = systemCodeEntity;
+                    type.setContent(systemCodeEntity.getValue());
                     swithLeakly(systemCodeEntity.code);
                 }
             }
@@ -445,6 +445,7 @@ public class DefectManageActivity extends BaseControllerActivity implements AddD
             for (SystemCodeEntity systemCodeEntity : levelList) {
                 if (StringUtil.contains(systemCodeEntity.getCode(), defectModelEntity.problemLevel)) {
                     selectLevel = systemCodeEntity;
+                    level.setContent(systemCodeEntity.getValue());
                 }
             }
         }
@@ -476,7 +477,7 @@ public class DefectManageActivity extends BaseControllerActivity implements AddD
     }
 
     private void swithLeakly(String code) {
-        if (StringUtil.contains(code, "Fault")) {
+        if (StringUtil.contains(code, "Leak")) {
             leak_ly.setVisibility(View.VISIBLE);
         } else {
             leak_ly.setVisibility(View.GONE);
@@ -512,6 +513,12 @@ public class DefectManageActivity extends BaseControllerActivity implements AddD
         putValueToEntity(false);
         saveFileToString();
         DatabaseManager.getDao().getDefectModelEntityDao().insertOrReplace(defectModelEntity);
+
+        if (tableNo == null || tableNo.longValue() < 1) {
+            finish();
+        } else {
+            ToastUtils.show(context, getString(R.string.middleware_save_succeed));
+        }
     }
 
     /**

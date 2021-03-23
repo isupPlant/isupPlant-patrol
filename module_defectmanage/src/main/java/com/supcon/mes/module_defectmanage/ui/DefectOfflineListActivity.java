@@ -118,6 +118,8 @@ public class DefectOfflineListActivity extends BaseRefreshRecyclerActivity<Defec
                     if (llt_buttom.getVisibility() == View.VISIBLE) {
                         llt_buttom.setVisibility(View.GONE);
                         checkedMap.clear();
+
+                        setAllBtn(false);
                         adapter.setCheckedMap(checkedMap);
                         adapter.setChoosing(false);
                     } else {
@@ -187,6 +189,7 @@ public class DefectOfflineListActivity extends BaseRefreshRecyclerActivity<Defec
                     submit();
                 });
 
+        adapter.setCheckedMap(checkedMap);
         adapter.setOnItemChildViewClickListener(new OnItemChildViewClickListener() {
             @Override
             public void onItemChildViewClick(View childView, int position, int action, Object obj) {
@@ -253,8 +256,7 @@ public class DefectOfflineListActivity extends BaseRefreshRecyclerActivity<Defec
 
     @Override
     public void defectEntrySuccess(BAP5CommonEntity entity) {
-        onLoadSuccess();
-        ToastUtils.show(context, context.getString(R.string.submit_success));
+
     }
 
     @Override
@@ -271,6 +273,9 @@ public class DefectOfflineListActivity extends BaseRefreshRecyclerActivity<Defec
         DatabaseManager.getDao().getDefectModelEntityDao().deleteInTx(list);
         checkedMap.clear();
         loadDataFromDb(tableNo);
+
+        onLoadSuccess();
+        ToastUtils.show(context, context.getString(R.string.submit_success));
     }
 
     @Override

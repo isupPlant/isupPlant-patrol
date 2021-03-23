@@ -20,7 +20,7 @@ public interface ApiService {
     Flowable<BAP5CommonEntity<Long>> defectEntry(@Body DefectModelEntity body);
 
     @POST("/msService/DefectManage/problemManage/problemManage/defectEntryBatch")
-    Flowable<BAP5CommonEntity<Long>> defectEntryBatch(@Body List<DefectModelEntity> infoList);
+    Flowable<BAP5CommonEntity<Object>> defectEntryBatch(@Body List<DefectModelEntity> infoList);
 
 
 }

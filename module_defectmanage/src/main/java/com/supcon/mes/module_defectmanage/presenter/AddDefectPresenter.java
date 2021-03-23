@@ -38,14 +38,14 @@ public class AddDefectPresenter extends AddDefectContract.Presenter {
     @Override
     public void defectEntryBatch(List<DefectModelEntity> infoList) {
         mCompositeSubscription.add(DefectManagerHttpClient.defectEntryBatch(infoList)
-                .onErrorReturn(new FunctionEx<Throwable, Long>() {
+                .onErrorReturn(new FunctionEx<Throwable, Object>() {
                     @Override
                     public BAP5CommonEntity apply(Throwable throwable)  {
                         return super.apply(throwable);
                     }
-                }).subscribe(new Consumer<BAP5CommonEntity<Long>>() {
+                }).subscribe(new Consumer<BAP5CommonEntity<Object>>() {
                     @Override
-                    public void accept(BAP5CommonEntity<Long> incidentTmpEntityCommonEntity) throws Exception {
+                    public void accept(BAP5CommonEntity<Object> incidentTmpEntityCommonEntity) throws Exception {
                         if (incidentTmpEntityCommonEntity.success) {
                             getView().defectEntryBatchSuccess(incidentTmpEntityCommonEntity);
                         } else {

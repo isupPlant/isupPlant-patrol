@@ -12,7 +12,7 @@ android {
         versionName         rootProject.ext.versionName
 
         greendao {
-            schemaVersion 1 //2019/11/7
+            schemaVersion 3 //2019/11/7
         }
 
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
