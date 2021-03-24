@@ -58,6 +58,7 @@ import com.supcon.mes.module_defectmanage.model.bean.FileUploadDefectEntity;
 import com.supcon.mes.module_defectmanage.model.contract.AddDefectContract;
 import com.supcon.mes.module_defectmanage.presenter.AddDefectPresenter;
 import com.supcon.mes.module_defectmanage.util.DatabaseManager;
+import com.supcon.mes.module_defectmanage.util.HandleUtils;
 import com.supcon.mes.module_defectmanage.util.Utils;
 
 import org.greenrobot.eventbus.EventBus;
@@ -130,7 +131,7 @@ public class DefectManageActivity extends BaseControllerActivity implements AddD
     private MyPickerController mDatePickController;
 
     SystemCodeEntity selectedType, selectLevel;
-    boolean selectedLeaklist;
+    Boolean haslist;//是否挂牌
     BaseCodeIdNameEntity selectSource;
     BaseCodeIdNameEntity selectedEamInfo;
 
@@ -327,7 +328,7 @@ public class DefectManageActivity extends BaseControllerActivity implements AddD
             @Override
             public void onChildViewClick(View childView, int action, Object obj) {
                 if (action == -1) {
-                    selectedLeaklist = false;
+                    haslist = false;
                 } else {
                     //如果选择的是泄漏的话
                     List<String> nameList = new ArrayList<>();
@@ -338,9 +339,9 @@ public class DefectManageActivity extends BaseControllerActivity implements AddD
                             .list(nameList)
                             .listener((index, item) -> {
                                 if (index == 0) {
-                                    selectedLeaklist = false;
+                                    haslist = false;
                                 } else {
-                                    selectedLeaklist = true;
+                                    haslist = true;
                                 }
                                 leak_status.setContent((String) item);
                             });
@@ -511,8 +512,8 @@ public class DefectManageActivity extends BaseControllerActivity implements AddD
         selectedFinder.setName(defectModelEntity.finderName);
 
         //泄漏的
-        selectedLeaklist = defectModelEntity.listed;
-        if (selectedLeaklist) {
+        haslist = defectModelEntity.listed;
+        if (haslist == null || !haslist) {
             leak_status.setContent(getString(R.string.defect_yes));
         } else {
             leak_status.setContent(getString(R.string.defect_no));
@@ -524,6 +525,13 @@ public class DefectManageActivity extends BaseControllerActivity implements AddD
 
         leak_name.setContent(defectModelEntity.leakName);
         leak_number.setContent(defectModelEntity.listedNumber);
+
+        if (!StringUtil.isBlank(defectModelEntity.fileJson)) {
+            ArrayList<FileEntity> fileList = (ArrayList<FileEntity>) GsonUtil.jsonToList(defectModelEntity.fileJson, FileEntity.class);
+            if (fileList != null && fileList.size() > 0) {
+                file_list.addAllList(fileList);
+            }
+        }
     }
 
     private void swithLeakly(String code) {
@@ -886,27 +894,15 @@ public class DefectManageActivity extends BaseControllerActivity implements AddD
         if (entity != null) {
             ArrayList<FileEntity> filelist = entity;
             if (filelist != null && filelist.size() > 0) {
-                List<FileUploadDefectEntity> uploadFileFormMapArrayList = converFileToUploadFile(filelist);
-                defectModelEntity.setList(uploadFileFormMapArrayList);
+                List<FileUploadDefectEntity> uploadFileFormMapArrayList = HandleUtils.converFileToUploadFile(filelist);
+                defectModelEntity.setDefectFile(uploadFileFormMapArrayList);
             }
 
-            submit();
+            presenterRouter.create(AddDefectAPI.class).defectEntry(defectModelEntity);
         }
     }
 
-    private List<FileUploadDefectEntity> converFileToUploadFile(List<FileEntity> fileEntities) {
-        List<FileUploadDefectEntity> resultList = new ArrayList<>();
-        if (fileEntities != null && fileEntities.size() > 0) {
-            for (FileEntity fileEntity : fileEntities) {
-                FileUploadDefectEntity entity = new FileUploadDefectEntity();
-                entity.setFileIcon(fileEntity.getFileIcon());
-                entity.setFilename(fileEntity.getFilename());
-                entity.setPath(fileEntity.getPath());
-                resultList.add(entity);
-            }
-        }
-        return resultList;
-    }
+
 
     @Override
     public void uploadMultiFilesFailed(String errorMsg) {

@@ -6,7 +6,7 @@ public class FileUploadDefectEntity extends BaseEntity {
 
     private String fileIcon;
     private String path;
-    private String filename;
+    private String fileName;
 
     public String getFileIcon() {
         return fileIcon;
@@ -25,10 +25,10 @@ public class FileUploadDefectEntity extends BaseEntity {
     }
 
     public String getFilename() {
-        return filename;
+        return fileName;
     }
 
     public void setFilename(String filename) {
-        this.filename = filename;
+        this.fileName = filename;
     }
 }

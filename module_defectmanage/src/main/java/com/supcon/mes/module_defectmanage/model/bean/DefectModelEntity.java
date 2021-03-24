@@ -95,7 +95,8 @@ public class DefectModelEntity extends BaseEntity {
     public String dealStaffCode;
     public Long dealStaffId;
     public String classification;
-    public String defectFile;
+    @Transient
+    public List<FileUploadDefectEntity> defectFile;
     public Long cid;
 
     public String fileJson;//存放 file数组的json的的字段
@@ -108,14 +109,11 @@ public class DefectModelEntity extends BaseEntity {
         this.fileJson = fileJson;
     }
 
-    @Transient
-    List<FileUploadDefectEntity> list;
 
-    @Generated(hash = 816692469)
+    @Generated(hash = 1008921216)
     public DefectModelEntity(Long dbId, Long tableNo, boolean isValid, String name, String eamName, String eamCode, Long eamId, String finderCode, Long finderId, String finderName, String findTime, String eamDeptCode,
             String eamDeptName, Long eamDeptId, String areaCode, String areaName, Long areaId, Boolean isClosed, String defectType, String problemLevel, String defectSource, String hiddenApperance, Boolean listed, String listedNumber,
-            String leakName, String listedTime, String assessorCode, String assessorName, Long assessorId, String eliminateTime, String dealStaffCode, Long dealStaffId, String classification, String defectFile, Long cid,
-            String fileJson) {
+            String leakName, String listedTime, String assessorCode, String assessorName, Long assessorId, String eliminateTime, String dealStaffCode, Long dealStaffId, String classification, Long cid, String fileJson) {
         this.dbId = dbId;
         this.tableNo = tableNo;
         this.isValid = isValid;
@@ -149,7 +147,6 @@ public class DefectModelEntity extends BaseEntity {
         this.dealStaffCode = dealStaffCode;
         this.dealStaffId = dealStaffId;
         this.classification = classification;
-        this.defectFile = defectFile;
         this.cid = cid;
         this.fileJson = fileJson;
     }
@@ -314,12 +311,7 @@ public class DefectModelEntity extends BaseEntity {
     public void setClassification(String classification) {
         this.classification = classification;
     }
-    public String getDefectFile() {
-        return this.defectFile;
-    }
-    public void setDefectFile(String defectFile) {
-        this.defectFile = defectFile;
-    }
+
     public Long getCid() {
         return this.cid;
     }
@@ -350,10 +342,7 @@ public class DefectModelEntity extends BaseEntity {
     public void setAreaName(String areaName) {
         this.areaName = areaName;
     }
-
-    public void setList(List<FileUploadDefectEntity> list) {
-        this.list = list;
-    }
+    
 
     public Long getDbId() {
         return this.dbId;
@@ -377,5 +366,13 @@ public class DefectModelEntity extends BaseEntity {
 
     public void setAssessorName(String assessorName) {
         this.assessorName = assessorName;
+    }
+
+    public List<FileUploadDefectEntity> getDefectFile() {
+        return defectFile;
+    }
+
+    public void setDefectFile(List<FileUploadDefectEntity> defectFile) {
+        this.defectFile = defectFile;
     }
 }

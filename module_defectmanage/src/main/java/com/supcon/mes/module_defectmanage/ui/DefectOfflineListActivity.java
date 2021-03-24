@@ -18,22 +18,28 @@ import com.supcon.common.view.base.activity.BaseRefreshRecyclerActivity;
 import com.supcon.common.view.base.adapter.IListAdapter;
 import com.supcon.common.view.listener.OnItemChildViewClickListener;
 import com.supcon.common.view.listener.OnRefreshListener;
-import com.supcon.common.view.util.LogUtil;
 import com.supcon.common.view.util.ToastUtils;
+import com.supcon.mes.mbap.utils.GsonUtil;
 import com.supcon.mes.mbap.utils.StatusBarUtils;
 import com.supcon.mes.mbap.view.CustomDialog;
 import com.supcon.mes.middleware.IntentRouter;
 import com.supcon.mes.middleware.constant.Constant;
+import com.supcon.mes.middleware.model.api.AddFileListAPI;
 import com.supcon.mes.middleware.model.bean.BAP5CommonEntity;
+import com.supcon.mes.middleware.model.bean.FileEntity;
+import com.supcon.mes.middleware.model.contract.AddFileListContract;
 import com.supcon.mes.middleware.util.EmptyAdapterHelper;
+import com.supcon.mes.middleware.util.StringUtil;
 import com.supcon.mes.module_defectmanage.R;
 import com.supcon.mes.module_defectmanage.model.api.AddDefectAPI;
 import com.supcon.mes.module_defectmanage.model.bean.DefectModelEntity;
 import com.supcon.mes.module_defectmanage.model.bean.DefectModelEntityDao;
+import com.supcon.mes.module_defectmanage.model.bean.FileUploadDefectEntity;
 import com.supcon.mes.module_defectmanage.model.contract.AddDefectContract;
 import com.supcon.mes.module_defectmanage.presenter.AddDefectPresenter;
 import com.supcon.mes.module_defectmanage.ui.adapter.DefectAddInfoAdapter;
 import com.supcon.mes.module_defectmanage.util.DatabaseManager;
+import com.supcon.mes.module_defectmanage.util.HandleUtils;
 import com.supcon.mes.module_defectmanage.util.Utils;
 
 import java.util.ArrayList;
@@ -47,7 +53,8 @@ import io.reactivex.disposables.Disposable;
 
 @Presenter(value = AddDefectPresenter.class)
 @Router(value = Utils.AppCode.DEFECT_MANAGEMENT_OFF_LINE_LIST)
-public class DefectOfflineListActivity extends BaseRefreshRecyclerActivity<DefectModelEntity> implements AddDefectContract.View {
+public class DefectOfflineListActivity extends BaseRefreshRecyclerActivity<DefectModelEntity> implements AddDefectContract.View,
+        AddFileListContract.View {
     @BindByTag("leftBtn")
     ImageButton leftBtn;
     @BindByTag("llt_buttom")
@@ -122,7 +129,7 @@ public class DefectOfflineListActivity extends BaseRefreshRecyclerActivity<Defec
                         setAllBtn(false);
                         adapter.setCheckedMap(checkedMap);
                         adapter.setChoosing(false);
-                    } else {
+                    } else if (adapter.getList() != null && adapter.getList().size() > 0){
                         llt_buttom.setVisibility(View.VISIBLE);
                         adapter.setChoosing(true);
                     }
@@ -234,13 +241,38 @@ public class DefectOfflineListActivity extends BaseRefreshRecyclerActivity<Defec
             ToastUtils.show(context, R.string.defect_data_is_not_complete);
             return;
         }
-        //如果有附件的话 还要添加附件的逻辑
+
         List<DefectModelEntity> list = new ArrayList<>();
         for (DefectModelEntity value : checkedMap.values()) {
             list.add(value);
         }
+
+        //如果有附件的话 还要添加附件的逻辑
+        //如果有附件的话 还要一个个的上传附件
+        uploadFileOneByOne(list);
+    }
+
+    private void uploadFileOneByOne(List<DefectModelEntity> list) {
+        ArrayList<String> pathAllList = new ArrayList<>();
+        for (DefectModelEntity entity : list) {
+            if (!StringUtil.isBlank(entity.getFileJson())) {
+                ArrayList<FileEntity> fileList = (ArrayList<FileEntity>) GsonUtil.jsonToList(entity.fileJson, FileEntity.class);
+                ArrayList<String> pathList = new ArrayList<>();
+                for (FileEntity item : fileList) {
+                    if (!item.isOnline())
+                        pathList.add(item.getPath());
+                }
+
+                pathAllList.addAll(pathList);
+            }
+        }
+
         onLoading();
-        presenterRouter.create(AddDefectAPI.class).defectEntryBatch(list);
+        if (pathAllList.size() == 0) {
+            presenterRouter.create(AddDefectAPI.class).defectEntryBatch(list);
+        } else {
+            presenterRouter.create(AddFileListAPI.class).uploadMultiFiles(pathAllList);
+        }
     }
 
 
@@ -356,5 +388,43 @@ public class DefectOfflineListActivity extends BaseRefreshRecyclerActivity<Defec
             all.setCompoundDrawables(null, drawable, null, null);
             all.setText(getString(R.string.middleware_choose_all));
         }
+    }
+
+    @Override
+    public void uploadMultiFilesSuccess(ArrayList entity) {
+        closeLoader();
+
+        if (entity != null) {
+            ArrayList<FileEntity> filelist = entity;
+            List<FileUploadDefectEntity> uploadFileFormMapArrayList = null;
+            if (filelist != null && filelist.size() > 0) {
+                uploadFileFormMapArrayList  = HandleUtils.converFileToUploadFile(filelist);
+            }
+
+            List<DefectModelEntity> list = new ArrayList<>();
+            for (DefectModelEntity value : checkedMap.values()) {
+                if (!StringUtil.isBlank(value.fileJson) && uploadFileFormMapArrayList != null) {
+                    String json = value.getFileJson();
+                    List<FileUploadDefectEntity> defectFileList = new ArrayList<>();
+                    for (FileUploadDefectEntity fileUploadDefectEntity : uploadFileFormMapArrayList) {
+                        if (StringUtil.contains(json, fileUploadDefectEntity.getFilename())) {
+                            //
+                            defectFileList.add(fileUploadDefectEntity);
+                        }
+                    }
+                    value.setDefectFile(defectFileList);
+                }
+                list.add(value);
+            }
+
+            onLoading();
+            presenterRouter.create(AddDefectAPI.class).defectEntryBatch(list);
+        }
+    }
+
+    @Override
+    public void uploadMultiFilesFailed(String errorMsg) {
+        closeLoader();
+        ToastUtils.show(context, errorMsg);
     }
 }

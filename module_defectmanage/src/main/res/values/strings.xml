@@ -40,7 +40,7 @@
 
     <string name="defect_submit_failed_save_to_local">提交失败，数据已经保存在本地列表，可以在本地缺陷列表中查看</string>
     <string name="defect_data_is_null">数据为空</string>
-    <string name="defect_data_is_not_complete">请补全信息后上传</string>
+    <string name="defect_data_is_not_complete">缺陷单中信息待完善，请补全信息后上传</string>
     <string name="defect_data_is_need_edit">待完善</string>
     <string name="defect_data_batch_upload">批量上传</string>
     <string name="defect_yes">否</string>
