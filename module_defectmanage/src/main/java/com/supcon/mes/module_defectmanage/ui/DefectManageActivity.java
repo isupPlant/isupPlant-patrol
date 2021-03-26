@@ -139,7 +139,7 @@ public class DefectManageActivity extends BaseControllerActivity implements AddD
     BaseIntIdNameEntity selectedDepartment;
     BaseIntIdNameEntity selectedAssor, selectedFinder;
 
-    BaseCodeIdNameEntity  selectedArea;
+    BaseCodeIdNameEntity  selectedArea = new BaseCodeIdNameEntity();
     long findTimeLong, handleTimeLong, leakTimeLong;
     DefectModelEntity defectModelEntity;
     DeviceEntity selectedDevice;
@@ -167,13 +167,13 @@ public class DefectManageActivity extends BaseControllerActivity implements AddD
         if (bundle != null) {
             Long dataId = bundle.getLong(Constant.INTENT_EXTRA_ID);
 
-            tableNo = bundle.getString(Constant.IntentKey.XJ_TASK_NO_STR);
-            String areaCode= bundle.getString(Constant.IntentKey.XJ_TASK_NO_STR);
-            String areaName = bundle.getString(Constant.IntentKey.XJ_TASK_NO_STR);
+            tableNo = bundle.getString(Constant.IntentKey.XJ_TASK_TABLENO);
+            String areaCode= bundle.getString(Constant.IntentKey.XJ_AREA_CODE);
+            String areaName = bundle.getString(Constant.IntentKey.XJ_AREA_NAME);
             selectedArea = new BaseCodeIdNameEntity();
             selectedArea.setCode(areaCode);
             selectedArea.setName(areaName);
-            String deviceIdList = bundle.getString(Constant.IntentKey.XJ_TASK_NO_STR);
+            String deviceIdList = bundle.getString(Constant.IntentKey.XJ_AREA_EAMLISTS);
             HandleUtils.setDeviceIdList(deviceIdList);//存储一下
             deviceEntities = getDeviceList(deviceIdList);
 
@@ -478,7 +478,8 @@ public class DefectManageActivity extends BaseControllerActivity implements AddD
                 .throttleFirst(200, TimeUnit.MILLISECONDS)
                 .subscribe(o -> {
                     Bundle bundle = new Bundle();
-                    bundle.putString(Constant.INTENT_EXTRA_OBJECT_CHAT, tableNo);
+                    bundle.putString(Constant.IntentKey.XJ_TASK_TABLENO, tableNo);
+                    bundle.putString(Constant.IntentKey.XJ_TASK_TABLENO, selectedArea.getCode());
                     IntentRouter.go(context, Utils.AppCode.DEFECT_MANAGEMENT_OFF_LINE_LIST, bundle);
                 });
     }

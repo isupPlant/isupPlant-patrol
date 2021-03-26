@@ -11,7 +11,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.app.annotation.BindByTag;
-import com.app.annotation.Presenter;
+import com.app.annotation.Controller;
 import com.app.annotation.apt.Router;
 import com.jakewharton.rxbinding2.view.RxView;
 import com.supcon.common.view.base.activity.BaseRefreshRecyclerActivity;
@@ -19,28 +19,23 @@ import com.supcon.common.view.base.adapter.IListAdapter;
 import com.supcon.common.view.listener.OnItemChildViewClickListener;
 import com.supcon.common.view.listener.OnRefreshListener;
 import com.supcon.common.view.util.ToastUtils;
-import com.supcon.mes.mbap.utils.GsonUtil;
 import com.supcon.mes.mbap.utils.StatusBarUtils;
 import com.supcon.mes.mbap.view.CustomDialog;
 import com.supcon.mes.middleware.IntentRouter;
 import com.supcon.mes.middleware.constant.Constant;
-import com.supcon.mes.middleware.model.api.AddFileListAPI;
-import com.supcon.mes.middleware.model.bean.BAP5CommonEntity;
-import com.supcon.mes.middleware.model.bean.FileEntity;
-import com.supcon.mes.middleware.model.contract.AddFileListContract;
+import com.supcon.mes.middleware.model.event.BaseEvent;
 import com.supcon.mes.middleware.util.EmptyAdapterHelper;
-import com.supcon.mes.middleware.util.StringUtil;
 import com.supcon.mes.module_defectmanage.R;
-import com.supcon.mes.module_defectmanage.model.api.AddDefectAPI;
+import com.supcon.mes.module_defectmanage.controller.BathUploadDefectController;
 import com.supcon.mes.module_defectmanage.model.bean.DefectModelEntity;
 import com.supcon.mes.module_defectmanage.model.bean.DefectModelEntityDao;
-import com.supcon.mes.module_defectmanage.model.bean.FileUploadDefectEntity;
-import com.supcon.mes.module_defectmanage.model.contract.AddDefectContract;
-import com.supcon.mes.module_defectmanage.presenter.AddDefectPresenter;
 import com.supcon.mes.module_defectmanage.ui.adapter.DefectAddInfoAdapter;
 import com.supcon.mes.module_defectmanage.util.DatabaseManager;
-import com.supcon.mes.module_defectmanage.util.HandleUtils;
 import com.supcon.mes.module_defectmanage.util.Utils;
+
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -51,10 +46,10 @@ import java.util.concurrent.TimeUnit;
 import io.reactivex.disposables.Disposable;
 
 
-@Presenter(value = AddDefectPresenter.class)
+//@Presenter(value = {AddDefectPresenter.class, AddFileListPresenter.class})
+@Controller(value = BathUploadDefectController.class)
 @Router(value = Utils.AppCode.DEFECT_MANAGEMENT_OFF_LINE_LIST)
-public class DefectOfflineListActivity extends BaseRefreshRecyclerActivity<DefectModelEntity> implements AddDefectContract.View,
-        AddFileListContract.View {
+public class DefectOfflineListActivity extends BaseRefreshRecyclerActivity<DefectModelEntity>  {
     @BindByTag("leftBtn")
     ImageButton leftBtn;
     @BindByTag("llt_buttom")
@@ -74,7 +69,7 @@ public class DefectOfflineListActivity extends BaseRefreshRecyclerActivity<Defec
 
     DefectAddInfoAdapter adapter;
     Map<Long, DefectModelEntity> checkedMap = new HashMap<>();
-    Long tableNo;
+    String tableNo, areaCode;
 
     @Override
     protected int getLayoutID() {
@@ -88,10 +83,8 @@ public class DefectOfflineListActivity extends BaseRefreshRecyclerActivity<Defec
         //情况分类：1、从巡检传过来的数据2、从列表中过来的某一条数据
         Bundle bundle = getIntent().getExtras();
         if (bundle != null) {
-            tableNo = bundle.getLong(Constant.INTENT_EXTRA_OBJECT_CHAT);
-            if (tableNo != null && tableNo.longValue() > 0) {
-//                loadDataFromDb(tableNo);
-            }
+            tableNo = bundle.getString(Constant.IntentKey.XJ_TASK_TABLENO);
+            areaCode = bundle.getString(Constant.IntentKey.XJ_AREA_CODE);
         }
     }
 
@@ -237,85 +230,49 @@ public class DefectOfflineListActivity extends BaseRefreshRecyclerActivity<Defec
      * 提交数据，提交失败后，提示是否保存在本地，保存在本地的数据都可以编辑
      */
     private void submit() {
-        if (!checkIsValid()){
-            ToastUtils.show(context, R.string.defect_data_is_not_complete);
-            return;
-        }
-
         List<DefectModelEntity> list = new ArrayList<>();
         for (DefectModelEntity value : checkedMap.values()) {
             list.add(value);
         }
 
-        //如果有附件的话 还要添加附件的逻辑
-        //如果有附件的话 还要一个个的上传附件
-        uploadFileOneByOne(list);
+        getController(BathUploadDefectController.class).bathUploadDefectList(list);
     }
 
-    private void uploadFileOneByOne(List<DefectModelEntity> list) {
-        ArrayList<String> pathAllList = new ArrayList<>();
-        for (DefectModelEntity entity : list) {
-            if (!StringUtil.isBlank(entity.getFileJson())) {
-                ArrayList<FileEntity> fileList = (ArrayList<FileEntity>) GsonUtil.jsonToList(entity.fileJson, FileEntity.class);
-                ArrayList<String> pathList = new ArrayList<>();
-                for (FileEntity item : fileList) {
-                    if (!item.isOnline())
-                        pathList.add(item.getPath());
-                }
 
-                pathAllList.addAll(pathList);
-            }
-        }
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        EventBus.getDefault().unregister(this);
+    }
 
-        onLoading();
-        if (pathAllList.size() == 0) {
-            presenterRouter.create(AddDefectAPI.class).defectEntryBatch(list);
-        } else {
-            presenterRouter.create(AddFileListAPI.class).uploadMultiFiles(pathAllList);
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onDataSelectNode(BaseEvent event) {
+        if (event != null && event.isSuccess()) {
+            checkedMap.clear();
+            loadDataFromDb(tableNo);
         }
     }
 
-
-    private boolean checkIsValid() {
-        for (DefectModelEntity value : checkedMap.values()) {
-            if (!value.isValid) {
-                return false;
-            }
-        }
-
-        return true;
-    }
-
-    @Override
-    public void defectEntrySuccess(BAP5CommonEntity entity) {
-
-    }
-
-    @Override
-    public void defectEntryFailed(String errorMsg) { ;
-    }
-
-    @Override
-    public void defectEntryBatchSuccess(BAP5CommonEntity entity) {
-        //删除上传的数据
-        List<DefectModelEntity> list = new ArrayList<>();
-        for (DefectModelEntity value : checkedMap.values()) {
-            list.add(value);
-        }
-        DatabaseManager.getDao().getDefectModelEntityDao().deleteInTx(list);
-        checkedMap.clear();
-        loadDataFromDb(tableNo);
-
-        onLoadSuccess();
-        ToastUtils.show(context, context.getString(R.string.submit_success));
-    }
-
-    @Override
-    public void defectEntryBatchFailed(String errorMsg) {
-        onLoadSuccess();
-        //提示用户保存在本地，但是不能重复保存啊,数据库的id是怎么回事
-        ToastUtils.show(context, context.getString(R.string.defect_submit_failed_save_to_local));
-    }
+//    @Override
+//    public void defectEntryBatchSuccess(BAP5CommonEntity entity) {
+//        //删除上传的数据
+//        List<DefectModelEntity> list = new ArrayList<>();
+//        for (DefectModelEntity value : checkedMap.values()) {
+//            list.add(value);
+//        }
+//        DatabaseManager.getDao().getDefectModelEntityDao().deleteInTx(list);
+//
+//
+//        onLoadSuccess();
+//        ToastUtils.show(context, context.getString(R.string.submit_success));
+//    }
+//
+//    @Override
+//    public void defectEntryBatchFailed(String errorMsg) {
+//        onLoadSuccess();
+//        //提示用户保存在本地，但是不能重复保存啊,数据库的id是怎么回事
+//        ToastUtils.show(context, context.getString(R.string.defect_submit_failed_save_to_local));
+//    }
 
     @Override
     protected IListAdapter<DefectModelEntity> createAdapter() {
@@ -326,10 +283,11 @@ public class DefectOfflineListActivity extends BaseRefreshRecyclerActivity<Defec
     /**
      * 从数据库中获取数据
      */
-    private void loadDataFromDb(Long tableNo) {
+    private void loadDataFromDb(String tableNo) {
         if (tableNo != null) {
             List<DefectModelEntity> list = DatabaseManager.getDao().getDefectModelEntityDao().queryBuilder()
-                .where(DefectModelEntityDao.Properties.TableNo.eq(tableNo.longValue())).list();
+                .where(DefectModelEntityDao.Properties.TableNo.eq(tableNo))
+                    .where(DefectModelEntityDao.Properties.AreaCode.eq(areaCode)).list();
 
             if (list != null && list.size() > 0) {
                 //通知页面更新
@@ -363,6 +321,8 @@ public class DefectOfflineListActivity extends BaseRefreshRecyclerActivity<Defec
 //                loadDataFromDb(tableNo);
             }
         });
+
+        EventBus.getDefault().register(this);
     }
 
     public void refreshList() {
@@ -390,41 +350,41 @@ public class DefectOfflineListActivity extends BaseRefreshRecyclerActivity<Defec
         }
     }
 
-    @Override
-    public void uploadMultiFilesSuccess(ArrayList entity) {
-        closeLoader();
-
-        if (entity != null) {
-            ArrayList<FileEntity> filelist = entity;
-            List<FileUploadDefectEntity> uploadFileFormMapArrayList = null;
-            if (filelist != null && filelist.size() > 0) {
-                uploadFileFormMapArrayList  = HandleUtils.converFileToUploadFile(filelist);
-            }
-
-            List<DefectModelEntity> list = new ArrayList<>();
-            for (DefectModelEntity value : checkedMap.values()) {
-                if (!StringUtil.isBlank(value.fileJson) && uploadFileFormMapArrayList != null) {
-                    String json = value.getFileJson();
-                    List<FileUploadDefectEntity> defectFileList = new ArrayList<>();
-                    for (FileUploadDefectEntity fileUploadDefectEntity : uploadFileFormMapArrayList) {
-                        if (StringUtil.contains(json, fileUploadDefectEntity.getFilename())) {
-                            //
-                            defectFileList.add(fileUploadDefectEntity);
-                        }
-                    }
-                    value.setDefectFile(defectFileList);
-                }
-                list.add(value);
-            }
-
-            onLoading();
-            presenterRouter.create(AddDefectAPI.class).defectEntryBatch(list);
-        }
-    }
-
-    @Override
-    public void uploadMultiFilesFailed(String errorMsg) {
-        closeLoader();
-        ToastUtils.show(context, errorMsg);
-    }
+//    @Override
+//    public void uploadMultiFilesSuccess(ArrayList entity) {
+//        closeLoader();
+//
+//        if (entity != null) {
+//            ArrayList<FileEntity> filelist = entity;
+//            List<FileUploadDefectEntity> uploadFileFormMapArrayList = null;
+//            if (filelist != null && filelist.size() > 0) {
+//                uploadFileFormMapArrayList  = HandleUtils.converFileToUploadFile(filelist);
+//            }
+//
+//            List<DefectModelEntity> list = new ArrayList<>();
+//            for (DefectModelEntity value : checkedMap.values()) {
+//                if (!StringUtil.isBlank(value.fileJson) && uploadFileFormMapArrayList != null) {
+//                    String json = value.getFileJson();
+//                    List<FileUploadDefectEntity> defectFileList = new ArrayList<>();
+//                    for (FileUploadDefectEntity fileUploadDefectEntity : uploadFileFormMapArrayList) {
+//                        if (StringUtil.contains(json, fileUploadDefectEntity.getFilename())) {
+//                            //
+//                            defectFileList.add(fileUploadDefectEntity);
+//                        }
+//                    }
+//                    value.setDefectFile(defectFileList);
+//                }
+//                list.add(value);
+//            }
+//
+//            onLoading();
+//            presenterRouter.create(AddDefectAPI.class).defectEntryBatch(list);
+//        }
+//    }
+//
+//    @Override
+//    public void uploadMultiFilesFailed(String errorMsg) {
+//        closeLoader();
+//        ToastUtils.show(context, errorMsg);
+//    }
 }
