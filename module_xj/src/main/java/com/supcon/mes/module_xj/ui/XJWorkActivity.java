@@ -447,16 +447,20 @@ public class XJWorkActivity extends BaseRefreshRecyclerActivity<XJTaskWorkEntity
                 showAllJumpDialog();
                 break;
             case 2:
-                StringBuilder idList = new StringBuilder();
-                for (DeviceEntity deviceEntity : deviceEntityList) {
-                    idList.append(deviceEntity.id);
-                    idList.append(",");
-                }
-                idList.replace(idList.length() - 1, idList.length(), "");
                 Bundle bundle = new Bundle();
+                StringBuilder idList = new StringBuilder();
+                if (deviceEntityList!=null){
+                    for (DeviceEntity deviceEntity : deviceEntityList) {
+                        idList.append(deviceEntity.id);
+                        idList.append(",");
+                    }
+                    idList.replace(idList.length() - 1, idList.length(), "");
+                    bundle.putString(Constant.IntentKey.XJ_AREA_EAMLISTS,  idList.toString());
+                }
+
+
                 bundle.putString(Constant.IntentKey.XJ_AREA_CODE,  mXJAreaEntity.code);
-                bundle.putString(Constant.IntentKey.XJ_AREA_NAME,  idList.toString());
-                bundle.putString(Constant.IntentKey.XJ_AREA_EAMLISTS,  mXJAreaEntity.code);
+                bundle.putString(Constant.IntentKey.XJ_AREA_NAME,  mXJAreaEntity.name);
                 bundle.putString(Constant.IntentKey.XJ_TASK_TABLENO,  mXJTaskEntity.tableNo);
                 IntentRouter.go(context, Constant.AppCode.DEFECT_MANAGEMENT_ADD, bundle);
 
