@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:focusable="true"
+    android:focusableInTouchMode="true"
+    android:background="@drawable/shap_fillet_bg"
+    android:orientation="vertical">
+
+    <TextView
+        android:id="@+id/tvAbnormalTitle"
+        android:tag="tvAbnormalTitle"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/dp_40"
+        android:background="@drawable/shap_fillet_theme_bg"
+        android:gravity="center_vertical"
+        android:paddingLeft="@dimen/dp_10"
+        android:text="@string/detailed_reasons"
+        android:textColor="@color/white"
+        android:textSize="@dimen/fontSize_15sp" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:paddingLeft="@dimen/dp_10"
+        android:paddingRight="@dimen/dp_10">
+
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/recyAbnormalReason"
+        android:tag="recyAbnormalReason"
+        android:layout_marginTop="@dimen/dp_10"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        />
+
+
+        <com.supcon.mes.mbap.view.CustomEditText
+            android:layout_marginTop="@dimen/dp_10"
+            android:id="@+id/editReasonDescription"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/dp_40"
+            android:tag="editReasonDescription"
+            app:edit_hint="@string/please_input_reason"
+            app:necessary="false"
+            app:editable="true"
+            android:focusable="false"
+            app:key="@string/reason_description"
+            app:edit_hint_color="@color/font_9e9e9e"
+            app:key_size="14" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/dp_30"
+        android:layout_marginTop="@dimen/dp_10"
+        android:layout_marginBottom="@dimen/dp_8"
+        android:gravity="right|center_vertical"
+        android:orientation="horizontal">
+
+        <TextView
+            android:id="@+id/btn_sure"
+            android:tag="btn_sure"
+            android:layout_width="@dimen/dp_60"
+            android:layout_height="match_parent"
+            android:layout_marginRight="@dimen/dp_10"
+            android:background="@color/themeColor"
+            android:gravity="center"
+            android:text="@string/middleware_sure"
+            android:textColor="@color/white" />
+
+        <TextView
+            android:id="@+id/btn_cancel"
+            android:layout_width="@dimen/dp_60"
+            android:layout_height="match_parent"
+            android:layout_marginRight="@dimen/dp_5"
+            android:background="@color/themeColor"
+            android:gravity="center"
+            android:text="@string/middleware_cancel"
+            android:textColor="@color/white" />
+    </LinearLayout>
+</LinearLayout>

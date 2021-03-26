@@ -34,6 +34,7 @@ import com.supcon.mes.aic_vib.util.DecimalFormatUtil;
 import com.supcon.mes.mbap.view.CustomEditText;
 import com.supcon.mes.mbap.view.CustomGalleryView;
 import com.supcon.mes.mbap.view.CustomSpinner;
+import com.supcon.mes.mbap.view.CustomTextView;
 import com.supcon.mes.middleware.SupPlantApplication;
 import com.supcon.mes.middleware.constant.Constant;
 import com.supcon.mes.middleware.constant.TemperatureMode;
@@ -228,8 +229,12 @@ public class XJWorkAdapter extends BaseListDataRecyclerViewAdapter<XJTaskWorkEnt
         @BindByTag("itemXJWorkCameraBtn")
         ImageView itemXJWorkCameraBtn;
 
+        @BindByTag("itemAbnormalReason")
+        LinearLayout itemAbnormalReason;
+
         XJCameraController mXJCameraController;
         String oldImgUrl = "";
+
 
         public XJWorkItemContentViewholder(Context context, ViewGroup parent) {
             super(context, parent);
@@ -263,6 +268,13 @@ public class XJWorkAdapter extends BaseListDataRecyclerViewAdapter<XJTaskWorkEnt
 
                 onItemChildViewClick(itemXJWorkRemarkBtn, 0, xjWorkItemEntity);
             });
+
+            RxView.clicks(itemAbnormalReason).throttleFirst(2, TimeUnit.SECONDS).subscribe(o -> {
+                XJTaskWorkEntity xjWorkItemEntity = getItem(getAdapterPosition());
+
+                onItemChildViewClick(itemAbnormalReason, 0, xjWorkItemEntity);
+            });
+
 
             RxView.clicks(itemXJWorkYHBtn).throttleFirst(2, TimeUnit.SECONDS).subscribe(o -> {
                 XJTaskWorkEntity xjWorkItemEntity = getItem(getAdapterPosition());
@@ -301,9 +313,15 @@ public class XJWorkAdapter extends BaseListDataRecyclerViewAdapter<XJTaskWorkEnt
                                         if ("PATROL_realValue/normal".equals(xjWorkItemEntity.conclusionID)) {
 //                                            initSpinner(itemXJWorkConclusionSpinner, realValueMap.get("PATROL_realValue/normal"), realValues);
                                             itemXJWorkConclusionSpinner.setSelection(realValues.indexOf(realValueMap.get("PATROL_realValue/normal")));
+                                            itemAbnormalReason.setVisibility(View.GONE);
+                                            xjWorkItemEntity.abnormalReason=null;
+                                            xjWorkItemEntity.reason=null;
                                         } else {
 //                                            initSpinner(itemXJWorkConclusionSpinner, realValueMap.get("PATROL_realValue/abnormal"), realValues);
                                             itemXJWorkConclusionSpinner.setSelection(realValues.indexOf(realValueMap.get("PATROL_realValue/abnormal")));
+                                            xjWorkItemEntity.isFold=true;
+                                            toggleFoldView();
+                                            itemAbnormalReason.setVisibility(View.VISIBLE);
                                         }
 
                                     }
@@ -868,7 +886,6 @@ public class XJWorkAdapter extends BaseListDataRecyclerViewAdapter<XJTaskWorkEnt
                 }
 
             }
-
             return false;
         }
 

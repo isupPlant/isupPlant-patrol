@@ -40,11 +40,10 @@ import com.supcon.mes.middleware.model.bean.xj.XJAreaEntityDao;
 import com.supcon.mes.middleware.model.bean.xj.XJTaskAreaEntity;
 import com.supcon.mes.middleware.model.bean.xj.XJTaskAreaEntityDao;
 import com.supcon.mes.middleware.model.bean.xj.XJTaskEntity;
-import com.supcon.mes.middleware.model.bean.xj.XJWorkEntity;
-import com.supcon.mes.middleware.model.bean.xj.XJWorkEntityDao;
 import com.supcon.mes.middleware.model.event.RefreshEvent;
 import com.supcon.mes.middleware.model.inter.IMap;
 import com.supcon.mes.middleware.model.inter.SystemCode;
+import com.supcon.mes.middleware.util.ErrorMsgHelper;
 import com.supcon.mes.middleware.util.SBTUtil;
 import com.supcon.mes.middleware.util.SystemCodeManager;
 import com.supcon.mes.middleware.util.XJTaskCacheUtil;
@@ -54,6 +53,7 @@ import com.supcon.mes.module_scan.util.scanCode.CodeUtlis;
 import com.supcon.mes.module_xj.IntentRouter;
 import com.supcon.mes.module_xj.R;
 import com.supcon.mes.module_xj.controller.XJLocalTaskController;
+import com.supcon.mes.module_xj.model.api.XJTaskSubmitAPI;
 import com.supcon.mes.module_xj.model.api.XJUpdateStatusAPI;
 import com.supcon.mes.module_xj.model.contract.XJTaskSubmitContract;
 import com.supcon.mes.module_xj.model.contract.XJUpdateStatusContract;
@@ -75,8 +75,8 @@ import org.greenrobot.eventbus.ThreadMode;
 
 import java.text.DecimalFormat;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
@@ -139,6 +139,8 @@ public class XJTaskDetailActivity extends BaseControllerActivity implements XJTa
     private ExpertUHFRFIDController mExpertUHFRFIDController;
     private int enterPosition = -1;
     private SoundHelper mSoundHelper = new SoundHelper();
+    private XJTaskAreaEntity mXJAreaEntity;
+
     @Override
     protected int getLayoutID() {
         return R.layout.ac_xj_task_detail;
@@ -289,6 +291,7 @@ public class XJTaskDetailActivity extends BaseControllerActivity implements XJTa
                 EventBus.getDefault().post(new UhfRfidEvent(stringBuilder.toString()));
             }
         });
+
     }
 
     @Override
@@ -318,7 +321,6 @@ public class XJTaskDetailActivity extends BaseControllerActivity implements XJTa
     @Override
     protected void initData() {
         super.initData();
-
         signTypeInfoMap = getController(SystemCodeJsonController.class).getCodeMap(Constant.SystemCode.PATROL_signInType);
     }
 
@@ -401,7 +403,6 @@ public class XJTaskDetailActivity extends BaseControllerActivity implements XJTa
         mXJAreaAdapter.exceptionIds = mXJTaskEntity.exceptinWorkIds;
         mXJAreaAdapter.setList(mXJTaskEntity.areas);
         xjTaskDetailContentView.setAdapter(mXJAreaAdapter);
-
     }
 
     @SuppressLint("CheckResult")
@@ -666,7 +667,7 @@ public class XJTaskDetailActivity extends BaseControllerActivity implements XJTa
                     .unique();
             mXJTaskEntity.areas.set(enterPosition, xjTaskAreaEntity);
             mXJAreaAdapter.notifyDataSetChanged();
-
+            uploadAreaDataAsync(mXJTaskEntity.areas.get(enterPosition));
         }
     }
 
@@ -801,25 +802,73 @@ public class XJTaskDetailActivity extends BaseControllerActivity implements XJTa
         XJTaskCacheUtil.insertTasksArea(xjAreaEntity);
     }
 
-
-    @Override
-    public void uploadFileSuccess(String entity) {
+    public  void uploadAreaDataAsync(XJTaskAreaEntity areaEntity) {
+        if (mXJTaskEntity==null){
+            return;
+        }
+        //获取当前设备相关联的巡检路线
+        Flowable.just(areaEntity)
+                .subscribeOn(Schedulers.newThread())
+                .filter(xjTaskAreaEntity -> !xjTaskAreaEntity.isUpload&&xjTaskAreaEntity.isFinished)
+                .subscribe(xjAreaEntity -> {
+                    mXJAreaEntity=xjAreaEntity;
+                    XJTaskEntity xjTaskEntity1=new XJTaskEntity();
+                    String s= GsonUtil.gsonString(mXJTaskEntity);
+                    xjTaskEntity1=GsonUtil.gsonToBean(s,XJTaskEntity.class);
+                    xjTaskEntity1.areas.clear();
+                    xjTaskEntity1.areas.add(xjAreaEntity);
+                    List<XJTaskEntity> xjTaskEntityList=new ArrayList<>();
+                    xjTaskEntityList.add(xjTaskEntity1);
+                    presenterRouter.create(XJTaskSubmitAPI.class).uploadFile(xjTaskEntityList, true);
+                });
 
     }
 
+
+    @Override
+    public void uploadFileSuccess(String path) {
+
+        LogUtil.d(""+path);
+
+        if(TextUtils.isEmpty(path)){
+            return;
+        }
+
+        Map<String, Object> queryMap = new HashMap<>();
+        queryMap.put("filePath", path.replace("\\", "/"));
+        queryMap.put("uploadTaskResultDTOs",new ArrayList<>());
+        presenterRouter.create(XJTaskSubmitAPI.class).uploadXJData(false, queryMap);
+    }
+
+
     @Override
     public void uploadFileFailed(String errorMsg) {
-
     }
 
     @Override
     public void uploadXJDataSuccess(Long id) {
+        if (id!=null){
+            mXJTaskEntity.id=id;
+            XJTaskCacheUtil.putStringAsync( mXJTaskEntity.toString(), new XJTaskCacheUtil.Callback() {
+                @Override
+                public void apply() {
+                    LogUtil.d("493 保存成功");
+                }
+            });
+        }
+
+        if (enterPosition != -1) {
+            mXJAreaEntity.isUpload=true;
+            XJTaskCacheUtil.insertTasksArea(mXJAreaEntity);
+            mXJTaskEntity.areas.set(enterPosition, mXJAreaEntity);
+            mXJAreaAdapter.notifyDataSetChanged();
+        }
+
 
     }
 
     @Override
     public void uploadXJDataFailed(String errorMsg) {
-
     }
 
 

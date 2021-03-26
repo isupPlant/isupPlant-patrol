@@ -128,4 +128,9 @@
     <string name="hour_begins">小时开始</string>
     <string name="hour_end">小时结束</string>
     <string name="uploaded">已上传</string>
+    <string name="detailed_reasons">详细原因</string>
+    <string name="reason_description">原因说明</string>
+    <string name="please_input_reason">请输入原因</string>
+    <string name="please_input_eason_description">请填写原因说明</string>
+    <string name="xj_patrol_input_abnormal_reason">需要异常原因</string>
 </resources>

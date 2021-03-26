@@ -2,6 +2,10 @@ package com.supcon.mes.module_xj.model.bean;
 
 import com.supcon.common.com_http.BaseEntity;
 import com.supcon.mes.middleware.model.bean.ObjectEntity;
+import com.supcon.mes.middleware.model.bean.SystemCodeEntity;
+import com.supcon.mes.middleware.model.converter.SystemCodeConverter;
+
+import org.greenrobot.greendao.annotation.Convert;
 
 /**
  * 巡检本地缓存实体类，只存必要数据，为上传做准备
@@ -20,4 +24,9 @@ public class XJWorkUploadEntity extends BaseEntity {
     public String xjImgName;
     public long completeDate;
     public String remark;
+    @Convert(converter = SystemCodeConverter.class, columnType = String.class)
+    public SystemCodeEntity abnormalReason;// 异常原因（系统编码）
+
+
+    public String reason  ;//原因（字符串）
 }

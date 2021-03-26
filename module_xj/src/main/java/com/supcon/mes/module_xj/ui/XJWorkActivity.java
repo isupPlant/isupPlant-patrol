@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
@@ -39,6 +40,7 @@ import com.supcon.mes.mbap.utils.GsonUtil;
 import com.supcon.mes.mbap.utils.SpaceItemDecoration;
 import com.supcon.mes.mbap.utils.controllers.SinglePickController;
 import com.supcon.mes.mbap.view.CustomDialog;
+import com.supcon.mes.mbap.view.CustomEditText;
 import com.supcon.mes.mbap.view.CustomSheetDialog;
 import com.supcon.mes.mbap.view.CustomTextView;
 import com.supcon.mes.mbap.view.CustomVerticalEditText;
@@ -80,6 +82,7 @@ import com.supcon.mes.module_xj.model.event.XJAreaRefreshEvent;
 import com.supcon.mes.module_xj.model.event.XJWorkRefreshEvent;
 import com.supcon.mes.module_xj.presenter.DeviceDCSParamQueryPresenter;
 import com.supcon.mes.module_xj.ui.adapter.XJWorkAdapter;
+import com.supcon.mes.module_xj.ui.dialog.XJAbnormalSelectDialog;
 import com.supcon.mes.module_xj.util.XLinearLayoutManager;
 import com.supcon.mes.mogu_viber.controller.MGViberController;
 import com.supcon.mes.sb2.model.event.ThermometerEvent;
@@ -113,7 +116,8 @@ import io.reactivex.schedulers.Schedulers;
 //        Constant.SystemCode.PATROL_editType,
 //        Constant.SystemCode.PATROL_valueType,
         Constant.SystemCode.PATROL_passReason,
-        Constant.SystemCode.PATROL_realValue
+        Constant.SystemCode.PATROL_realValue,
+        Constant.SystemCode.PATROL_abnormalReason
 
 })
 public class XJWorkActivity extends BaseRefreshRecyclerActivity<XJTaskWorkEntity> implements
@@ -166,11 +170,10 @@ public class XJWorkActivity extends BaseRefreshRecyclerActivity<XJTaskWorkEntity
     private ImageView viberStatusIv;
     private boolean isAll = true;
     private List<DeviceEntity> deviceEntityList = new ArrayList<>();
-    //Todo: swap from
-    //Todo: swap begin
+
     private String exceptionIdsStr;
     private List<String> exceptionIds = new ArrayList<>();
-    //Todo: swap end
+    private Map<String, String> abnormalReasonMap;     //异常原因
 
     @Override
     protected int getLayoutID() {
@@ -325,6 +328,7 @@ public class XJWorkActivity extends BaseRefreshRecyclerActivity<XJTaskWorkEntity
     private void initPopupWindowData() {
         createPopupWindowEntityData(context.getString(R.string.xj_work_over), R.drawable.ic_xj_work_finish,0);
         createPopupWindowEntityData(context.getString(R.string.xj_work_jump), R.drawable.ic_xj_work_skip,1);
+        createPopupWindowEntityData("录入缺陷", R.drawable.ic_xj_work_skip,2);
         mCustomPopupWindow = new CustomPopupWindow(context, mPopupWindowEntityList);
     }
 
@@ -403,6 +407,10 @@ public class XJWorkActivity extends BaseRefreshRecyclerActivity<XJTaskWorkEntity
                     showEditDialog(xjWorkEntity, position);
                     break;
 
+                case "itemAbnormalReason":
+                    showPopUp(xjWorkEntity);
+                    break;
+
             }
 
 
@@ -437,6 +445,42 @@ public class XJWorkActivity extends BaseRefreshRecyclerActivity<XJTaskWorkEntity
             case 1:
                 mCustomPopupWindow.dismiss();
                 showAllJumpDialog();
+                break;
+            case 2:
+                StringBuilder idList = new StringBuilder();
+                for (DeviceEntity deviceEntity : deviceEntityList) {
+                    idList.append(deviceEntity.id);
+                    idList.append(",");
+                }
+                idList.replace(idList.length() - 1, idList.length(), "");
+                Bundle bundle = new Bundle();
+                bundle.putString(Constant.IntentKey.XJ_AREA_CODE,  mXJAreaEntity.code);
+                bundle.putString(Constant.IntentKey.XJ_AREA_NAME,  idList.toString());
+                bundle.putString(Constant.IntentKey.XJ_AREA_EAMLISTS,  mXJAreaEntity.code);
+                bundle.putString(Constant.IntentKey.XJ_TASK_TABLENO,  mXJTaskEntity.tableNo);
+                IntentRouter.go(context, Constant.AppCode.DEFECT_MANAGEMENT_ADD, bundle);
+
+//                if (!TextUtils.isEmpty(获取到的设备idListString)) {
+//                    List<DeviceEntity>   deviceEntityList = new ArrayList<>();
+//                    String[] eamIdList = 获取到的设备idListString.split(",");
+//                    for (String  eamId : eamIdList) {
+//                        //根据设备eamId获取CommonDeviceEntity
+//                        try {
+//                            DeviceEntity commonDeviceEntity = SupPlantApplication.dao().getDeviceEntityDao().queryBuilder()
+//                                    .where(DeviceEntityDao.Properties.Id.eq(eamId)).unique();
+//                            if (commonDeviceEntity != null) {
+//                                if (commonDeviceEntity.state.id.equals("BaseSet_eamState/inUse")) {
+//                                    if (!deviceEntityList.contains(commonDeviceEntity)) {
+//                                        deviceEntityList.add(commonDeviceEntity);
+//                                    }
+//                                }
+//                            }
+//                        } catch (Exception e) {
+//
+//                        }
+//                    }
+//                }
+
                 break;
             default:
         }
@@ -548,6 +592,7 @@ public class XJWorkActivity extends BaseRefreshRecyclerActivity<XJTaskWorkEntity
 
         passReasonMap = getController(SystemCodeJsonController.class).getCodeMap(Constant.SystemCode.PATROL_passReason);
         realValueMap = getController(SystemCodeJsonController.class).getCodeMap(Constant.SystemCode.PATROL_realValue);
+        abnormalReasonMap = getController(SystemCodeJsonController.class).getCodeMap(Constant.SystemCode.PATROL_abnormalReason);
         checkDeviceState();
         refreshListController.setOnRefreshListener(() -> {
             if (mXJAreaEntity != null && mXJAreaEntity.works != null) {
@@ -908,6 +953,15 @@ public class XJWorkActivity extends BaseRefreshRecyclerActivity<XJTaskWorkEntity
                                 }
                                 sb.append(context.getResources().getString(R.string.xj_patrol_xj_content)).append(xjWorkItemEntity.content).append(context.getResources().getString(R.string.xj_patrol_take_photo));
                                 msg = sb.toString();
+                            }else if(xjWorkItemEntity.conclusionID.equals("PATROL_realValue/abnormal")&&xjWorkItemEntity.abnormalReason==null){
+                                StringBuilder sb = new StringBuilder();
+                                if (xjWorkItemEntity.eamLongId == 0) {
+                                    sb.append("");
+                                } else {
+                                    sb.append("[").append(xjWorkItemEntity.eamId.name).append("]");
+                                }
+                                sb.append(context.getResources().getString(R.string.xj_patrol_xj_content)).append(xjWorkItemEntity.content).append(context.getResources().getString(R.string.xj_patrol_input_abnormal_reason));
+                                msg = sb.toString();
                             }
                             if (!TextUtils.isEmpty(msg)) {
                                 if (isCanEndAll) {
@@ -1152,6 +1206,41 @@ public class XJWorkActivity extends BaseRefreshRecyclerActivity<XJTaskWorkEntity
                 }).show();
 
     }
+
+
+    XJAbnormalSelectDialog abnormalSelectDialog;
+    //巡检项异常原因选择框
+    private void showPopUp(XJTaskWorkEntity xjWorkEntity) {
+        if (abnormalSelectDialog==null)
+            abnormalSelectDialog=new XJAbnormalSelectDialog(context,context.getResources().getString(R.string.detailed_reasons)+xjWorkEntity.eamName,abnormalReasonMap);
+            abnormalSelectDialog.show();
+            abnormalSelectDialog.setOnSureListener((selectAbnormalId, season) -> {
+            xjWorkEntity.abnormalReason = SystemCodeManager.getInstance().getSystemCodeEntity(selectAbnormalId);
+            xjWorkEntity.reason = season;
+        });
+//
+//        mCustomDialog
+//
+//                .bindClickListener(R.id.btn_sure, v -> {
+//                        //TODO 这个判断值需要改
+//                        if (selectAbnoralId.equals("其他")&&TextUtils.isEmpty(editReasonDescription.getContent())) {
+//                            ToastUtils.show(context, context.getResources().getString(R.string.please_input_eason_description));
+//                            return;
+//                        }
+//                        xjWorkEntity.abnormalReason = SystemCodeManager.getInstance().getSystemCodeEntity(finalId);
+//                        xjWorkEntity.reason = editReasonDescription.getContent();
+//                        mXJWorkAdapter.notifyDataSetChanged();
+//                }, false)
+//                .bindClickListener(R.id.btn_cancel, v ->{
+//
+//                }, true);
+//
+
+
+    }
+
+
+
 
 
     @SuppressLint("CheckResult")

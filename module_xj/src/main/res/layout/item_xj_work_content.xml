@@ -34,7 +34,8 @@
         android:gravity="center_vertical"
         android:tag="itemXJWorkContent"
         android:textColor="@color/xjTitleColor"
-        android:textSize="@dimen/fontSize_14sp" />
+        android:textSize="@dimen/fontSize_14sp"
+        />
 
 
     <ImageView
@@ -245,21 +246,32 @@
             android:layout_below="@+id/itemXJWorkPics"
             android:gravity="center_vertical"
             >
-            <com.supcon.mes.mbap.view.CustomTextView
+
+            <LinearLayout
+                android:id="@+id/itemAbnormalReason"
+                android:tag="itemAbnormalReason"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:id="@+id/itemXJWorkRemarkInput"
-                android:tag="itemXJWorkRemarkInput"
-                android:layout_marginTop="5dp"
-                app:text_width="0dp"
-                app:text_color="@color/xjTextColor"
-                app:text_size="14"
-                app:max_lines="2"
-                app:editable="false"
                 android:gravity="center_vertical"
-                android:layout_marginRight="110dp"
-                android:visibility="gone"
-                />
+                android:layout_centerVertical="true"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="*"
+                    android:textColor="#E72941"
+                    android:textSize="@dimen/fontSize_15sp" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/detailed_reasons"
+                    android:textColor="@color/c_scan_333"
+                    android:textSize="@dimen/fontSize_15sp" />
+            </LinearLayout>
+
+
             <TextView
                 android:layout_width="70dp"
                 android:layout_height="30dp"
