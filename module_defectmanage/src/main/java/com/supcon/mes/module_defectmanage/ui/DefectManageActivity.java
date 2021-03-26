@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.text.TextUtils;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageButton;
@@ -17,7 +18,6 @@ import com.app.annotation.apt.Router;
 import com.jakewharton.rxbinding2.view.RxView;
 import com.supcon.common.view.base.activity.BaseControllerActivity;
 import com.supcon.common.view.listener.OnChildViewClickListener;
-import com.supcon.common.view.util.LogUtil;
 import com.supcon.common.view.util.ToastUtils;
 import com.supcon.mes.mbap.utils.DateUtil;
 import com.supcon.mes.mbap.utils.GsonUtil;
@@ -35,12 +35,13 @@ import com.supcon.mes.middleware.controller.SystemCodeJsonController;
 import com.supcon.mes.middleware.model.api.AddFileListAPI;
 import com.supcon.mes.middleware.model.bean.BAP5CommonEntity;
 import com.supcon.mes.middleware.model.bean.BaseCodeIdNameEntity;
-import com.supcon.mes.middleware.model.bean.BaseIdValueEntity;
 import com.supcon.mes.middleware.model.bean.BaseIntIdNameEntity;
 import com.supcon.mes.middleware.model.bean.ContactEntity;
-import com.supcon.mes.middleware.model.bean.DataUtil;
 import com.supcon.mes.middleware.model.bean.DepartmentEntity;
+import com.supcon.mes.middleware.model.bean.DeviceEntity;
+import com.supcon.mes.middleware.model.bean.DeviceEntityDao;
 import com.supcon.mes.middleware.model.bean.FileEntity;
+import com.supcon.mes.middleware.model.bean.SelectEntity;
 import com.supcon.mes.middleware.model.bean.SystemCodeEntity;
 import com.supcon.mes.middleware.model.contract.AddFileListContract;
 import com.supcon.mes.middleware.model.event.SelectDataEvent;
@@ -54,6 +55,7 @@ import com.supcon.mes.module_defectmanage.R;
 import com.supcon.mes.module_defectmanage.model.api.AddDefectAPI;
 import com.supcon.mes.module_defectmanage.model.bean.DefectModelEntity;
 import com.supcon.mes.module_defectmanage.model.bean.DefectModelEntityDao;
+import com.supcon.mes.module_defectmanage.model.bean.DeviceSelected;
 import com.supcon.mes.module_defectmanage.model.bean.FileUploadDefectEntity;
 import com.supcon.mes.module_defectmanage.model.contract.AddDefectContract;
 import com.supcon.mes.module_defectmanage.presenter.AddDefectPresenter;
@@ -65,7 +67,6 @@ import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
@@ -133,7 +134,7 @@ public class DefectManageActivity extends BaseControllerActivity implements AddD
     SystemCodeEntity selectedType, selectLevel;
     Boolean haslist;//是否挂牌
     BaseCodeIdNameEntity selectSource;
-    BaseCodeIdNameEntity selectedEamInfo;
+//    BaseCodeIdNameEntity selectedEamInfo;
 
     BaseIntIdNameEntity selectedDepartment;
     BaseIntIdNameEntity selectedAssor, selectedFinder;
@@ -141,7 +142,9 @@ public class DefectManageActivity extends BaseControllerActivity implements AddD
     BaseCodeIdNameEntity  selectedArea;
     long findTimeLong, handleTimeLong, leakTimeLong;
     DefectModelEntity defectModelEntity;
-    Long tableNo;
+    DeviceEntity selectedDevice;
+    List<DeviceEntity> deviceEntities;
+    String tableNo;
 
     String chooseType;
 
@@ -155,11 +158,25 @@ public class DefectManageActivity extends BaseControllerActivity implements AddD
     protected void initData() {
         super.initData();
 
+        selectSource = new BaseCodeIdNameEntity();
+        selectSource.setCode("OSI");
+        selectSource.setName(getString(R.string.defect_source_osi));
+
         //情况分类：1、从巡检传过来的数据2、从列表中过来的某一条数据
         Bundle bundle = getIntent().getExtras();
         if (bundle != null) {
             Long dataId = bundle.getLong(Constant.INTENT_EXTRA_ID);
-            tableNo = bundle.getLong(Constant.INTENT_EXTRA_OBJECT_CHAT);
+
+            tableNo = bundle.getString(Constant.IntentKey.XJ_TASK_NO_STR);
+            String areaCode= bundle.getString(Constant.IntentKey.XJ_TASK_NO_STR);
+            String areaName = bundle.getString(Constant.IntentKey.XJ_TASK_NO_STR);
+            selectedArea = new BaseCodeIdNameEntity();
+            selectedArea.setCode(areaCode);
+            selectedArea.setName(areaName);
+            String deviceIdList = bundle.getString(Constant.IntentKey.XJ_TASK_NO_STR);
+            HandleUtils.setDeviceIdList(deviceIdList);//存储一下
+            deviceEntities = getDeviceList(deviceIdList);
+
             if (dataId != null && dataId.longValue() > 0) {
                 //说明是从列表中过来的
                 rightBtn.setVisibility(View.GONE);
@@ -182,7 +199,7 @@ public class DefectManageActivity extends BaseControllerActivity implements AddD
         initDatePickController();
         initSinglePickController();
 
-        if (tableNo != null && tableNo.longValue() > 0) {
+        if (StringUtil.isBlank(tableNo)) {
             initByEmpty();
         } else {
             initByEditInfo();
@@ -197,6 +214,8 @@ public class DefectManageActivity extends BaseControllerActivity implements AddD
         titleText.setText(R.string.defect_add_file);
         rightBtn.setVisibility(View.VISIBLE);
         rightBtn.setImageDrawable(getResources().getDrawable(R.drawable.ic_top_all_p));
+
+        source.setContent(R.string.defect_source_osi);
 
         file_list.setFileListView(new FileListView.FileListViewListener() {
             @Override
@@ -234,6 +253,32 @@ public class DefectManageActivity extends BaseControllerActivity implements AddD
             @Override
             public void onClick(View v) {
                 back();
+            }
+        });
+
+        devicename.setOnChildViewClickListener(new OnChildViewClickListener() {
+            @Override
+            public void onChildViewClick(View childView, int action, Object obj) {
+                if (action == -1) {
+                    selectedDevice = null;
+                } else {
+                    //转换为小狄的
+                    ArrayList<DeviceSelected> selectedList = new ArrayList<>();
+                    if (deviceEntities == null || deviceEntities.size() < 1) {
+                        return;
+                    }
+                    for (DeviceEntity deviceEntity : deviceEntities) {
+                        DeviceSelected deviceSelected = new DeviceSelected();
+                        deviceSelected.id = deviceEntity.id;
+                        deviceSelected.name = deviceEntity.name;
+                        selectedList.add(deviceSelected);
+                    }
+                    Bundle bundle = new Bundle();
+                    bundle.putSerializable(Constant.INTENT_EXTRA_OBJECT, selectedList);
+                    bundle.putInt(Constant.INTENT_EXTRA_INT, 1);
+                    bundle.putString(Constant.INTENT_EXTRA_OBJECT_CHAT, "device");
+                    IntentRouter.go(context, Constant.Router.SELECT, bundle);
+                }
             }
         });
 
@@ -433,7 +478,7 @@ public class DefectManageActivity extends BaseControllerActivity implements AddD
                 .throttleFirst(200, TimeUnit.MILLISECONDS)
                 .subscribe(o -> {
                     Bundle bundle = new Bundle();
-                    bundle.putLong(Constant.INTENT_EXTRA_OBJECT_CHAT, tableNo);
+                    bundle.putString(Constant.INTENT_EXTRA_OBJECT_CHAT, tableNo);
                     IntentRouter.go(context, Utils.AppCode.DEFECT_MANAGEMENT_OFF_LINE_LIST, bundle);
                 });
     }
@@ -532,6 +577,20 @@ public class DefectManageActivity extends BaseControllerActivity implements AddD
                 file_list.addAllList(fileList);
             }
         }
+
+        //
+        selectedArea = new BaseCodeIdNameEntity();
+        selectedArea.setName(defectModelEntity.areaName);
+        selectedArea.setCode(defectModelEntity.areaCode);
+
+        selectedDevice = new DeviceEntity();
+        selectedDevice.setCode(defectModelEntity.getEamCode());
+        selectedDevice.setName(defectModelEntity.eamName);
+
+        //从全局变量中获取，如果第一次进来的时候就会去获取
+        deviceEntities = getDeviceList(HandleUtils.getDeviceIdList());
+
+        address.setContent(selectedArea.getCode());
     }
 
     private void swithLeakly(String code) {
@@ -564,6 +623,8 @@ public class DefectManageActivity extends BaseControllerActivity implements AddD
 
         leakTimeLong = calendar.getTimeInMillis();
         leak_time.setDate(DateUtil.dateFormat(handleTimeLong, "yyyy-MM-dd HH:mm:ss"));
+
+        address.setContent(selectedArea.getCode());
     }
 
     /**
@@ -575,7 +636,7 @@ public class DefectManageActivity extends BaseControllerActivity implements AddD
         saveFileToString();
         DatabaseManager.getDao().getDefectModelEntityDao().insertOrReplace(defectModelEntity);
 
-        if (tableNo == null || tableNo.longValue() < 1) {
+        if (StringUtil.isBlank(tableNo)) {
             finish();
         } else {
             ToastUtils.show(context, getString(R.string.middleware_save_succeed));
@@ -621,9 +682,9 @@ public class DefectManageActivity extends BaseControllerActivity implements AddD
         defectModelEntity.name = name.getContent();
         defectModelEntity.hiddenApperance = describe.getContent();
 
-//        if (selectedType != null) {
-//            defectModelEntity.defectSource = selectSource.getCode();
-//        }
+        if (selectSource != null) {
+            defectModelEntity.defectSource = selectSource.getCode();
+        }
 
         if (selectedType != null) {
             defectModelEntity.defectType =  selectedType.getCode();
@@ -646,12 +707,10 @@ public class DefectManageActivity extends BaseControllerActivity implements AddD
         //            "name":"巡检"
         //        }
 
-        defectModelEntity.eamCode = "ZGSSB002";
-        defectModelEntity.defectSource = "OSI";
-//        if (selectedEamInfo != null) {
-//            defectModelEntity.eamCode = selectedEamInfo.getCode();
-//        }
-
+        if (selectedDevice != null) {
+            defectModelEntity.eamCode = selectedDevice.getCode();
+            defectModelEntity.eamName = selectedDevice.getName();
+        }
 
         if (selectedDepartment != null) {
             defectModelEntity.eamDeptId = selectedDepartment.getId();
@@ -668,10 +727,11 @@ public class DefectManageActivity extends BaseControllerActivity implements AddD
             defectModelEntity.finderName = selectedFinder.getName();
         }
 
+        if (selectedArea != null) {
+            defectModelEntity.areaCode = selectedArea.getCode();
+            defectModelEntity.areaName = selectedArea.getName();
+        }
         defectModelEntity.areaId = 1005L;
-//        if (selectedArea != null) {
-//            defectModelEntity.areaCode = selectedArea.getCode();
-//        }
 
         if (findTimeLong > 0) {
             defectModelEntity.findTime = DateUtil.dateTimeFormat(findTimeLong);
@@ -879,6 +939,11 @@ public class DefectManageActivity extends BaseControllerActivity implements AddD
                     break;
 
             }
+        } else if (StringUtil.equalsIgnoreCase(event.getSelectTag(), "device")){
+            if (event.getEntity() instanceof DeviceSelected) {
+                selectedDevice = (DeviceEntity) event.getEntity();
+                devicename.setContent(selectedDevice.name);
+            }
         }
     }
 
@@ -921,4 +986,26 @@ public class DefectManageActivity extends BaseControllerActivity implements AddD
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         file_list.onRequestPermissionsResult(requestCode, permissions, grantResults);
     }
+
+    private List<DeviceEntity> getDeviceList(String idList) {
+        idList = "70290724115712";
+        if (!TextUtils.isEmpty(idList)) {
+            List<DeviceEntity> deviceEntityList = new ArrayList<>();
+            String[] eamIdList = idList.split(",");
+            for (String eamId : eamIdList) {
+                //根据设备eamId获取CommonDeviceEntity
+                try {
+                    DeviceEntity commonDeviceEntity = SupPlantApplication.dao().getDeviceEntityDao().queryBuilder()
+                            .where(DeviceEntityDao.Properties.Id.eq(eamId)).where(DeviceEntityDao.Properties.State.eq("BaseSet_eamState/inUse")).unique();
+                    deviceEntityList.add(commonDeviceEntity);
+                } catch (Exception e) {
+
+                }
+            }
+            return deviceEntityList;
+        }
+        return null;
+    }
+
+
 }

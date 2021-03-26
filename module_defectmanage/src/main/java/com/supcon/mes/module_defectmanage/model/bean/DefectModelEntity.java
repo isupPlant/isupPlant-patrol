@@ -60,7 +60,7 @@ public class DefectModelEntity extends BaseEntity {
     @Id(autoincrement = false)
     public Long dbId;
     
-    public Long tableNo;//巡检中的区域的表？一个区域一个表吗//外键
+    public String tableNo;//巡检中的区域的表？一个区域一个表吗//外键
 
     public boolean isValid;//合法的，默认不合法，就是这条数据有没有完成，保存的时候我就做了校验，提交的时候可以直接使用
 
@@ -110,8 +110,12 @@ public class DefectModelEntity extends BaseEntity {
     }
 
 
-    @Generated(hash = 1008921216)
-    public DefectModelEntity(Long dbId, Long tableNo, boolean isValid, String name, String eamName, String eamCode, Long eamId, String finderCode, Long finderId, String finderName, String findTime, String eamDeptCode,
+    @Generated(hash = 1719998226)
+    public DefectModelEntity() {
+    }
+
+    @Generated(hash = 496418111)
+    public DefectModelEntity(Long dbId, String tableNo, boolean isValid, String name, String eamName, String eamCode, Long eamId, String finderCode, Long finderId, String finderName, String findTime, String eamDeptCode,
             String eamDeptName, Long eamDeptId, String areaCode, String areaName, Long areaId, Boolean isClosed, String defectType, String problemLevel, String defectSource, String hiddenApperance, Boolean listed, String listedNumber,
             String leakName, String listedTime, String assessorCode, String assessorName, Long assessorId, String eliminateTime, String dealStaffCode, Long dealStaffId, String classification, Long cid, String fileJson) {
         this.dbId = dbId;
@@ -149,10 +153,6 @@ public class DefectModelEntity extends BaseEntity {
         this.classification = classification;
         this.cid = cid;
         this.fileJson = fileJson;
-    }
-
-    @Generated(hash = 1719998226)
-    public DefectModelEntity() {
     }
 
     public boolean getIsValid() {
@@ -318,12 +318,6 @@ public class DefectModelEntity extends BaseEntity {
     public void setCid(Long cid) {
         this.cid = cid;
     }
-    public Long getTableNo() {
-        return this.tableNo;
-    }
-    public void setTableNo(Long tableNo) {
-        this.tableNo = tableNo;
-    }
     public String getEamName() {
         return this.eamName;
     }
@@ -374,5 +368,13 @@ public class DefectModelEntity extends BaseEntity {
 
     public void setDefectFile(List<FileUploadDefectEntity> defectFile) {
         this.defectFile = defectFile;
+    }
+
+    public String getTableNo() {
+        return this.tableNo;
+    }
+
+    public void setTableNo(String tableNo) {
+        this.tableNo = tableNo;
     }
 }

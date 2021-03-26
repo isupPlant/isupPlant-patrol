@@ -12,6 +12,7 @@ import java.util.List;
  * Des:
  */
 public class HandleUtils {
+    private static String deviceIdList;
 
     public static List<FileUploadDefectEntity> converFileToUploadFile(List<FileEntity> fileEntities) {
         List<FileUploadDefectEntity> resultList = new ArrayList<>();
@@ -25,5 +26,13 @@ public class HandleUtils {
             }
         }
         return resultList;
+    }
+
+    public static String getDeviceIdList() {
+        return deviceIdList;
+    }
+
+    public static void setDeviceIdList(String deviceIdList) {
+        HandleUtils.deviceIdList = deviceIdList;
     }
 }

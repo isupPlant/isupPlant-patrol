@@ -10,10 +10,12 @@
     <string name="defect_equip_department">受检装置/部门</string>
     <string name="defect_assesor">评估人</string>
     <string name="defect_discover">发现人</string>
-    <string name="defect_address">发现地点</string>
+    <string name="defect_address">区域</string>
     <string name="defect_find_time">发现时间</string>
     <string name="defect_plan_handle_time">计划消缺时间</string>
     <string name="defect_add_file">添加附件</string>
+    <string name="defect_source_osi">巡检</string>
+
 
     <string name="defect_leak_name">漏点名称</string>
     <string name="defect_leak_status">是否挂牌</string>
@@ -29,7 +31,7 @@
     <string name="defect_equip_department_is_null">受检装置/部门不能为空</string>
     <string name="defect_assesor_is_null">评估人不能为空</string>
     <string name="defect_discover_is_null">发现人不能为空</string>
-    <string name="defect_address_is_null">发现地点不能为空</string>
+    <string name="defect_address_is_null">发现区域不能为空</string>
     <string name="defect_find_time_is_null">发现时间不能为空</string>
     <string name="defect_plan_handle_time_is_null">计划消缺时间不能为空</string>
     <string name="defect_choose">选择</string>

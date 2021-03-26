@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical">
@@ -55,7 +54,7 @@
                 android:id="@+id/source"
                 style="@style/psc_edit_date_horizontal_style_text_view"
                 android:tag="source"
-                app:editable="true"
+                app:editable="false"
                 app:icon_res="@drawable/ic_unfold66"
                 app:key="@string/defect_source"
                 app:necessary="true" />
@@ -134,6 +133,7 @@
                 android:tag="address"
                 app:edit_hint="@string/defect_address"
                 app:necessary="true"
+                app:editable="false"
                 app:text="@string/defect_address" />
 
             <include layout="@layout/v_divider_gray" />
