@@ -52,4 +52,9 @@
 
     <string name="defect_data_choose_is_null">没有选择数据</string>
     <string name="defect_check_plan_cancel_all">取消全选</string>
+
+    <string-array name="defect_list_tab">
+        <item>未提交</item>
+        <item>已提交</item>
+    </string-array>
 </resources>

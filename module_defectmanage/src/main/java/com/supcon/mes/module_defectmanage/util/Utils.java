@@ -8,5 +8,6 @@ package com.supcon.mes.module_defectmanage.util;
 public interface Utils {
     interface AppCode {
         String DEFECT_MANAGEMENT_OFF_LINE_LIST = "DEFECT_MANAGEMENT_OFF_LINE_LIST";
+        String DEFECT_MANAGEMENT_ON_LINE_DETAIL = "DEFECT_MANAGEMENT_ON_LINE_DETAIL";
     }
 }

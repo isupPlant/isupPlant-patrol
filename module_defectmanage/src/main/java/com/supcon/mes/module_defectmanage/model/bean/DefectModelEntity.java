@@ -96,7 +96,7 @@ public class DefectModelEntity extends BaseEntity {
     public Long dealStaffId;
     public String classification;
     @Transient
-    public List<FileUploadDefectEntity> defectFile;
+    public String defectFile;
     public Long cid;
 
     public String fileJson;//存放 file数组的json的的字段
@@ -362,19 +362,19 @@ public class DefectModelEntity extends BaseEntity {
         this.assessorName = assessorName;
     }
 
-    public List<FileUploadDefectEntity> getDefectFile() {
-        return defectFile;
-    }
-
-    public void setDefectFile(List<FileUploadDefectEntity> defectFile) {
-        this.defectFile = defectFile;
-    }
-
     public String getTableNo() {
         return this.tableNo;
     }
 
     public void setTableNo(String tableNo) {
         this.tableNo = tableNo;
+    }
+
+    public String getDefectFile() {
+        return defectFile;
+    }
+
+    public void setDefectFile(String defectFile) {
+        this.defectFile = defectFile;
     }
 }

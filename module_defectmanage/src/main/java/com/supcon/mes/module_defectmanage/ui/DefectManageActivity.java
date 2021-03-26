@@ -77,7 +77,8 @@ import io.reactivex.disposables.Disposable;
 
 @Presenter(value = {AddDefectPresenter.class, AddFileListPresenter.class})
 @Controller(value = {SystemCodeJsonController.class})
-@SystemCode(entityCodes = {Constant.SystemCode.DefectManage_problemClass, Constant.SystemCode.DefectManage_problemLevel})
+@SystemCode(entityCodes = {Constant.SystemCode.DefectManage_problemClass, Constant.SystemCode.DefectManage_problemLevel,
+Constant.SystemCode.DefectManage_problemState})
 @Router(value = Constant.AppCode.DEFECT_MANAGEMENT_ADD)
 public class DefectManageActivity extends BaseControllerActivity implements AddDefectContract.View, AddFileListContract.View {
 
@@ -162,12 +163,14 @@ public class DefectManageActivity extends BaseControllerActivity implements AddD
         selectSource.setCode("OSI");
         selectSource.setName(getString(R.string.defect_source_osi));
 
+        Long dataId = null;
         //情况分类：1、从巡检传过来的数据2、从列表中过来的某一条数据
         Bundle bundle = getIntent().getExtras();
         if (bundle != null) {
-            Long dataId = bundle.getLong(Constant.INTENT_EXTRA_ID);
+            dataId = bundle.getLong(Constant.INTENT_EXTRA_ID);
 
             tableNo = bundle.getString(Constant.IntentKey.XJ_TASK_TABLENO);
+            tableNo = "1000";
             String areaCode= bundle.getString(Constant.IntentKey.XJ_AREA_CODE);
             String areaName = bundle.getString(Constant.IntentKey.XJ_AREA_NAME);
             selectedArea = new BaseCodeIdNameEntity();
@@ -199,7 +202,7 @@ public class DefectManageActivity extends BaseControllerActivity implements AddD
         initDatePickController();
         initSinglePickController();
 
-        if (StringUtil.isBlank(tableNo)) {
+        if (dataId == null || dataId.longValue() ==0) {
             initByEmpty();
         } else {
             initByEditInfo();
@@ -708,6 +711,7 @@ public class DefectManageActivity extends BaseControllerActivity implements AddD
         //            "name":"巡检"
         //        }
 
+        defectModelEntity.eamCode = "ZGSSB002";
         if (selectedDevice != null) {
             defectModelEntity.eamCode = selectedDevice.getCode();
             defectModelEntity.eamName = selectedDevice.getName();
@@ -754,6 +758,7 @@ public class DefectManageActivity extends BaseControllerActivity implements AddD
         if (SupPlantApplication.getAccountInfo() != null) {
             defectModelEntity.cid = SupPlantApplication.getAccountInfo().companyId;
         }
+
 
         //附件的问题还没有
     }
@@ -814,11 +819,11 @@ public class DefectManageActivity extends BaseControllerActivity implements AddD
             toastTip(needToastTip, getString(R.string.defect_discover_is_null));
             return false;
         }
-        //地点
-        if (StringUtil.isBlank(address.getContent())) {
-            toastTip(needToastTip, getString(R.string.defect_address_is_null));
-            return false;
-        }
+//        //地点
+//        if (StringUtil.isBlank(address.getContent())) {
+//            toastTip(needToastTip, getString(R.string.defect_address_is_null));
+//            return false;
+//        }
         //时间
         if (StringUtil.isBlank(findtime.getContent())) {
             toastTip(needToastTip, getString(R.string.defect_find_time_is_null));
@@ -844,6 +849,8 @@ public class DefectManageActivity extends BaseControllerActivity implements AddD
 
     @Override
     public void defectEntrySuccess(BAP5CommonEntity entity) {
+        DatabaseManager.getDao().getDefectModelEntityDao().deleteInTx(defectModelEntity);
+
         onLoadSuccess();
         ToastUtils.show(context, context.getString(R.string.submit_success));
 
@@ -855,6 +862,8 @@ public class DefectManageActivity extends BaseControllerActivity implements AddD
     @Override
     public void defectEntryFailed(String errorMsg) {
         closeLoader();
+
+        defectModelEntity.setDefectFile(null);//如果提交失败了 就要重新上传
         //提示用户保存在本地，但是不能重复保存啊,数据库的id是怎么回事
         ToastUtils.show(context, errorMsg + context.getString(R.string.defect_submit_failed_save_to_local));
 
@@ -956,12 +965,12 @@ public class DefectManageActivity extends BaseControllerActivity implements AddD
 
     @Override
     public void uploadMultiFilesSuccess(ArrayList entity) {
-        closeLoader();
         if (entity != null) {
             ArrayList<FileEntity> filelist = entity;
             if (filelist != null && filelist.size() > 0) {
                 List<FileUploadDefectEntity> uploadFileFormMapArrayList = HandleUtils.converFileToUploadFile(filelist);
-                defectModelEntity.setDefectFile(uploadFileFormMapArrayList);
+                String fileListJson = GsonUtil.gsonString(uploadFileFormMapArrayList);
+                defectModelEntity.setDefectFile(fileListJson);
             }
 
             presenterRouter.create(AddDefectAPI.class).defectEntry(defectModelEntity);
@@ -989,16 +998,18 @@ public class DefectManageActivity extends BaseControllerActivity implements AddD
     }
 
     private List<DeviceEntity> getDeviceList(String idList) {
-        idList = "70290724115712";
         if (!TextUtils.isEmpty(idList)) {
             List<DeviceEntity> deviceEntityList = new ArrayList<>();
             String[] eamIdList = idList.split(",");
             for (String eamId : eamIdList) {
                 //根据设备eamId获取CommonDeviceEntity
                 try {
+                    List<DeviceEntity> listall = SupPlantApplication.dao().getDeviceEntityDao().queryBuilder().list();
                     DeviceEntity commonDeviceEntity = SupPlantApplication.dao().getDeviceEntityDao().queryBuilder()
-                            .where(DeviceEntityDao.Properties.Id.eq(eamId)).where(DeviceEntityDao.Properties.State.eq("BaseSet_eamState/inUse")).unique();
-                    deviceEntityList.add(commonDeviceEntity);
+                            .where(DeviceEntityDao.Properties.Code.eq(eamId)).where(DeviceEntityDao.Properties.State.eq("BaseSet_eamState/inUse")).unique();
+                    if (commonDeviceEntity != null) {
+                        deviceEntityList.add(commonDeviceEntity);
+                    }
                 } catch (Exception e) {
 
                 }

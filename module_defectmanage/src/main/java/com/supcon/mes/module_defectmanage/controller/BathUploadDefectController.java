@@ -3,6 +3,7 @@ package com.supcon.mes.module_defectmanage.controller;
 import android.content.Context;
 
 import com.app.annotation.Presenter;
+import com.google.gson.Gson;
 import com.supcon.common.view.base.activity.BaseActivity;
 import com.supcon.common.view.base.controller.BaseDataController;
 import com.supcon.common.view.util.ToastUtils;
@@ -47,16 +48,14 @@ public class BathUploadDefectController extends BaseDataController implements Ad
      * 给巡检提供的接口
      * 返回 对应的巡检任务 对应的areaCode的缺陷单 并上传
      * @param tableNo
-     * @param areaCode
      * @return
      */
-    public void bathUploadDefectList(String tableNo, String areaCode) {
+    public void bathUploadDefectList(String tableNo) {
         defectModelEntityList.clear();
 
-        if (!StringUtil.isBlank(tableNo) && StringUtil.isBlank(areaCode)) {
+        if (!StringUtil.isBlank(tableNo)) {
             defectModelEntityList = DatabaseManager.getDao().getDefectModelEntityDao().queryBuilder()
-                    .where(DefectModelEntityDao.Properties.TableNo.eq(tableNo))
-                    .where(DefectModelEntityDao.Properties.AreaCode.eq(areaCode)).list();
+                    .where(DefectModelEntityDao.Properties.TableNo.eq(tableNo)).list();
 
             if (defectModelEntityList != null && defectModelEntityList.size() > 0) {
                 //通知页面更新
@@ -154,7 +153,8 @@ public class BathUploadDefectController extends BaseDataController implements Ad
                             defectFileList.add(fileUploadDefectEntity);
                         }
                     }
-                    value.setDefectFile(defectFileList);
+                    String fileListJson = GsonUtil.gsonString(defectFileList);
+                    value.setDefectFile(fileListJson);
                 }
             }
 

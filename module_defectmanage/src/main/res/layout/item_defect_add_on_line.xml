@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@color/list_bg_color"
+    android:descendantFocusability="blocksDescendants"
+    android:orientation="vertical">
+
+    <LinearLayout
+        android:id="@+id/llt_item"
+        style="@style/style_linear_border"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingLeft="5dp"
+            android:paddingRight="5dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+
+                <ImageView
+                    android:id="@+id/iv_check"
+                    style="@style/style_text_small_grey"
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:layout_gravity="center"
+                    android:background="@drawable/ic_check_no"
+                    android:gravity="center"
+                    android:maxLines="1"
+                    android:tag="iv_check" />
+
+                <TextView
+                    android:id="@+id/devicename"
+                    style="@style/KeyText_ex_height"
+                    android:layout_width="wrap_content"
+                    android:layout_weight="1"
+                    android:tag="devicename"
+                    android:text="@string/defect_add_title"
+                    android:translationZ="1dp" />
+
+                <TextView
+                    android:id="@+id/tableNo"
+                    style="@style/KeyText_ex_height"
+                    android:layout_width="wrap_content"
+                    android:layout_gravity="center"
+                    android:tag="tableNo"
+                    android:text="@string/defect_add_title"
+                    android:translationZ="1dp" />
+
+                <TextView
+                    android:id="@+id/status"
+                    style="@style/KeyText_ex_height"
+                    android:layout_width="wrap_content"
+                    android:layout_gravity="center"
+                    android:layout_marginLeft="@dimen/header_footer_left_right_padding"
+                    android:tag="status"
+                    android:text="@string/defect_data_is_need_edit"
+                    android:textColor="@color/warnBtnColor"
+                    android:translationZ="1dp" />
+
+            </LinearLayout>
+
+            <include layout="@layout/v_divider_gray" />
+
+
+            <com.supcon.mes.middleware.ui.view.CustomTitleValueSmall
+                android:id="@+id/name"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingLeft="5dp"
+                android:tag="name"
+                app:icon="@drawable/ic_hazard_content"
+                app:title="@string/defect_name" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <com.supcon.mes.middleware.ui.view.CustomTitleValueSmall
+                    android:id="@+id/findtime"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:paddingLeft="5dp"
+                    android:tag="findtime"
+                    app:icon="@drawable/ic_mode"
+                    app:title="@string/defect_find_time" />
+
+
+                <com.supcon.mes.middleware.ui.view.CustomTitleValueSmall
+                    android:id="@+id/finder"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:paddingLeft="5dp"
+                    android:tag="finder"
+                    app:icon="@drawable/ic_person"
+                    app:title="@string/defect_discover" />
+
+
+            </LinearLayout>
+
+
+            <com.supcon.mes.middleware.ui.view.CustomTitleValueSmall
+                android:id="@+id/address"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingLeft="5dp"
+                android:tag="address"
+                app:icon="@drawable/ic_map_location"
+                app:title="@string/defect_address" />
+
+        </LinearLayout>
+    </LinearLayout>
+</LinearLayout>
