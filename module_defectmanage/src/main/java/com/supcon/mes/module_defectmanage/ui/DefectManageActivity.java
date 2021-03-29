@@ -191,7 +191,6 @@ public class DefectManageActivity extends BaseControllerActivity implements AddD
             } else {
                 //从另外的实体来的进行初始化
                 defectModelEntity = new DefectModelEntity();
-
             }
         }
 
@@ -951,8 +950,20 @@ public class DefectManageActivity extends BaseControllerActivity implements AddD
             }
         } else if (StringUtil.equalsIgnoreCase(event.getSelectTag(), "device")){
             if (event.getEntity() instanceof DeviceSelected) {
-                selectedDevice = (DeviceEntity) event.getEntity();
-                devicename.setContent(selectedDevice.name);
+                DeviceSelected deviceSelected = (DeviceSelected) event.getEntity();
+                if (deviceSelected != null) {
+
+                    if (deviceEntities != null) {
+                        for (DeviceEntity deviceEntity : deviceEntities) {
+                            if (deviceEntity.id != null && deviceEntity.id != null && deviceEntity.id == deviceEntity.id.longValue()) {
+                                selectedDevice = deviceEntity;
+                                devicename.setContent(selectedDevice.name);
+                                break;
+                            }
+                        }
+                    }
+
+                }
             }
         }
     }
