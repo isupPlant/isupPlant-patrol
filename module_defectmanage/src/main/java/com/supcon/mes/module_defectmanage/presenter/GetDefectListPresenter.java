@@ -3,6 +3,7 @@ package com.supcon.mes.module_defectmanage.presenter;
 import com.supcon.mes.middleware.SupPlantApplication;
 import com.supcon.mes.middleware.model.bean.BAP5CommonEntity;
 import com.supcon.mes.middleware.model.bean.FunctionEx;
+import com.supcon.mes.module_defectmanage.model.bean.DefectListResponseResultEntity;
 import com.supcon.mes.module_defectmanage.model.bean.DefectModelEntity;
 import com.supcon.mes.module_defectmanage.model.bean.DefectOnlineEntity;
 import com.supcon.mes.module_defectmanage.model.bean.DefectRequestListEntity;
@@ -43,14 +44,14 @@ public class GetDefectListPresenter extends GetDefectListContract.Presenter {
         entity.setPageNo(pageNo);
         entity.setPageSize(20);
         mCompositeSubscription.add(DefectManagerHttpClient.getDefectList(entity)
-                .onErrorReturn(new FunctionEx<Throwable, List<DefectOnlineEntity>>() {
+                .onErrorReturn(new FunctionEx<Throwable, DefectListResponseResultEntity>() {
                     @Override
                     public BAP5CommonEntity apply(Throwable throwable)  {
                         return super.apply(throwable);
                     }
-                }).subscribe(new Consumer<BAP5CommonEntity<List<DefectOnlineEntity>>>() {
+                }).subscribe(new Consumer<BAP5CommonEntity<DefectListResponseResultEntity>>() {
                     @Override
-                    public void accept(BAP5CommonEntity<List<DefectOnlineEntity>> incidentTmpEntityCommonEntity) throws Exception {
+                    public void accept(BAP5CommonEntity<DefectListResponseResultEntity> incidentTmpEntityCommonEntity) throws Exception {
                         if (incidentTmpEntityCommonEntity.success) {
                             getView().getDefectListSuccess(incidentTmpEntityCommonEntity);
                         } else {

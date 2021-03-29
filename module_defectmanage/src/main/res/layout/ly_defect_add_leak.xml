@@ -23,10 +23,12 @@
         android:id="@+id/leak_status"
         style="@style/psc_edit_date_horizontal_style_text_view"
         android:tag="leak_status"
-        android:translationZ="1dp"
         app:icon_res="@drawable/ic_unfold66"
         app:editable="true"
         app:key="@string/defect_leak_status" />
+
+    <include layout="@layout/v_divider_gray" />
+
 
     <com.supcon.mes.mbap.view.CustomEditText
         android:id="@+id/leak_number"

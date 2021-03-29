@@ -14,6 +14,7 @@ import com.supcon.mes.middleware.model.bean.BAP5CommonEntity;
 import com.supcon.mes.middleware.util.EmptyAdapterHelper;
 import com.supcon.mes.module_defectmanage.R;
 import com.supcon.mes.module_defectmanage.model.api.GetDefectListAPI;
+import com.supcon.mes.module_defectmanage.model.bean.DefectListResponseResultEntity;
 import com.supcon.mes.module_defectmanage.model.bean.DefectOnlineEntity;
 import com.supcon.mes.module_defectmanage.model.contract.GetDefectListContract;
 import com.supcon.mes.module_defectmanage.presenter.GetDefectListPresenter;
@@ -106,12 +107,16 @@ public class DefectOnlineFragment extends BaseRefreshRecyclerFragment<DefectOnli
 
     @Override
     public void getDefectListSuccess(BAP5CommonEntity entity) {
-
-        if (entity != null) {
-            refreshListController.refreshComplete((List<DefectOnlineEntity>) entity.data);
-        } else {
-            refreshListController.refreshComplete(new ArrayList<>());
+        if (entity != null && entity.data != null) {
+            DefectListResponseResultEntity result = (DefectListResponseResultEntity) entity.data;
+            if (result != null) {
+                List<DefectOnlineEntity> list = result.getReult();
+                refreshListController.refreshComplete(list);
+                return;
+            }
         }
+
+        refreshListController.refreshComplete(new ArrayList<>());
     }
 
     @Override

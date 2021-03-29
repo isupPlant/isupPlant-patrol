@@ -41,7 +41,7 @@
             <com.supcon.mes.mbap.view.CustomVerticalEditText
                 android:id="@+id/describe"
                 android:layout_width="match_parent"
-                android:layout_height="46dp"
+                android:layout_height="wrap_content"
                 android:background="@color/white"
                 android:tag="describe"
                 app:edit_hint="@string/defect_describe"

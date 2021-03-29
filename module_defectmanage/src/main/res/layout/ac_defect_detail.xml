@@ -128,7 +128,7 @@
 
             <include layout="@layout/v_divider_gray" />
 
-            <com.supcon.mes.mbap.view.CustomEditText
+            <com.supcon.mes.mbap.view.CustomTextView
                 android:id="@+id/address"
                 android:layout_width="match_parent"
                 android:layout_height="46dp"
@@ -141,7 +141,7 @@
             <include layout="@layout/v_divider_gray" />
 
 
-            <com.supcon.mes.mbap.view.CustomEditText
+            <com.supcon.mes.mbap.view.CustomTextView
                 android:id="@+id/findtime"
                 style="@style/psc_edit_date_horizontal_style_text_view"
                 android:tag="findtime"
@@ -150,7 +150,7 @@
 
             <include layout="@layout/v_divider_gray" />
 
-            <com.supcon.mes.mbap.view.CustomEditText
+            <com.supcon.mes.mbap.view.CustomTextView
                 android:id="@+id/planhandletime"
                 style="@style/psc_edit_date_horizontal_style_text_view"
                 android:tag="planhandletime"

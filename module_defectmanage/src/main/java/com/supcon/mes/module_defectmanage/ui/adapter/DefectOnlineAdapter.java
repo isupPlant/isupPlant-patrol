@@ -12,6 +12,7 @@ import com.supcon.common.view.base.adapter.viewholder.BaseRecyclerViewHolder;
 import com.supcon.mes.middleware.constant.Constant;
 import com.supcon.mes.middleware.model.bean.SystemCodeEntity;
 import com.supcon.mes.middleware.ui.view.CustomTitleValueSmall;
+import com.supcon.mes.middleware.util.StringUtil;
 import com.supcon.mes.middleware.util.SystemCodeManager;
 import com.supcon.mes.module_defectmanage.R;
 import com.supcon.mes.module_defectmanage.model.bean.DefectOnlineEntity;
@@ -52,8 +53,8 @@ public class DefectOnlineAdapter extends HeaderRecyclerViewAdapter<DefectOnlineE
         CustomTitleValueSmall finder;
         @BindByTag("address")
         CustomTitleValueSmall address;
-//        @BindByTag("name")
-//        CustomTitleValueSmall name;
+        @BindByTag("name")
+        CustomTitleValueSmall name;
         @BindByTag("tableNo")
         TextView tableNo;
         @BindByTag("devicename")
@@ -88,13 +89,13 @@ public class DefectOnlineAdapter extends HeaderRecyclerViewAdapter<DefectOnlineE
 
         @Override
         protected int layoutId() {
-            return R.layout.item_defect_add_off_line;
+            return R.layout.item_defect_add_on_line;
         }
 
         @Override
         protected void update(DefectOnlineEntity data) {
 
-//            name.setValue(data.getName());
+            name.setValue(data.getName());
             if (data.getFinder() != null) {
                 finder.setValue(data.getFinder().getName());
             } else {
@@ -111,7 +112,11 @@ public class DefectOnlineAdapter extends HeaderRecyclerViewAdapter<DefectOnlineE
             if (data.getEam() != null) {
                 devicename.setText(data.getEam().getName());
             }
-            tableNo.setText(data.getTableNo() + "");
+            if (!StringUtil.isBlank(data.getTableNo())) {
+                tableNo.setText(data.getTableNo() + "");
+            } else {
+                tableNo.setText("");
+            }
 
             status.setVisibility(View.VISIBLE);
 

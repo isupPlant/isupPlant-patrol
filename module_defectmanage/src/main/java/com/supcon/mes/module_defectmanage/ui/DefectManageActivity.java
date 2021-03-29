@@ -634,7 +634,12 @@ public class DefectManageActivity extends BaseControllerActivity implements AddD
      */
     private void saveToLocal() {
         //如果是从数据库中取出来的是不是就不用new一个对象
-        putValueToEntity(false);
+//        putValueToEntity(false);
+        putValueToEntity(true);
+        if (!defectModelEntity.isValid) {
+            return;
+        }
+
         saveFileToString();
         DatabaseManager.getDao().getDefectModelEntityDao().insertOrReplace(defectModelEntity);
 

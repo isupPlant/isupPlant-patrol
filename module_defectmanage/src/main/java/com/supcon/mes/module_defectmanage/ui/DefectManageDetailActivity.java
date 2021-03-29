@@ -9,18 +9,23 @@ import android.widget.TextView;
 import com.app.annotation.BindByTag;
 import com.app.annotation.apt.Router;
 import com.supcon.common.view.base.activity.BaseControllerActivity;
+import com.supcon.common.view.util.ToastUtils;
 import com.supcon.mes.mbap.utils.StatusBarUtils;
 import com.supcon.mes.mbap.view.CustomDateView;
 import com.supcon.mes.mbap.view.CustomEditText;
 import com.supcon.mes.mbap.view.CustomTextView;
 import com.supcon.mes.middleware.constant.Constant;
 import com.supcon.mes.middleware.model.bean.FileEntity;
+import com.supcon.mes.middleware.model.bean.SystemCodeEntity;
 import com.supcon.mes.middleware.ui.view.FileListView;
+import com.supcon.mes.middleware.util.StringUtil;
+import com.supcon.mes.middleware.util.SystemCodeManager;
 import com.supcon.mes.module_defectmanage.R;
 import com.supcon.mes.module_defectmanage.model.bean.DefectOnlineEntity;
 import com.supcon.mes.module_defectmanage.util.Utils;
 
 import java.util.ArrayList;
+import java.util.List;
 
 
 @Router(value = Utils.AppCode.DEFECT_MANAGEMENT_ON_LINE_DETAIL)
@@ -47,7 +52,7 @@ public class DefectManageDetailActivity extends BaseControllerActivity  {
     @BindByTag("discover")
     CustomTextView discover;
     @BindByTag("address")
-    CustomEditText address;
+    CustomTextView address;
     @BindByTag("findtime")
     CustomTextView findtime;
     @BindByTag("planhandletime")
@@ -93,6 +98,7 @@ public class DefectManageDetailActivity extends BaseControllerActivity  {
             finish();
         }
 
+        initByEntity();
     }
 
     @Override
@@ -102,6 +108,32 @@ public class DefectManageDetailActivity extends BaseControllerActivity  {
 
         titleText.setText(R.string.defect_detail);
         rightBtn.setVisibility(View.GONE);
+
+    }
+
+    @Override
+    protected void initListener() {
+        super.initListener();
+
+        leftBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                back();
+            }
+        });
+
+
+    }
+
+
+    private void setFileList(ArrayList<FileEntity> list) {
+        if(list!=null&&list.size()!=0){
+            file_list.setVisibility(View.VISIBLE);
+            file_list.setList(list);
+        }
+    }
+
+    private void initByEntity() {
         describe.setContent(entity.getHiddenApperance());
         if (entity.getDefectSource() != null) {
             source.setContent(entity.getDefectSource().getName());
@@ -115,6 +147,8 @@ public class DefectManageDetailActivity extends BaseControllerActivity  {
         if (entity.getProblemLevel() != null) {
             level.setContent(entity.getProblemLevel().getName());
         }
+
+        devicename.setContent(getString(R.string.defect_source_osi));
         if (entity.getEam() != null) {
             devicename.setContent(entity.getEam().getName());
         }
@@ -126,6 +160,10 @@ public class DefectManageDetailActivity extends BaseControllerActivity  {
         }
         if (entity.getFinder() != null) {
             discover.setContent(entity.getFinder().getName());
+        }
+
+        if (entity.getArea() != null) {
+            address.setContent(entity.getArea().getName());
         }
         findtime.setContent(entity.getFindTime() + "");
 
@@ -159,27 +197,26 @@ public class DefectManageDetailActivity extends BaseControllerActivity  {
         file_list.setEntityCode("DefectManage_6.0.0.1_problemManage");
 
         setFileList((ArrayList<FileEntity>) entity.getDefectFile());
-    }
 
-    @Override
-    protected void initListener() {
-        super.initListener();
-
-        leftBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                back();
-            }
-        });
-
-
-    }
-
-
-    private void setFileList(ArrayList<FileEntity> list) {
-        if(list!=null&&list.size()!=0){
-            file_list.setVisibility(View.VISIBLE);
-            file_list.setList(list);
+        //
+        if (entity.getDefectType() != null && StringUtil.contains(entity.getDefectType().getCode(), "Leak")) {
+            showLeakllt();
         }
+    }
+
+    private void showLeakllt() {
+        leak_ly.setVisibility(View.VISIBLE);
+        leak_name.setEditable(false);
+        leak_name.setNecessary(false);
+
+        leak_status.setEditable(false);
+        leak_status.setNecessary(false);
+
+        leak_number.setEditable(false);
+        leak_number.setNecessary(false);
+
+        leak_time.setEditable(false);
+        leak_time.setNecessary(false);
+
     }
 }

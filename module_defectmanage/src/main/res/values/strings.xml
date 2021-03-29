@@ -8,7 +8,7 @@
     <string name="defect_type">缺陷类型</string>
     <string name="defect_level">缺陷等级</string>
     <string name="defect_device_name">设备名称</string>
-    <string name="defect_equip_department">受检装置/部门</string>
+    <string name="defect_equip_department">受检装置</string>
     <string name="defect_assesor">评估人</string>
     <string name="defect_discover">发现人</string>
     <string name="defect_address">区域</string>
