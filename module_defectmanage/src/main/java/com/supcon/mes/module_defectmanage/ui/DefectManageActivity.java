@@ -170,7 +170,6 @@ public class DefectManageActivity extends BaseControllerActivity implements AddD
             dataId = bundle.getLong(Constant.INTENT_EXTRA_ID);
 
             tableNo = bundle.getString(Constant.IntentKey.XJ_TASK_TABLENO);
-            tableNo = "1000";
             String areaCode= bundle.getString(Constant.IntentKey.XJ_AREA_CODE);
             String areaName = bundle.getString(Constant.IntentKey.XJ_AREA_NAME);
             selectedArea = new BaseCodeIdNameEntity();

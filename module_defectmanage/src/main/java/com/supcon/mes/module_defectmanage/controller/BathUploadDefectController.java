@@ -8,8 +8,11 @@ import com.supcon.common.view.base.activity.BaseActivity;
 import com.supcon.common.view.base.controller.BaseDataController;
 import com.supcon.common.view.util.ToastUtils;
 import com.supcon.mes.mbap.utils.GsonUtil;
+import com.supcon.mes.middleware.SupPlantApplication;
 import com.supcon.mes.middleware.model.api.AddFileListAPI;
 import com.supcon.mes.middleware.model.bean.BAP5CommonEntity;
+import com.supcon.mes.middleware.model.bean.DeviceEntity;
+import com.supcon.mes.middleware.model.bean.DeviceEntityDao;
 import com.supcon.mes.middleware.model.bean.FileEntity;
 import com.supcon.mes.middleware.model.contract.AddFileListContract;
 import com.supcon.mes.middleware.model.event.BaseEvent;
@@ -52,11 +55,18 @@ public class BathUploadDefectController extends BaseDataController implements Ad
      */
     public void bathUploadDefectList(String tableNo) {
         defectModelEntityList.clear();
-
         if (!StringUtil.isBlank(tableNo)) {
-            defectModelEntityList = DatabaseManager.getDao().getDefectModelEntityDao().queryBuilder()
-                    .where(DefectModelEntityDao.Properties.TableNo.eq(tableNo)).list();
+            String[] taskList = tableNo.split(",");
+            for (String tableno : taskList) {
+                //根据设备eamId获取CommonDeviceEntity
+                try {
+                    defectModelEntityList.addAll( DatabaseManager.getDao().getDefectModelEntityDao().queryBuilder()
+                            .where(DefectModelEntityDao.Properties.TableNo.eq(tableno)).list());
 
+                } catch (Exception e) {
+
+                }
+            }
             if (defectModelEntityList != null && defectModelEntityList.size() > 0) {
                 //通知页面更新
                 submit(defectModelEntityList);
@@ -66,7 +76,6 @@ public class BathUploadDefectController extends BaseDataController implements Ad
             }
         }
 
-        EventBus.getDefault().post(new BaseEvent(true, ""));
         return;
     }
 

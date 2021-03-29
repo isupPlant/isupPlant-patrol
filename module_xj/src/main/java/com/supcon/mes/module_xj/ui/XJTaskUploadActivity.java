@@ -261,7 +261,17 @@ public class XJTaskUploadActivity extends BaseRefreshRecyclerActivity<XJTaskGrou
 
 
                         if(mUploadTasks.size()!=0){
-                            presenterRouter.create(XJTaskSubmitAPI.class).uploadFile(mUploadTasks, false);
+                            StringBuilder idList = new StringBuilder();
+                            if (mUploadTasks!=null){
+                                for (XJTaskEntity xjTaskEntity : mUploadTasks) {
+                                    idList.append(xjTaskEntity.tableNo);
+                                    idList.append(",");
+                                }
+                                idList.replace(idList.length() - 1, idList.length(), "");
+                            }
+
+
+                            getController(BathUploadDefectController.class).bathUploadDefectList(idList.toString());
                             onLoading(getString(R.string.xj_task_uploading));
                         }
 
@@ -494,7 +504,9 @@ public class XJTaskUploadActivity extends BaseRefreshRecyclerActivity<XJTaskGrou
     @SuppressLint("CheckResult")
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void uploadDefectManageResult(BaseEvent baseEvent) {
-
+        if (baseEvent.isSuccess()){
+            presenterRouter.create(XJTaskSubmitAPI.class).uploadFile(mUploadTasks, false);
+        }
     }
 
 
