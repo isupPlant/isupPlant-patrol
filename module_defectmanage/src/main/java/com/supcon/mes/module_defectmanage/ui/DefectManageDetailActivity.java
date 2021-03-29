@@ -208,15 +208,34 @@ public class DefectManageDetailActivity extends BaseControllerActivity  {
         leak_ly.setVisibility(View.VISIBLE);
         leak_name.setEditable(false);
         leak_name.setNecessary(false);
+        leak_name.setHint("");
 
         leak_status.setEditable(false);
         leak_status.setNecessary(false);
 
         leak_number.setEditable(false);
         leak_number.setNecessary(false);
+        leak_number.setHint("");
 
         leak_time.setEditable(false);
         leak_time.setNecessary(false);
 
+        if (entity.getListed() != null && entity.getListed()) {
+            leak_status.setContent(getString(R.string.yes));
+        } else {
+            leak_status.setContent(getString(R.string.no));
+        }
+
+        if (!StringUtil.isBlank(entity.getListedTime())) {
+            leak_time.setContent(entity.getListedTime());
+        }
+
+        if (!StringUtil.isBlank(entity.getLeakName())) {
+            leak_name.setContent(entity.getLeakName());
+        }
+
+        if (!StringUtil.isBlank(entity.getListedNumber())) {
+            leak_number.setContent(entity.getListedNumber());
+        }
     }
 }

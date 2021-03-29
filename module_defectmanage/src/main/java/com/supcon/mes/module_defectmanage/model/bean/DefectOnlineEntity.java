@@ -49,6 +49,27 @@ public class DefectOnlineEntity extends BaseEntity {
     private BaseCodeIdNameEntity defectState;
     private List<FileEntity> defectFile;
 
+    private Boolean listed;
+    private String listedNumber;
+    private String leakName;
+    private String listedTime;
+
+    public Boolean getListed() {
+        return listed;
+    }
+
+    public String getListedNumber() {
+        return listedNumber;
+    }
+
+    public String getLeakName() {
+        return leakName;
+    }
+
+    public String getListedTime() {
+        return listedTime;
+    }
+
     public long getId() {
         return id;
     }
