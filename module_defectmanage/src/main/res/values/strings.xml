@@ -2,6 +2,7 @@
     <string name="defect_add_title">缺陷单</string>
     <string name="defect_off_line_list_title">缺陷单记录</string>
     <string name="defect_name">缺陷名称</string>
+    <string name="defect_status">状态</string>
     <string name="defect_describe">缺陷描述</string>
     <string name="defect_source">缺陷来源</string>
     <string name="defect_type">缺陷类型</string>
@@ -48,6 +49,7 @@
     <string name="defect_yes">否</string>
     <string name="defect_no">是</string>
 
+    <string name="defect_detail">详情</string>
 
 
     <string name="defect_data_choose_is_null">没有选择数据</string>

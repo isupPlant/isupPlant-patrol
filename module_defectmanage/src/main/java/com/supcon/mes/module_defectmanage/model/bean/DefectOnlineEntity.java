@@ -35,8 +35,8 @@ public class DefectOnlineEntity extends BaseEntity {
     private long id;
     private String name;
     private String code;
-    private Object hiddenApperance;
-    private Object tableNo;
+    private String hiddenApperance;
+    private String tableNo;
     private BaseCodeIdNameEntity defectType;
     private BaseCodeIdNameEntity problemLevel;
     private BaseCodeIdNameEntity defectSource;
@@ -73,21 +73,15 @@ public class DefectOnlineEntity extends BaseEntity {
         this.code = code;
     }
 
-    public Object getHiddenApperance() {
+    public String getHiddenApperance() {
         return hiddenApperance;
     }
 
-    public void setHiddenApperance(Object hiddenApperance) {
-        this.hiddenApperance = hiddenApperance;
-    }
 
-    public Object getTableNo() {
+    public String getTableNo() {
         return tableNo;
     }
 
-    public void setTableNo(Object tableNo) {
-        this.tableNo = tableNo;
-    }
 
     public BaseCodeIdNameEntity getDefectType() {
         return defectType;

@@ -481,7 +481,7 @@ public class DefectManageActivity extends BaseControllerActivity implements AddD
                 .subscribe(o -> {
                     Bundle bundle = new Bundle();
                     bundle.putString(Constant.IntentKey.XJ_TASK_TABLENO, tableNo);
-                    bundle.putString(Constant.IntentKey.XJ_TASK_TABLENO, selectedArea.getCode());
+                    bundle.putString(Constant.IntentKey.XJ_AREA_CODE, selectedArea.getCode());
                     IntentRouter.go(context, Utils.AppCode.DEFECT_MANAGEMENT_OFF_LINE_LIST, bundle);
                 });
     }
@@ -735,7 +735,7 @@ public class DefectManageActivity extends BaseControllerActivity implements AddD
             defectModelEntity.areaCode = selectedArea.getCode();
             defectModelEntity.areaName = selectedArea.getName();
         }
-        defectModelEntity.areaId = 1005L;
+//        defectModelEntity.areaId = 1005L;
 
         if (findTimeLong > 0) {
             defectModelEntity.findTime = DateUtil.dateTimeFormat(findTimeLong);
@@ -949,17 +949,15 @@ public class DefectManageActivity extends BaseControllerActivity implements AddD
 
             }
         } else if (StringUtil.equalsIgnoreCase(event.getSelectTag(), "device")){
-            if (event.getEntity() instanceof SelectEntity) {
-                SelectEntity selectEntity = (SelectEntity) event.getEntity();
-                if (selectEntity != null) {
+            if (event.getEntity() instanceof List) {
+                List<SelectEntity> selectEntity = (List<SelectEntity>) event.getEntity();
+                if (selectEntity != null&& selectEntity.size() > 0 && deviceEntities != null) {
 
-                    if (deviceEntities != null) {
-                        for (DeviceEntity deviceEntity : deviceEntities) {
-                            if (deviceEntity.id != null && deviceEntity.id != null && deviceEntity.id .equals(selectEntity.get_id()) ) {
-                                selectedDevice = deviceEntity;
-                                devicename.setContent(selectedDevice.name);
-                                break;
-                            }
+                    for (DeviceEntity deviceEntity : deviceEntities) {
+                        if (deviceEntity.id != null && deviceEntity.id != null && deviceEntity.id.equals(selectEntity.get(0).get_id())) {
+                            selectedDevice = deviceEntity;
+                            devicename.setContent(selectedDevice.name);
+                            break;
                         }
                     }
 

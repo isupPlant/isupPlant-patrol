@@ -52,8 +52,8 @@ public class DefectOnlineAdapter extends HeaderRecyclerViewAdapter<DefectOnlineE
         CustomTitleValueSmall finder;
         @BindByTag("address")
         CustomTitleValueSmall address;
-        @BindByTag("name")
-        CustomTitleValueSmall name;
+//        @BindByTag("name")
+//        CustomTitleValueSmall name;
         @BindByTag("tableNo")
         TextView tableNo;
         @BindByTag("devicename")
@@ -94,7 +94,7 @@ public class DefectOnlineAdapter extends HeaderRecyclerViewAdapter<DefectOnlineE
         @Override
         protected void update(DefectOnlineEntity data) {
 
-            name.setValue(data.getName());
+//            name.setValue(data.getName());
             if (data.getFinder() != null) {
                 finder.setValue(data.getFinder().getName());
             } else {
@@ -107,6 +107,7 @@ public class DefectOnlineAdapter extends HeaderRecyclerViewAdapter<DefectOnlineE
                 address.setValue(data.getArea().getName());
             }
 
+            devicename.setText(data.getName());
             if (data.getEam() != null) {
                 devicename.setText(data.getEam().getName());
             }

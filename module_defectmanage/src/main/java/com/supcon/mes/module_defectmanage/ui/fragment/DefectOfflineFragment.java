@@ -14,6 +14,7 @@ import com.jakewharton.rxbinding2.view.RxView;
 import com.supcon.common.view.base.adapter.IListAdapter;
 import com.supcon.common.view.base.fragment.BaseRefreshRecyclerFragment;
 import com.supcon.common.view.listener.OnItemChildViewClickListener;
+import com.supcon.common.view.listener.OnRefreshListener;
 import com.supcon.common.view.listener.OnRefreshPageListener;
 import com.supcon.common.view.util.ToastUtils;
 import com.supcon.mes.mbap.view.CustomDialog;
@@ -47,7 +48,7 @@ import io.reactivex.disposables.Disposable;
  * Des:
  */
 @Controller(value = BathUploadDefectController.class)
-public class DefectOutlineFragment extends BaseRefreshRecyclerFragment<DefectModelEntity> {
+public class DefectOfflineFragment extends BaseRefreshRecyclerFragment<DefectModelEntity> {
     @BindByTag("llt_buttom")
     LinearLayout llt_buttom;
     @BindByTag("contentView")
@@ -70,9 +71,14 @@ public class DefectOutlineFragment extends BaseRefreshRecyclerFragment<DefectMod
     }
 
     @Override
+    public void onResume() {
+        super.onResume();
+        loadDataFromDb(tableNo);
+    }
+
+    @Override
     protected void initListener() {
         super.initListener();
-
 
 
         Disposable disposable = RxView.clicks(all)
@@ -233,8 +239,8 @@ public class DefectOutlineFragment extends BaseRefreshRecyclerFragment<DefectMod
     public void loadDataFromDb(String tableNo) {
         if (tableNo != null) {
             List<DefectModelEntity> list = DatabaseManager.getDao().getDefectModelEntityDao().queryBuilder()
-                    .where(DefectModelEntityDao.Properties.TableNo.eq(tableNo))
-                    .where(DefectModelEntityDao.Properties.AreaCode.eq(areaCode)).list();
+                    .where(DefectModelEntityDao.Properties.TableNo.eq(tableNo)).list();
+//                    .where(DefectModelEntityDao.Properties.AreaCode.eq(areaCode)).list();
             refreshListController.refreshComplete(list);
         } else {
             refreshListController.refreshComplete();
@@ -253,19 +259,16 @@ public class DefectOutlineFragment extends BaseRefreshRecyclerFragment<DefectMod
         refreshListController.setLoadMoreEnable(false);
         refreshListController.setPullDownRefreshEnabled(false);
         refreshListController.setAutoPullDownRefresh(false);
-        refreshListController.setOnRefreshPageListener(new OnRefreshPageListener() {
+        refreshListController.setOnRefreshListener(new OnRefreshListener() {
             @Override
-            public void onRefresh(int pageIndex) {
+            public void onRefresh() {
+
             }
         });
 
         EventBus.getDefault().register(this);
     }
 
-    public void refreshList() {
-        if(refreshListController!=null)
-            refreshListController.refreshBegin();
-    }
 
     private void setAllBtn(boolean isAllSelected) {
         if (isAllSelected) {

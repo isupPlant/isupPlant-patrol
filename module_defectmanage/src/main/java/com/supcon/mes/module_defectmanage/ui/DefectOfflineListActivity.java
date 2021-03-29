@@ -20,7 +20,7 @@ import com.supcon.mes.middleware.constant.Constant;
 import com.supcon.mes.module_defectmanage.R;
 import com.supcon.mes.module_defectmanage.model.api.GetDefectListAPI;
 import com.supcon.mes.module_defectmanage.ui.fragment.DefectOnlineFragment;
-import com.supcon.mes.module_defectmanage.ui.fragment.DefectOutlineFragment;
+import com.supcon.mes.module_defectmanage.ui.fragment.DefectOfflineFragment;
 import com.supcon.mes.module_defectmanage.util.Utils;
 
 import java.util.ArrayList;
@@ -45,7 +45,7 @@ public class DefectOfflineListActivity extends BaseControllerActivity {
     TabLayout tablayout;
 
     String tableNo, areaCode;
-    DefectOutlineFragment defectOutlineFragment;
+    DefectOfflineFragment defectOutlineFragment;
     DefectOnlineFragment defectOnlineFragment;
 
     private List<Fragment> pages = new ArrayList<>();
@@ -83,7 +83,7 @@ public class DefectOfflineListActivity extends BaseControllerActivity {
         rightBtn_text.setVisibility(View.VISIBLE);
         rightBtn_text.setText(getString(R.string.defect_choose));
 
-        defectOutlineFragment = new DefectOutlineFragment();
+        defectOutlineFragment = new DefectOfflineFragment();
         defectOnlineFragment = new DefectOnlineFragment();
         pages.add(defectOutlineFragment);
         pages.add(defectOnlineFragment);

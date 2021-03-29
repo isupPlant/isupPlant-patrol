@@ -60,6 +60,8 @@ public class DefectManageDetailActivity extends BaseControllerActivity  {
     CustomEditText leak_number;
     @BindByTag("leak_time")
     CustomDateView leak_time;
+    @BindByTag("status")
+    CustomTextView status;
 
     @BindByTag("leak_ly")
     LinearLayout leak_ly;
@@ -74,7 +76,7 @@ public class DefectManageDetailActivity extends BaseControllerActivity  {
 
     @Override
     protected int getLayoutID() {
-        return R.layout.ac_defect_add;
+        return R.layout.ac_defect_detail;
     }
 
     @Override
@@ -98,11 +100,36 @@ public class DefectManageDetailActivity extends BaseControllerActivity  {
         super.initView();
         StatusBarUtils.setWindowStatusBarColor(this, R.color.themeColor);
 
-        titleText.setText(R.string.defect_add_file);
-        rightBtn.setVisibility(View.VISIBLE);
-        rightBtn.setImageDrawable(getResources().getDrawable(R.drawable.ic_top_all_p));
+        titleText.setText(R.string.defect_detail);
+        rightBtn.setVisibility(View.GONE);
+        describe.setContent(entity.getHiddenApperance());
+        if (entity.getDefectSource() != null) {
+            source.setContent(entity.getDefectSource().getName());
+        }
+        if (entity.getDefectState() != null) {
+            status.setContent(entity.getDefectState().getName());
+        }
+        if (entity.getDefectType() != null) {
+            type.setContent(entity.getDefectType().getName());
+        }
+        if (entity.getProblemLevel() != null) {
+            level.setContent(entity.getProblemLevel().getName());
+        }
+        if (entity.getEam() != null) {
+            devicename.setContent(entity.getEam().getName());
+        }
+        if (entity.getEamDept() != null) {
+            equip_department.setContent(entity.getEamDept().getName());
+        }
+        if (entity.getAssessor() != null) {
+            assessor.setContent(entity.getAssessor().getName());
+        }
+        if (entity.getFinder() != null) {
+            discover.setContent(entity.getFinder().getName());
+        }
+        findtime.setContent(entity.getFindTime() + "");
 
-        source.setContent(R.string.defect_source_osi);
+        name.setContent(entity.getName());
 
         file_list.setFileListView(new FileListView.FileListViewListener() {
             @Override
@@ -128,7 +155,7 @@ public class DefectManageDetailActivity extends BaseControllerActivity  {
                 }
             }
         });
-        file_list.setModuleCode("HierarchicalMod");
+        file_list.setModuleCode("DefectManage");
         file_list.setEntityCode("DefectManage_6.0.0.1_problemManage");
 
         setFileList((ArrayList<FileEntity>) entity.getDefectFile());

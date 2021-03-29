@@ -45,8 +45,20 @@
                 android:tag="describe"
                 app:editable="false"
                 app:text="@string/defect_describe" />
+
             <include layout="@layout/v_divider_gray" />
 
+
+            <com.supcon.mes.mbap.view.CustomTextView
+                android:id="@+id/status"
+                android:layout_width="match_parent"
+                android:layout_height="46dp"
+                android:background="@color/white"
+                android:tag="status"
+                app:editable="false"
+                app:text="@string/defect_status" />
+
+            <include layout="@layout/v_divider_gray" />
 
             <com.supcon.mes.mbap.view.CustomTextView
                 android:id="@+id/source"
@@ -62,18 +74,19 @@
                 android:id="@+id/type"
                 style="@style/psc_edit_date_horizontal_style_text_view"
                 android:tag="type"
-                android:translationZ="1dp"
                 app:editable="false"
                 app:key="@string/defect_type" />
 
+            <include layout="@layout/v_divider_gray" />
 
             <com.supcon.mes.mbap.view.CustomTextView
                 android:id="@+id/level"
                 style="@style/psc_edit_date_horizontal_style_text_view"
                 android:tag="level"
-                android:translationZ="1dp"
                 app:editable="false"
                 app:key="@string/defect_level" />
+
+            <include layout="@layout/v_divider_gray" />
 
 
             <com.supcon.mes.mbap.view.CustomTextView
@@ -100,19 +113,20 @@
                 android:id="@+id/assessor"
                 style="@style/psc_edit_date_horizontal_style_text_view"
                 android:tag="assessor"
-                android:translationZ="1dp"
                 app:editable="false"
                 app:key="@string/defect_assesor" />
+
+            <include layout="@layout/v_divider_gray" />
 
 
             <com.supcon.mes.mbap.view.CustomTextView
                 android:id="@+id/discover"
                 style="@style/psc_edit_date_horizontal_style_text_view"
                 android:tag="discover"
-                android:translationZ="1dp"
                 app:editable="false"
                 app:key="@string/defect_discover" />
 
+            <include layout="@layout/v_divider_gray" />
 
             <com.supcon.mes.mbap.view.CustomEditText
                 android:id="@+id/address"
@@ -131,8 +145,8 @@
                 android:id="@+id/findtime"
                 style="@style/psc_edit_date_horizontal_style_text_view"
                 android:tag="findtime"
-                app:key="@string/defect_find_time"
-                app:editable="false"/>
+                app:editable="false"
+                app:key="@string/defect_find_time" />
 
             <include layout="@layout/v_divider_gray" />
 
@@ -140,10 +154,13 @@
                 android:id="@+id/planhandletime"
                 style="@style/psc_edit_date_horizontal_style_text_view"
                 android:tag="planhandletime"
-                app:key="@string/defect_plan_handle_time"
-                app:editable="false"/>
+                android:visibility="gone"
+                app:editable="false"
+                app:key="@string/defect_plan_handle_time" />
 
-            <include layout="@layout/v_divider_gray" />
+            <include
+                layout="@layout/v_divider_gray"
+                android:visibility="gone" />
 
 
             <include
@@ -153,11 +170,11 @@
                 android:visibility="gone" />
 
             <com.supcon.mes.middleware.ui.view.FileListView
-                android:visibility="gone"
                 android:id="@+id/file_list"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:tag="file_list"/>
+                android:tag="file_list"
+                android:visibility="gone" />
         </LinearLayout>
 
 

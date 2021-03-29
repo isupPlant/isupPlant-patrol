@@ -20,6 +20,7 @@ import com.supcon.mes.module_defectmanage.presenter.GetDefectListPresenter;
 import com.supcon.mes.module_defectmanage.ui.adapter.DefectOnlineAdapter;
 import com.supcon.mes.module_defectmanage.util.Utils;
 
+import java.util.ArrayList;
 import java.util.List;
 
 
@@ -109,12 +110,12 @@ public class DefectOnlineFragment extends BaseRefreshRecyclerFragment<DefectOnli
         if (entity != null) {
             refreshListController.refreshComplete((List<DefectOnlineEntity>) entity.data);
         } else {
-            refreshListController.refreshComplete();
+            refreshListController.refreshComplete(new ArrayList<>());
         }
     }
 
     @Override
     public void getDefectListFailed(String errorMsg) {
-        refreshListController.refreshComplete();
+        refreshListController.refreshComplete(new ArrayList<>());
     }
 }
