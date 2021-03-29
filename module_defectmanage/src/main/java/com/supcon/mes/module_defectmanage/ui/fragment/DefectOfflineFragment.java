@@ -123,9 +123,7 @@ public class DefectOfflineFragment extends BaseRefreshRecyclerFragment<DefectMod
                                     DatabaseManager.getDao().getDefectModelEntityDao().deleteInTx(list);
 
                                     //重制UI
-                                    llt_buttom.setVisibility(View.GONE);
-                                    checkedMap.clear();
-                                    setAllBtn(false);
+                                    resetLltButtom();
                                     loadDataFromDb(tableNo);
                                 }
                             }, true)

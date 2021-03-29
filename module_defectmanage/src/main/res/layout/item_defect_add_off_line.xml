@@ -84,9 +84,8 @@
 
             <com.supcon.mes.middleware.ui.view.CustomTitleValueSmall
                 android:id="@+id/findtime"
-                android:layout_width="0dp"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
                 android:paddingLeft="5dp"
                 android:tag="findtime"
                 app:icon="@drawable/ic_time"
@@ -95,9 +94,8 @@
 
             <com.supcon.mes.middleware.ui.view.CustomTitleValueSmall
                 android:id="@+id/finder"
-                android:layout_width="0dp"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
                 android:paddingLeft="5dp"
                 android:tag="finder"
                 app:icon="@drawable/ic_person"

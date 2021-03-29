@@ -11,6 +11,7 @@ import com.supcon.common.view.base.adapter.HeaderRecyclerViewAdapter;
 import com.supcon.common.view.base.adapter.viewholder.BaseRecyclerViewHolder;
 import com.supcon.mes.mbap.view.CustomTextView;
 import com.supcon.mes.middleware.ui.view.CustomTitleValueSmall;
+import com.supcon.mes.middleware.util.StringUtil;
 import com.supcon.mes.module_defectmanage.R;
 import com.supcon.mes.module_defectmanage.model.bean.DefectModelEntity;
 
@@ -47,8 +48,8 @@ public class DefectAddInfoAdapter extends HeaderRecyclerViewAdapter<DefectModelE
         CustomTitleValueSmall finder;
         @BindByTag("address")
         CustomTitleValueSmall address;
-        @BindByTag("name")
-        CustomTitleValueSmall name;
+//        @BindByTag("name")
+//        CustomTitleValueSmall name;
         @BindByTag("tableNo")
         TextView tableNo;
         @BindByTag("devicename")
@@ -99,11 +100,14 @@ public class DefectAddInfoAdapter extends HeaderRecyclerViewAdapter<DefectModelE
                 iv_check.setVisibility(View.GONE);
             }
 
-            name.setValue(data.getName());
+//            name.setValue(data.getName());
+            devicename.setText(data.getName());
+            if (!StringUtil.isBlank(data.eamName)) {
+                devicename.setText(data.eamName);
+            }
             finder.setValue(data.finderName);
             findtime.setValue(data.findTime);
             address.setValue(data.areaName);
-            devicename.setText(data.eamName);
             tableNo.setText(data.getTableNo() + "");
 
             if (data.isValid) {
