@@ -107,7 +107,7 @@ public class DefectOnlineFragment extends BaseRefreshRecyclerFragment<DefectOnli
     public void getDefectListSuccess(BAP5CommonEntity entity) {
 
         if (entity != null) {
-            refreshListController.refreshComplete((List<DefectOnlineEntity>) entity.result);
+            refreshListController.refreshComplete((List<DefectOnlineEntity>) entity.data);
         } else {
             refreshListController.refreshComplete();
         }

@@ -26,9 +26,11 @@ import com.supcon.mes.middleware.SupPlantApplication;
 import com.supcon.mes.middleware.constant.Constant;
 import com.supcon.mes.middleware.controller.DateFilterController;
 import com.supcon.mes.middleware.model.bean.xj.XJTaskEntity;
+import com.supcon.mes.middleware.model.event.BaseEvent;
 import com.supcon.mes.middleware.model.event.RefreshEvent;
 import com.supcon.mes.middleware.util.ErrorMsgHelper;
 import com.supcon.mes.middleware.util.XJTaskCacheUtil;
+import com.supcon.mes.module_defectmanage.controller.BathUploadDefectController;
 import com.supcon.mes.module_xj.R;
 import com.supcon.mes.module_xj.model.api.XJLocalTaskAPI;
 import com.supcon.mes.module_xj.model.api.XJTaskSubmitAPI;
@@ -40,6 +42,8 @@ import com.supcon.mes.module_xj.presenter.XJTaskSubmitPresenter;
 import com.supcon.mes.module_xj.ui.adapter.XJTaskGroupAdapter;
 
 import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
 import org.reactivestreams.Publisher;
 
 import java.util.ArrayList;
@@ -64,7 +68,7 @@ import io.reactivex.schedulers.Schedulers;
  * Email:wangshizhan@supcom.com
  */
 @Router(value = Constant.Router.XJ_TASK_UPLOAD)
-@Controller(value = {DateFilterController.class})
+@Controller(value = {DateFilterController.class, BathUploadDefectController.class})
 @Presenter(value = {XJLocalTaskPresenter.class, XJTaskSubmitPresenter.class})
 public class XJTaskUploadActivity extends BaseRefreshRecyclerActivity<XJTaskGroupEntity> implements XJLocalTaskContract.View, XJTaskSubmitContract.View {
 
@@ -112,6 +116,7 @@ public class XJTaskUploadActivity extends BaseRefreshRecyclerActivity<XJTaskGrou
     protected void initView() {
         super.initView();
         StatusBarUtils.setWindowStatusBarColor(this,R.color.themeColor);
+        EventBus.getDefault().register(this);
         titleText.setText(getString(R.string.xj_task_upload));
         rightBtn.setVisibility(View.VISIBLE);
         rightBtn.setImageResource(R.drawable.ic_top_all);
@@ -484,4 +489,13 @@ public class XJTaskUploadActivity extends BaseRefreshRecyclerActivity<XJTaskGrou
         }
 
     }
+
+
+    @SuppressLint("CheckResult")
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void uploadDefectManageResult(BaseEvent baseEvent) {
+
+    }
+
+
 }

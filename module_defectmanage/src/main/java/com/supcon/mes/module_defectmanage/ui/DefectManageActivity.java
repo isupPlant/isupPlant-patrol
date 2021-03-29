@@ -1001,12 +1001,12 @@ public class DefectManageActivity extends BaseControllerActivity implements AddD
         if (!TextUtils.isEmpty(idList)) {
             List<DeviceEntity> deviceEntityList = new ArrayList<>();
             String[] eamIdList = idList.split(",");
-            for (String eamId : eamIdList) {
+            for (String eamCode : eamIdList) {
                 //根据设备eamId获取CommonDeviceEntity
                 try {
                     List<DeviceEntity> listall = SupPlantApplication.dao().getDeviceEntityDao().queryBuilder().list();
                     DeviceEntity commonDeviceEntity = SupPlantApplication.dao().getDeviceEntityDao().queryBuilder()
-                            .where(DeviceEntityDao.Properties.Code.eq(eamId)).where(DeviceEntityDao.Properties.State.eq("BaseSet_eamState/inUse")).unique();
+                            .where(DeviceEntityDao.Properties.Code.eq(eamCode)).unique();
                     if (commonDeviceEntity != null) {
                         deviceEntityList.add(commonDeviceEntity);
                     }

@@ -451,7 +451,7 @@ public class XJWorkActivity extends BaseRefreshRecyclerActivity<XJTaskWorkEntity
                 StringBuilder idList = new StringBuilder();
                 if (deviceEntityList!=null){
                     for (DeviceEntity deviceEntity : deviceEntityList) {
-                        idList.append(deviceEntity.id);
+                        idList.append(deviceEntity.code);
                         idList.append(",");
                     }
                     idList.replace(idList.length() - 1, idList.length(), "");
@@ -615,7 +615,9 @@ public class XJWorkActivity extends BaseRefreshRecyclerActivity<XJTaskWorkEntity
                         DeviceEntity commonDeviceEntity = SupPlantApplication.dao().getDeviceEntityDao().queryBuilder()
                                 .where(DeviceEntityDao.Properties.Code.eq( xjWorkEntity.eamId.code)).unique();
                         if (commonDeviceEntity!=null){
-                            deviceEntityList.add(commonDeviceEntity);
+                            if (!deviceEntityList.contains(commonDeviceEntity)) {
+                                deviceEntityList.add(commonDeviceEntity);
+                            }
                         }
                     }catch (Exception e){
 
