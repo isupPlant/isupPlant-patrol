@@ -18,6 +18,7 @@ import com.supcon.mes.module_defectmanage.model.bean.DefectOnlineEntity;
 import com.supcon.mes.module_defectmanage.model.contract.GetDefectListContract;
 import com.supcon.mes.module_defectmanage.presenter.GetDefectListPresenter;
 import com.supcon.mes.module_defectmanage.ui.adapter.DefectOnlineAdapter;
+import com.supcon.mes.module_defectmanage.util.Utils;
 
 import java.util.List;
 
@@ -78,8 +79,8 @@ public class DefectOnlineFragment extends BaseRefreshRecyclerFragment<DefectOnli
         adapter.setOnItemChildViewClickListener((childView, position, action, obj) -> {
             DefectOnlineEntity item = ((DefectOnlineEntity) obj);
             Bundle bundle = new Bundle();
-            bundle.putLong(Constant.INTENT_EXTRA_ID, item.getId());
-            IntentRouter.go(context, Constant.Router.PSC_TASK_DETAIL,bundle);
+            bundle.putSerializable(Constant.INTENT_EXTRA_OBJECT, item);
+            IntentRouter.go(context, Utils.AppCode.DEFECT_MANAGEMENT_ON_LINE_DETAIL,bundle);
         });
     }
 

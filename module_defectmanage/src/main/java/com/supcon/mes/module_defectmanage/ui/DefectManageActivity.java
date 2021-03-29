@@ -78,7 +78,7 @@ import io.reactivex.disposables.Disposable;
 @Presenter(value = {AddDefectPresenter.class, AddFileListPresenter.class})
 @Controller(value = {SystemCodeJsonController.class})
 @SystemCode(entityCodes = {Constant.SystemCode.DefectManage_problemClass, Constant.SystemCode.DefectManage_problemLevel,
-Constant.SystemCode.DefectManage_problemState})
+Utils.SystemCode.DefectManage_problemState})
 @Router(value = Constant.AppCode.DEFECT_MANAGEMENT_ADD)
 public class DefectManageActivity extends BaseControllerActivity implements AddDefectContract.View, AddFileListContract.View {
 

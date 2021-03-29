@@ -2,6 +2,9 @@ package com.supcon.mes.module_defectmanage.model.bean;
 
 import com.supcon.common.com_http.BaseEntity;
 import com.supcon.mes.middleware.model.bean.BaseCodeIdNameEntity;
+import com.supcon.mes.middleware.model.bean.FileEntity;
+
+import java.util.List;
 
 /**
  * Time:    2021/3/26  18: 24
@@ -44,7 +47,7 @@ public class DefectOnlineEntity extends BaseEntity {
     private BaseCodeIdNameEntity eamDept;
     private String findTime;
     private BaseCodeIdNameEntity defectState;
-//    private List<FileEntity> defectFile;
+    private List<FileEntity> defectFile;
 
     public long getId() {
         return id;
@@ -158,13 +161,13 @@ public class DefectOnlineEntity extends BaseEntity {
         this.defectState = defectState;
     }
 
-//    public List<FileEntity> getDefectFile() {
-//        return defectFile;
-//    }
-//
-//    public void setDefectFile(List<FileEntity> defectFile) {
-//        this.defectFile = defectFile;
-//    }
+    public List<FileEntity> getDefectFile() {
+        return defectFile;
+    }
+
+    public void setDefectFile(List<FileEntity> defectFile) {
+        this.defectFile = defectFile;
+    }
 
     public String getFindTime() {
         return findTime;
