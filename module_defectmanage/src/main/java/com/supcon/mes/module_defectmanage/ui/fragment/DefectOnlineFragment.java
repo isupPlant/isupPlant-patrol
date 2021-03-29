@@ -11,10 +11,10 @@ import com.supcon.common.view.base.fragment.BaseRefreshRecyclerFragment;
 import com.supcon.mes.middleware.IntentRouter;
 import com.supcon.mes.middleware.constant.Constant;
 import com.supcon.mes.middleware.model.bean.BAP5CommonEntity;
+import com.supcon.mes.middleware.model.bean.BapPageResultEntity;
 import com.supcon.mes.middleware.util.EmptyAdapterHelper;
 import com.supcon.mes.module_defectmanage.R;
 import com.supcon.mes.module_defectmanage.model.api.GetDefectListAPI;
-import com.supcon.mes.module_defectmanage.model.bean.DefectListResponseResultEntity;
 import com.supcon.mes.module_defectmanage.model.bean.DefectOnlineEntity;
 import com.supcon.mes.module_defectmanage.model.contract.GetDefectListContract;
 import com.supcon.mes.module_defectmanage.presenter.GetDefectListPresenter;
@@ -108,9 +108,14 @@ public class DefectOnlineFragment extends BaseRefreshRecyclerFragment<DefectOnli
     @Override
     public void getDefectListSuccess(BAP5CommonEntity entity) {
         if (entity != null && entity.data != null) {
-            DefectListResponseResultEntity result = (DefectListResponseResultEntity) entity.data;
+            BapPageResultEntity<DefectOnlineEntity> result = (BapPageResultEntity<DefectOnlineEntity>) entity.data;
+            if (!result.isHasNext()) {
+                refreshListController.setLoadMoreEnable(false);
+            } else{
+                refreshListController.setLoadMoreEnable(true);
+            }
             if (result != null) {
-                List<DefectOnlineEntity> list = result.getReult();
+                List<DefectOnlineEntity> list = result.getResult();
                 refreshListController.refreshComplete(list);
                 return;
             }

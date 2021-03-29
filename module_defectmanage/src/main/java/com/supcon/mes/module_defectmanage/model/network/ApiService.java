@@ -2,18 +2,16 @@ package com.supcon.mes.module_defectmanage.model.network;
 
 import com.app.annotation.apt.ApiFactory;
 import com.supcon.mes.middleware.model.bean.BAP5CommonEntity;
-import com.supcon.mes.module_defectmanage.model.bean.DefectListResponseResultEntity;
+import com.supcon.mes.middleware.model.bean.BapPageResultEntity;
 import com.supcon.mes.module_defectmanage.model.bean.DefectModelEntity;
 import com.supcon.mes.module_defectmanage.model.bean.DefectOnlineEntity;
 import com.supcon.mes.module_defectmanage.model.bean.DefectRequestListEntity;
 
 import java.util.List;
-import java.util.Map;
 
 import io.reactivex.Flowable;
 import retrofit2.http.Body;
 import retrofit2.http.POST;
-import retrofit2.http.QueryMap;
 
 /**
  * Created by Administrator on 2016/3/23.
@@ -42,5 +40,5 @@ public interface ApiService {
      * @return
      */
     @POST("/msService/DefectManage/problemManage/problemManage/getDefectPage")
-    Flowable<BAP5CommonEntity<DefectListResponseResultEntity>> getDefectList(@Body DefectRequestListEntity map);
+    Flowable<BAP5CommonEntity<BapPageResultEntity<DefectOnlineEntity>>> getDefectList(@Body DefectRequestListEntity map);
 }
