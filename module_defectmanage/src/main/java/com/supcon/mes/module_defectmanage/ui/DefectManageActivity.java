@@ -949,13 +949,13 @@ public class DefectManageActivity extends BaseControllerActivity implements AddD
 
             }
         } else if (StringUtil.equalsIgnoreCase(event.getSelectTag(), "device")){
-            if (event.getEntity() instanceof DeviceSelected) {
-                DeviceSelected deviceSelected = (DeviceSelected) event.getEntity();
-                if (deviceSelected != null) {
+            if (event.getEntity() instanceof SelectEntity) {
+                SelectEntity selectEntity = (SelectEntity) event.getEntity();
+                if (selectEntity != null) {
 
                     if (deviceEntities != null) {
                         for (DeviceEntity deviceEntity : deviceEntities) {
-                            if (deviceEntity.id != null && deviceEntity.id != null && deviceEntity.id == deviceEntity.id.longValue()) {
+                            if (deviceEntity.id != null && deviceEntity.id != null && deviceEntity.id .equals(selectEntity.get_id()) ) {
                                 selectedDevice = deviceEntity;
                                 devicename.setContent(selectedDevice.name);
                                 break;
