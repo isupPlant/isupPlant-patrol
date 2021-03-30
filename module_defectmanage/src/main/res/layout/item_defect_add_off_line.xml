@@ -5,27 +5,58 @@
     android:layout_height="wrap_content"
     android:background="@color/list_bg_color"
     android:descendantFocusability="blocksDescendants"
-    android:orientation="vertical">
+    android:orientation="horizontal">
 
     <LinearLayout
-        android:id="@+id/llt_item"
         style="@style/style_linear_border"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:paddingRight="15dp"
+        android:paddingLeft="15dp"
         android:orientation="vertical">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:paddingLeft="5dp"
-            android:paddingRight="5dp">
+            >
 
             <LinearLayout
+                android:id="@+id/llt_check"
+                android:tag="llt_check"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal">
 
+
+                <TextView
+                    android:id="@+id/devicename"
+                    style="@style/KeyText_ex_height"
+                    android:layout_width="0dp"
+                    android:layout_weight="1"
+                    android:tag="devicename"
+                    android:text="@string/defect_add_title"
+                    android:paddingStart="5dp"
+                    android:paddingEnd="5dp" />
+
+                <TextView
+                    android:id="@+id/tableNo"
+                    style="@style/KeyText_ex_height"
+                    android:layout_width="wrap_content"
+                    android:layout_gravity="center"
+                    android:tag="tableNo"
+                    android:text="@string/defect_add_title"
+                    android:visibility="gone" />
+
+                <TextView
+                    android:id="@+id/status"
+                    style="@style/KeyText_ex_height"
+                    android:layout_width="wrap_content"
+                    android:layout_gravity="center"
+                    android:layout_marginStart="@dimen/border_margin"
+                    android:tag="status"
+                    android:text="@string/defect_data_is_need_edit"
+                    android:textColor="@color/warnBtnColor" />
 
                 <ImageView
                     android:id="@+id/iv_check"
@@ -36,38 +67,19 @@
                     android:background="@drawable/ic_check_no"
                     android:gravity="center"
                     android:maxLines="1"
+                    android:contentDescription="@string/but_clear"
+                    android:layout_margin="@dimen/border_margin"
+                    android:scaleType="fitCenter"
                     android:tag="iv_check" />
 
-                <TextView
-                    android:id="@+id/devicename"
-                    style="@style/KeyText_ex_height"
-                    android:layout_width="wrap_content"
-                    android:layout_weight="1"
-                    android:tag="devicename"
-                    android:text="@string/defect_add_title"
-                    android:translationZ="1dp" />
-
-                <TextView
-                    android:id="@+id/tableNo"
-                    style="@style/KeyText_ex_height"
-                    android:layout_width="wrap_content"
-                    android:layout_gravity="center"
-                    android:tag="tableNo"
-                    android:text="@string/defect_add_title"
-                    android:translationZ="1dp" />
-
-                <TextView
-                    android:id="@+id/status"
-                    style="@style/KeyText_ex_height"
-                    android:layout_width="wrap_content"
-                    android:layout_gravity="center"
-                    android:layout_marginLeft="@dimen/header_footer_left_right_padding"
-                    android:tag="status"
-                    android:text="@string/defect_data_is_need_edit"
-                    android:textColor="@color/warnBtnColor"
-                    android:translationZ="1dp" />
-
             </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/llt_item"
+                android:tag="llt_item"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
 
             <include layout="@layout/v_divider_gray" />
 
@@ -86,7 +98,7 @@
                 android:id="@+id/findtime"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:paddingLeft="5dp"
+                android:paddingStart="5dp"
                 android:tag="findtime"
                 app:icon="@drawable/ic_time"
                 app:title="@string/defect_find_time" />
@@ -96,7 +108,7 @@
                 android:id="@+id/finder"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:paddingLeft="5dp"
+                android:paddingStart="5dp"
                 android:tag="finder"
                 app:icon="@drawable/ic_person"
                 app:title="@string/defect_discover" />
@@ -106,10 +118,11 @@
                 android:id="@+id/address"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:paddingLeft="5dp"
+                android:paddingStart="5dp"
                 android:tag="address"
                 app:icon="@drawable/ic_map_location"
                 app:title="@string/defect_address" />
+            </LinearLayout>
 
         </LinearLayout>
     </LinearLayout>

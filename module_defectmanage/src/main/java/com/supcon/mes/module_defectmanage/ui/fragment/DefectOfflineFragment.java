@@ -1,6 +1,5 @@
 package com.supcon.mes.module_defectmanage.ui.fragment;
 
-import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -13,9 +12,7 @@ import com.app.annotation.Controller;
 import com.jakewharton.rxbinding2.view.RxView;
 import com.supcon.common.view.base.adapter.IListAdapter;
 import com.supcon.common.view.base.fragment.BaseRefreshRecyclerFragment;
-import com.supcon.common.view.listener.OnItemChildViewClickListener;
 import com.supcon.common.view.listener.OnRefreshListener;
-import com.supcon.common.view.listener.OnRefreshPageListener;
 import com.supcon.common.view.util.ToastUtils;
 import com.supcon.mes.mbap.view.CustomDialog;
 import com.supcon.mes.middleware.IntentRouter;
@@ -26,6 +23,7 @@ import com.supcon.mes.module_defectmanage.R;
 import com.supcon.mes.module_defectmanage.controller.BathUploadDefectController;
 import com.supcon.mes.module_defectmanage.model.bean.DefectModelEntity;
 import com.supcon.mes.module_defectmanage.model.bean.DefectModelEntityDao;
+import com.supcon.mes.module_defectmanage.ui.DefectOfflineListActivity;
 import com.supcon.mes.module_defectmanage.ui.adapter.DefectAddInfoAdapter;
 import com.supcon.mes.module_defectmanage.util.DatabaseManager;
 
@@ -67,7 +65,7 @@ public class DefectOfflineFragment extends BaseRefreshRecyclerFragment<DefectMod
 
     @Override
     protected int getLayoutID() {
-        return R.layout.frag_defect_outline_list;
+        return R.layout.frag_defect_offline_list;
     }
 
     @Override
@@ -81,23 +79,20 @@ public class DefectOfflineFragment extends BaseRefreshRecyclerFragment<DefectMod
         super.initListener();
 
 
-        Disposable disposable = RxView.clicks(all)
-                .throttleFirst(200, TimeUnit.MILLISECONDS)
-                .subscribe(o -> {
-                    //检查有没有选过的，如果有，就清空；如果没有就全选
-                    if (checkedMap != null && checkedMap.size() > 0) {
-                        setAllBtn(false);
-                        checkedMap.clear();
-                    } else {
-                        List<DefectModelEntity> allList = adapter.getList();
-                        for (DefectModelEntity defectModelEntity : allList) {
-                            checkedMap.put(defectModelEntity.dbId, defectModelEntity);
-                        }
-                        setAllBtn(true);
-                    }
-
-                    adapter.setCheckedMap(checkedMap);
-                });
+//        Disposable disposable = RxView.clicks(all)
+//                .throttleFirst(200, TimeUnit.MILLISECONDS)
+//                .subscribe(o -> {
+//                    //检查有没有选过的，如果有，就清空；如果没有就全选
+//                    if (checkedMap != null && checkedMap.size() > 0) {
+//                        setAllBtn(false);
+//                        checkedMap.clear();
+//                    } else {
+//
+//                        setAllBtn(true);
+//                    }
+//
+//                    adapter.setCheckedMap(checkedMap);
+//                });
 
         Disposable disposableSave = RxView.clicks(delete)
                 .throttleFirst(200, TimeUnit.MILLISECONDS)
@@ -123,7 +118,8 @@ public class DefectOfflineFragment extends BaseRefreshRecyclerFragment<DefectMod
                                     DatabaseManager.getDao().getDefectModelEntityDao().deleteInTx(list);
 
                                     //重制UI
-                                    resetLltButtom();
+                                    checkedMap.clear();
+                                    updateCheckStatus();
                                     loadDataFromDb(tableNo);
                                 }
                             }, true)
@@ -141,40 +137,28 @@ public class DefectOfflineFragment extends BaseRefreshRecyclerFragment<DefectMod
                 });
 
         adapter.setCheckedMap(checkedMap);
-        adapter.setOnItemChildViewClickListener(new OnItemChildViewClickListener() {
+        adapter.setListener(new DefectAddInfoAdapter.OnclickListener(){
             @Override
-            public void onItemChildViewClick(View childView, int position, int action, Object obj) {
-                DefectModelEntity entity = (DefectModelEntity) obj;
-
-                if (llt_buttom.getVisibility() == View.VISIBLE) {
-                    //选中
-                    if (checkedMap.containsKey(entity.dbId)) {
-                        checkedMap.remove(entity.dbId);
-                    } else {
-                        checkedMap.put(entity.dbId, entity);
-                    }
-
-                    updateCheckStatus();
+            public void clickCheckButton(DefectModelEntity entity) {
+                //选中
+                if (checkedMap.containsKey(entity.dbId)) {
+                    checkedMap.remove(entity.dbId);
                 } else {
-                    //调转到详情中
-                    Bundle bundle = new Bundle();
-                    bundle.putLong(Constant.INTENT_EXTRA_ID, entity.dbId);
-                    IntentRouter.go(context, Constant.AppCode.DEFECT_MANAGEMENT_ADD, bundle);
+                    checkedMap.put(entity.dbId, entity);
                 }
+
+                updateCheckStatus();
+            }
+
+            @Override
+            public void clickItem(DefectModelEntity entity) {
+                //调转到详情中
+                Bundle bundle = new Bundle();
+                bundle.putLong(Constant.INTENT_EXTRA_ID, entity.dbId);
+                IntentRouter.go(context, Constant.AppCode.DEFECT_MANAGEMENT_ADD, bundle);
             }
         });
-    }
 
-    private void updateCheckStatus() {
-        if (checkedMap.size() < 1) {
-            setAllBtn(false);
-        } else if (checkedMap.size() == adapter.getList().size()) {
-            setAllBtn(true);
-        } else {
-            delete.setVisibility(View.VISIBLE);
-            upload.setVisibility(View.VISIBLE);
-        }
-        adapter.notifyDataSetChanged();
     }
 
     /**
@@ -200,30 +184,11 @@ public class DefectOfflineFragment extends BaseRefreshRecyclerFragment<DefectMod
     public void onDataSelectNode(BaseEvent event) {
         if (event != null && event.isSuccess()) {
             checkedMap.clear();
+            updateCheckStatus();
             loadDataFromDb(tableNo);
         }
     }
 
-//    @Override
-//    public void defectEntryBatchSuccess(BAP5CommonEntity entity) {
-//        //删除上传的数据
-//        List<DefectModelEntity> list = new ArrayList<>();
-//        for (DefectModelEntity value : checkedMap.values()) {
-//            list.add(value);
-//        }
-//        DatabaseManager.getDao().getDefectModelEntityDao().deleteInTx(list);
-//
-//
-//        onLoadSuccess();
-//        ToastUtils.show(context, context.getString(R.string.submit_success));
-//    }
-//
-//    @Override
-//    public void defectEntryBatchFailed(String errorMsg) {
-//        onLoadSuccess();
-//        //提示用户保存在本地，但是不能重复保存啊,数据库的id是怎么回事
-//        ToastUtils.show(context, context.getString(R.string.defect_submit_failed_save_to_local));
-//    }
 
     @Override
     protected IListAdapter<DefectModelEntity> createAdapter() {
@@ -239,9 +204,12 @@ public class DefectOfflineFragment extends BaseRefreshRecyclerFragment<DefectMod
             List<DefectModelEntity> list = DatabaseManager.getDao().getDefectModelEntityDao().queryBuilder()
                     .where(DefectModelEntityDao.Properties.TableNo.eq(tableNo)).list();
 //                    .where(DefectModelEntityDao.Properties.AreaCode.eq(areaCode)).list();
+            if (list == null) {
+                list = new ArrayList<>();
+            }
             refreshListController.refreshComplete(list);
         } else {
-            refreshListController.refreshComplete();
+            refreshListController.refreshComplete(new ArrayList<>());
 
         }
     }
@@ -267,83 +235,49 @@ public class DefectOfflineFragment extends BaseRefreshRecyclerFragment<DefectMod
         EventBus.getDefault().register(this);
     }
 
-
-    private void setAllBtn(boolean isAllSelected) {
-        if (isAllSelected) {
-            Drawable drawable = getResources().getDrawable(R.drawable.ic_check_yes);
-            drawable.setBounds(0, 0, drawable.getMinimumWidth(),drawable.getMinimumHeight());
-            all.setCompoundDrawables(null, drawable, null, null);
-            all.setText(getString(R.string.defect_check_plan_cancel_all));
-
-            delete.setVisibility(View.VISIBLE);
-            upload.setVisibility(View.VISIBLE);
-        } else {
-            delete.setVisibility(View.INVISIBLE);
-            upload.setVisibility(View.INVISIBLE);
-
-            Drawable drawable = getResources().getDrawable(R.drawable.ic_check_no);
-            drawable.setBounds(0, 0, drawable.getMinimumWidth(),drawable.getMinimumHeight());
-            all.setCompoundDrawables(null, drawable, null, null);
-            all.setText(getString(R.string.middleware_choose_all));
-        }
-    }
-
-
-//    @Override
-//    public void uploadMultiFilesSuccess(ArrayList entity) {
-//        closeLoader();
-//
-//        if (entity != null) {
-//            ArrayList<FileEntity> filelist = entity;
-//            List<FileUploadDefectEntity> uploadFileFormMapArrayList = null;
-//            if (filelist != null && filelist.size() > 0) {
-//                uploadFileFormMapArrayList  = HandleUtils.converFileToUploadFile(filelist);
-//            }
-//
-//            List<DefectModelEntity> list = new ArrayList<>();
-//            for (DefectModelEntity value : checkedMap.values()) {
-//                if (!StringUtil.isBlank(value.fileJson) && uploadFileFormMapArrayList != null) {
-//                    String json = value.getFileJson();
-//                    List<FileUploadDefectEntity> defectFileList = new ArrayList<>();
-//                    for (FileUploadDefectEntity fileUploadDefectEntity : uploadFileFormMapArrayList) {
-//                        if (StringUtil.contains(json, fileUploadDefectEntity.getFilename())) {
-//                            //
-//                            defectFileList.add(fileUploadDefectEntity);
-//                        }
-//                    }
-//                    value.setDefectFile(defectFileList);
-//                }
-//                list.add(value);
-//            }
-//
-//            onLoading();
-//            presenterRouter.create(AddDefectAPI.class).defectEntryBatch(list);
-//        }
-//    }
-//
-//    @Override
-//    public void uploadMultiFilesFailed(String errorMsg) {
-//        closeLoader();
-//        ToastUtils.show(context, errorMsg);
-//    }
-
     public void setInfo(String tableNo, String areaCode) {
         this.tableNo = tableNo;
         this.areaCode = areaCode;
     }
 
-    public void resetLltButtom() {
-        if (llt_buttom.getVisibility() == View.VISIBLE) {
-            llt_buttom.setVisibility(View.GONE);
+    public void setAllChoose(boolean chooseAll) {
+        if (!chooseAll) {
             checkedMap.clear();
-
-            setAllBtn(false);
-            adapter.setCheckedMap(checkedMap);
-            adapter.setChoosing(false);
-        } else if (adapter.getList() != null && adapter.getList().size() > 0){
+            llt_buttom.setVisibility(View.GONE);
+        } else {
+            List<DefectModelEntity> allList = adapter.getList();
+            for (DefectModelEntity defectModelEntity : allList) {
+                checkedMap.put(defectModelEntity.dbId, defectModelEntity);
+            }
             llt_buttom.setVisibility(View.VISIBLE);
-            adapter.setChoosing(true);
         }
+        adapter.notifyDataSetChanged();
+    }
+
+    private void updateCheckStatus() {
+        if (checkedMap.size() < 1) {
+            setAllChoose(false);
+            //通知标题
+            if (context instanceof DefectOfflineListActivity) {
+                ((DefectOfflineListActivity) context).setRightButton(false);
+            }
+            llt_buttom.setVisibility(View.GONE);
+
+        } else if (checkedMap.size() == adapter.getList().size()) {
+            setAllChoose(true);
+
+            if (context instanceof DefectOfflineListActivity) {
+                ((DefectOfflineListActivity) context).setRightButton(true);
+            }
+            llt_buttom.setVisibility(View.VISIBLE);
+        } else {
+            if (context instanceof DefectOfflineListActivity) {
+                ((DefectOfflineListActivity) context).setRightButton(false);
+            }
+            llt_buttom.setVisibility(View.VISIBLE);
+
+        }
+        adapter.notifyDataSetChanged();
     }
 
 }

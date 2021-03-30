@@ -13,7 +13,8 @@
 
     <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
         android:fillViewport="true">
 
 
@@ -73,6 +74,14 @@
                 app:necessary="true" />
 
             <include layout="@layout/v_divider_gray" />
+
+
+
+            <include
+                layout="@layout/ly_defect_add_leak"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:visibility="gone" />
 
             <com.supcon.mes.mbap.view.CustomTextView
                 android:id="@+id/level"
@@ -158,14 +167,7 @@
                 app:key="@string/defect_plan_handle_time"
                 app:necessary="true" />
 
-            <include layout="@layout/v_divider_gray" />
 
-
-            <include
-                layout="@layout/ly_defect_add_leak"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:visibility="gone" />
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -181,33 +183,35 @@
 
             </LinearLayout>
 
-            <LinearLayout
-                android:id="@+id/ll_btn"
-                android:layout_width="match_parent"
-                android:layout_height="50dp"
-                android:background="@color/white"
-                android:orientation="horizontal">
 
-                <Button
-                    android:id="@+id/saveBtn"
-                    style="@style/style_button"
-                    android:layout_weight="1"
-                    android:tag="saveBtn"
-                    android:text="@string/middleware_save"
-                    android:visibility="visible" />
-
-                <Button
-                    android:id="@+id/submitBtn"
-                    style="@style/style_button"
-                    android:layout_weight="1"
-                    android:tag="submitBtn"
-                    android:text="@string/submit"
-                    android:visibility="visible" />
-
-            </LinearLayout>
         </LinearLayout>
 
 
     </ScrollView>
+
+    <LinearLayout
+        android:id="@+id/ll_btn"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:background="@color/white"
+        android:orientation="horizontal">
+
+        <Button
+            android:id="@+id/saveBtn"
+            style="@style/style_button"
+            android:layout_weight="1"
+            android:tag="saveBtn"
+            android:text="@string/middleware_save"
+            android:visibility="visible" />
+
+        <Button
+            android:id="@+id/submitBtn"
+            style="@style/style_button"
+            android:layout_weight="1"
+            android:tag="submitBtn"
+            android:text="@string/submit"
+            android:visibility="visible" />
+
+    </LinearLayout>
 
 </LinearLayout>

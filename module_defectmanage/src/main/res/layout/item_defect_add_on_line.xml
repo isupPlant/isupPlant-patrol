@@ -34,6 +34,7 @@
                     android:layout_weight="1"
                     android:tag="devicename"
                     android:text="@string/defect_add_title"
+                    android:paddingLeft="5dp"
                     android:translationZ="1dp" />
 
                 <TextView
@@ -82,7 +83,7 @@
                     android:layout_weight="1"
                     android:paddingLeft="5dp"
                     android:tag="findtime"
-                    app:icon="@drawable/ic_mode"
+                    app:icon="@drawable/ic_time"
                     app:title="@string/defect_find_time" />
 
 

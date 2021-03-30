@@ -209,7 +209,7 @@ public class BathUploadDefectController extends BaseDataController implements Ad
             ((BaseActivity)context).closeLoader();
         }
         //提示用户保存在本地，但是不能重复保存啊,数据库的id是怎么回事
-        ToastUtils.show(context, context.getString(R.string.defect_submit_failed_save_to_local));
+        ToastUtils.show(context, context.getString(R.string.defect_submit_failed) + errorMsg);
 
         EventBus.getDefault().post(new BaseEvent(false, ""));
     }

@@ -4,12 +4,12 @@ import android.content.Context;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.app.annotation.BindByTag;
 import com.supcon.common.view.base.adapter.HeaderRecyclerViewAdapter;
 import com.supcon.common.view.base.adapter.viewholder.BaseRecyclerViewHolder;
-import com.supcon.mes.mbap.view.CustomTextView;
 import com.supcon.mes.middleware.ui.view.CustomTitleValueSmall;
 import com.supcon.mes.middleware.util.StringUtil;
 import com.supcon.mes.module_defectmanage.R;
@@ -25,11 +25,16 @@ import java.util.Map;
  */
 public class DefectAddInfoAdapter extends HeaderRecyclerViewAdapter<DefectModelEntity> {
     Map<Long, DefectModelEntity> checkedMap = new HashMap<>();
-    boolean isChoosing = false;
+//    boolean isChoosing = false;
+    OnclickListener listener;
 
-    public void setChoosing(boolean choosing) {
-        isChoosing = choosing;
+    public void setListener(OnclickListener listener) {
+        this.listener = listener;
     }
+
+//    public void setChoosing(boolean choosing) {
+//        isChoosing = choosing;
+//    }
 
     public DefectAddInfoAdapter(Context context) {
         super(context);
@@ -58,13 +63,35 @@ public class DefectAddInfoAdapter extends HeaderRecyclerViewAdapter<DefectModelE
         ImageView iv_check;
         @BindByTag("status")
         TextView status;
+        @BindByTag("llt_check")
+        LinearLayout llt_check;
+        @BindByTag("llt_item")
+        LinearLayout llt_item;
 
         @Override
         protected void initListener() {
             super.initListener();
-            itemView.setOnClickListener(v -> {
-                if (onItemChildViewClickListener != null) {
-                    onItemChildViewClick(itemView, 0, getItem(getAdapterPosition()));
+//            itemView.setOnClickListener(v -> {
+//                if (onItemChildViewClickListener != null) {
+//                    onItemChildViewClick(itemView, 0, getItem(getAdapterPosition()));
+//                }
+//            });
+
+            llt_check.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    if (listener != null) {
+                        listener.clickCheckButton(getItem(getAdapterPosition()));
+                    }
+                }
+            });
+
+            llt_item.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    if (listener != null) {
+                        listener.clickItem(getItem(getAdapterPosition()));
+                    }
                 }
             });
         }
@@ -89,16 +116,16 @@ public class DefectAddInfoAdapter extends HeaderRecyclerViewAdapter<DefectModelE
 
         @Override
         protected void update(DefectModelEntity data) {
-            if (isChoosing) {
+//            if (isChoosing) {
                 iv_check.setVisibility(View.VISIBLE);
                 if (checkedMap.containsKey(data.dbId)) {
                     iv_check.setImageDrawable(context.getResources().getDrawable(R.drawable.ic_check_yes));
                 } else {
                     iv_check.setImageDrawable(context.getResources().getDrawable(R.drawable.ic_check_no));
                 }
-            } else {
-                iv_check.setVisibility(View.GONE);
-            }
+//            } else {
+//                iv_check.setVisibility(View.GONE);
+//            }
 
 //            name.setValue(data.getName());
             devicename.setText(data.getName());
@@ -121,5 +148,11 @@ public class DefectAddInfoAdapter extends HeaderRecyclerViewAdapter<DefectModelE
     public void setCheckedMap(Map<Long, DefectModelEntity> checkedMap) {
         this.checkedMap = checkedMap;
         notifyDataSetChanged();
+    }
+
+    public interface OnclickListener{
+        void clickCheckButton(DefectModelEntity entity);
+
+        void clickItem(DefectModelEntity entity);
     }
 }

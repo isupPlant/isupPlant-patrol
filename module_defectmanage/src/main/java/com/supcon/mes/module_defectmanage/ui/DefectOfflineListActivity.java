@@ -17,6 +17,7 @@ import com.jakewharton.rxbinding2.view.RxView;
 import com.supcon.common.view.base.activity.BaseControllerActivity;
 import com.supcon.mes.mbap.utils.StatusBarUtils;
 import com.supcon.mes.middleware.constant.Constant;
+import com.supcon.mes.middleware.util.StringUtil;
 import com.supcon.mes.module_defectmanage.R;
 import com.supcon.mes.module_defectmanage.model.api.GetDefectListAPI;
 import com.supcon.mes.module_defectmanage.ui.fragment.DefectOnlineFragment;
@@ -81,7 +82,7 @@ public class DefectOfflineListActivity extends BaseControllerActivity {
 
         titleText.setText(R.string.defect_off_line_list_title);
         rightBtn_text.setVisibility(View.VISIBLE);
-        rightBtn_text.setText(getString(R.string.defect_choose));
+        rightBtn_text.setText(getString(R.string.middleware_choose_all));
 
         defectOutlineFragment = new DefectOfflineFragment();
         defectOnlineFragment = new DefectOnlineFragment();
@@ -133,32 +134,15 @@ public class DefectOfflineListActivity extends BaseControllerActivity {
         Disposable disposableRight = RxView.clicks(rightBtn_text)
                 .throttleFirst(200, TimeUnit.MILLISECONDS)
                 .subscribe(o -> {
-                    defectOutlineFragment.resetLltButtom();
+                    if (StringUtil.equalsIgnoreCase(rightBtn_text.getText().toString(), getString(R.string.middleware_choose_all))) {
+                        rightBtn_text.setText(getString(R.string.defect_check_plan_cancel_all));
+                        defectOutlineFragment.setAllChoose(true);
+                    } else {
+                        rightBtn_text.setText(getString(R.string.middleware_choose_all));
+                        defectOutlineFragment.setAllChoose(false);
+                    }
                 });
     }
-
-
-
-//    @Override
-//    public void defectEntryBatchSuccess(BAP5CommonEntity entity) {
-//        //删除上传的数据
-//        List<DefectModelEntity> list = new ArrayList<>();
-//        for (DefectModelEntity value : checkedMap.values()) {
-//            list.add(value);
-//        }
-//        DatabaseManager.getDao().getDefectModelEntityDao().deleteInTx(list);
-//
-//
-//        onLoadSuccess();
-//        ToastUtils.show(context, context.getString(R.string.submit_success));
-//    }
-//
-//    @Override
-//    public void defectEntryBatchFailed(String errorMsg) {
-//        onLoadSuccess();
-//        //提示用户保存在本地，但是不能重复保存啊,数据库的id是怎么回事
-//        ToastUtils.show(context, context.getString(R.string.defect_submit_failed_save_to_local));
-//    }
 
 
     private class MyAdapter extends FragmentPagerAdapter {
@@ -185,42 +169,11 @@ public class DefectOfflineListActivity extends BaseControllerActivity {
     }
 
 
-
-//    @Override
-//    public void uploadMultiFilesSuccess(ArrayList entity) {
-//        closeLoader();
-//
-//        if (entity != null) {
-//            ArrayList<FileEntity> filelist = entity;
-//            List<FileUploadDefectEntity> uploadFileFormMapArrayList = null;
-//            if (filelist != null && filelist.size() > 0) {
-//                uploadFileFormMapArrayList  = HandleUtils.converFileToUploadFile(filelist);
-//            }
-//
-//            List<DefectModelEntity> list = new ArrayList<>();
-//            for (DefectModelEntity value : checkedMap.values()) {
-//                if (!StringUtil.isBlank(value.fileJson) && uploadFileFormMapArrayList != null) {
-//                    String json = value.getFileJson();
-//                    List<FileUploadDefectEntity> defectFileList = new ArrayList<>();
-//                    for (FileUploadDefectEntity fileUploadDefectEntity : uploadFileFormMapArrayList) {
-//                        if (StringUtil.contains(json, fileUploadDefectEntity.getFilename())) {
-//                            //
-//                            defectFileList.add(fileUploadDefectEntity);
-//                        }
-//                    }
-//                    value.setDefectFile(defectFileList);
-//                }
-//                list.add(value);
-//            }
-//
-//            onLoading();
-//            presenterRouter.create(AddDefectAPI.class).defectEntryBatch(list);
-//        }
-//    }
-//
-//    @Override
-//    public void uploadMultiFilesFailed(String errorMsg) {
-//        closeLoader();
-//        ToastUtils.show(context, errorMsg);
-//    }
+    public void setRightButton(boolean allChoose) {
+        if (allChoose) {
+            rightBtn_text.setText(getString(R.string.defect_check_plan_cancel_all));
+        } else {
+            rightBtn_text.setText(getString(R.string.middleware_choose_all));
+        }
+    }
 }

@@ -46,6 +46,7 @@
         style="@style/psc_edit_date_horizontal_style_text_view"
         android:tag="leak_time"
         app:key="@string/defect_leak_time" />
+    <include layout="@layout/v_divider_gray" />
 
 
 </LinearLayout>

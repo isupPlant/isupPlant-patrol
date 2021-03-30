@@ -214,7 +214,7 @@ public class DefectManageActivity extends BaseControllerActivity implements AddD
 
         titleText.setText(R.string.defect_add_file);
         rightBtn.setVisibility(View.VISIBLE);
-        rightBtn.setImageDrawable(getResources().getDrawable(R.drawable.ic_top_all_p));
+        rightBtn.setImageDrawable(getResources().getDrawable(R.drawable.ic_top_list));
 
         source.setContent(R.string.defect_source_osi);
 
@@ -646,7 +646,7 @@ public class DefectManageActivity extends BaseControllerActivity implements AddD
         if (StringUtil.isBlank(tableNo)) {
             finish();
         } else {
-            ToastUtils.show(context, getString(R.string.middleware_save_succeed));
+            ToastUtils.show(context, getString(R.string.defect_save_local_success));
         }
     }
 
@@ -868,7 +868,7 @@ public class DefectManageActivity extends BaseControllerActivity implements AddD
 
         defectModelEntity.setDefectFile(null);//如果提交失败了 就要重新上传
         //提示用户保存在本地，但是不能重复保存啊,数据库的id是怎么回事
-        ToastUtils.show(context, errorMsg + context.getString(R.string.defect_submit_failed_save_to_local));
+        ToastUtils.show(context, context.getString(R.string.defect_submit_failed) + errorMsg + context.getString(R.string.defect_submit_failed_save_to_local));
 
         saveFileToString();
         //把数据在本地数据库中更新
