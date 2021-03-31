@@ -10,12 +10,12 @@
 
     <TextView
         android:id="@+id/tvAbnormalTitle"
-        android:tag="tvAbnormalTitle"
         android:layout_width="match_parent"
         android:layout_height="@dimen/dp_40"
         android:background="@drawable/shap_fillet_theme_bg"
         android:gravity="center_vertical"
         android:paddingLeft="@dimen/dp_10"
+        android:tag="tvAbnormalTitle"
         android:text="@string/detailed_reasons"
         android:textColor="@color/white"
         android:textSize="@dimen/fontSize_15sp" />

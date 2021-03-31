@@ -133,4 +133,5 @@
 	<string name="please_input_reason">Please enter the reason</string>
 	<string name="please_input_eason_description">Please fill in the reason</string>
 	<string name="xj_patrol_input_abnormal_reason">Need exception reason</string>
+	<string name="input_defect">Input defect</string>
 </resources>

@@ -328,7 +328,7 @@ public class XJWorkActivity extends BaseRefreshRecyclerActivity<XJTaskWorkEntity
     private void initPopupWindowData() {
         createPopupWindowEntityData(context.getString(R.string.xj_work_over), R.drawable.ic_xj_work_finish,0);
         createPopupWindowEntityData(context.getString(R.string.xj_work_jump), R.drawable.ic_xj_work_skip,1);
-        createPopupWindowEntityData("录入缺陷", R.drawable.ic_xj_work_skip,2);
+        createPopupWindowEntityData(context.getString(R.string.input_defect), R.drawable.ic_input_defect,2);
         mCustomPopupWindow = new CustomPopupWindow(context, mPopupWindowEntityList);
     }
 

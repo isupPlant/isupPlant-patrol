@@ -133,4 +133,5 @@
     <string name="please_input_reason">请输入原因</string>
     <string name="please_input_eason_description">请填写原因说明</string>
     <string name="xj_patrol_input_abnormal_reason">需要异常原因</string>
+    <string name="input_defect">录入缺陷</string>
 </resources>
