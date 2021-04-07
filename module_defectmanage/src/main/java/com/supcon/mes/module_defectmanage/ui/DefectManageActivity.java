@@ -18,6 +18,7 @@ import com.app.annotation.apt.Router;
 import com.jakewharton.rxbinding2.view.RxView;
 import com.supcon.common.view.base.activity.BaseControllerActivity;
 import com.supcon.common.view.listener.OnChildViewClickListener;
+import com.supcon.common.view.util.LogUtil;
 import com.supcon.common.view.util.ToastUtils;
 import com.supcon.mes.mbap.utils.DateUtil;
 import com.supcon.mes.mbap.utils.GsonUtil;
@@ -176,8 +177,10 @@ public class DefectManageActivity extends BaseControllerActivity implements AddD
             selectedArea.setCode(areaCode);
             selectedArea.setName(areaName);
             String deviceIdList = bundle.getString(Constant.IntentKey.XJ_AREA_EAMLISTS);
-            HandleUtils.setDeviceIdList(deviceIdList);//存储一下
-            deviceEntities = getDeviceList(deviceIdList);
+            if (deviceIdList != null) {
+                HandleUtils.setDeviceIdList(deviceIdList);//存储一下
+                deviceEntities = getDeviceList(deviceIdList);
+            }
 
             if (dataId != null && dataId.longValue() > 0) {
                 //说明是从列表中过来的
@@ -588,6 +591,7 @@ public class DefectManageActivity extends BaseControllerActivity implements AddD
         selectedDevice = new DeviceEntity();
         selectedDevice.setCode(defectModelEntity.getEamCode());
         selectedDevice.setName(defectModelEntity.eamName);
+        devicename.setContent(selectedDevice.name);
 
         //从全局变量中获取，如果第一次进来的时候就会去获取
         deviceEntities = getDeviceList(HandleUtils.getDeviceIdList());
@@ -714,8 +718,8 @@ public class DefectManageActivity extends BaseControllerActivity implements AddD
         //            "name":"巡检"
         //        }
 
-        defectModelEntity.eamCode = "ZGSSB002";
         if (selectedDevice != null) {
+            LogUtil.e(selectedDevice.getName());
             defectModelEntity.eamCode = selectedDevice.getCode();
             defectModelEntity.eamName = selectedDevice.getName();
         }
@@ -1014,19 +1018,20 @@ public class DefectManageActivity extends BaseControllerActivity implements AddD
         if (!TextUtils.isEmpty(idList)) {
             List<DeviceEntity> deviceEntityList = new ArrayList<>();
             String[] eamIdList = idList.split(",");
-            for (String eamCode : eamIdList) {
+//            for (String eamCode : eamIdList) {
                 //根据设备eamId获取CommonDeviceEntity
                 try {
-                    List<DeviceEntity> listall = SupPlantApplication.dao().getDeviceEntityDao().queryBuilder().list();
-                    DeviceEntity commonDeviceEntity = SupPlantApplication.dao().getDeviceEntityDao().queryBuilder()
-                            .where(DeviceEntityDao.Properties.Code.eq(eamCode)).unique();
-                    if (commonDeviceEntity != null) {
-                        deviceEntityList.add(commonDeviceEntity);
+                    List<DeviceEntity> listall = SupPlantApplication.dao().getDeviceEntityDao().queryBuilder()
+                            .where(DeviceEntityDao.Properties.Code.in(eamIdList)).list();
+//                    DeviceEntity commonDeviceEntity = SupPlantApplication.dao().getDeviceEntityDao().queryBuilder()
+//                            .where(DeviceEntityDao.Properties.Code.eq(eamCode)).unique();
+                    if (listall != null && listall.size() > 0) {
+                        deviceEntityList.addAll(listall);
                     }
                 } catch (Exception e) {
 
                 }
-            }
+//            }
             return deviceEntityList;
         }
         return null;
