@@ -46,6 +46,7 @@ import com.supcon.mes.middleware.model.event.RefreshEvent;
 import com.supcon.mes.middleware.model.inter.IMap;
 import com.supcon.mes.middleware.model.inter.SystemCode;
 import com.supcon.mes.middleware.util.SBTUtil;
+import com.supcon.mes.middleware.util.StringUtil;
 import com.supcon.mes.middleware.util.SystemCodeManager;
 import com.supcon.mes.middleware.util.XJTaskCacheUtil;
 import com.supcon.mes.module_scan.controller.ScanDriverController;
@@ -411,6 +412,11 @@ public class XJTaskDetailActivity extends BaseControllerActivity implements XJTa
         RxView.clicks(xjTaskDetailCloseBtn)
                 .subscribe(o -> back());
 
+        RxView.clicks(xjTaskDetailTableNo)
+                .subscribe(o -> {
+                    driverController.openCameraScan();
+                });
+
         if (mXJAreaAdapter != null) {
             mXJAreaAdapter.setOnItemChildViewClickListener((childView, position, action, obj) -> {
                 XJTaskAreaEntity xjAreaEntity = (XJTaskAreaEntity) obj;
@@ -704,6 +710,8 @@ public class XJTaskDetailActivity extends BaseControllerActivity implements XJTa
         } else if (CodeUtlis.UHF_TYPE.equals(codeResultEvent.type)) {
             dealSign(resultCode);
         } else if (CodeUtlis.HW_TYPE.equals(codeResultEvent.type)) {
+            dealSign(resultCode);
+        } else if (CodeUtlis.QR_TYPE.equals(codeResultEvent.type)) {
             dealSign(resultCode);
         }
 

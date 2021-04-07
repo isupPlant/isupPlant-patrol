@@ -4,17 +4,23 @@
     android:layout_height="match_parent"
     android:gravity="center"
     android:id="@+id/xjTaskDetailParent"
+    android:paddingTop="@dimen/dp_50"
+    android:paddingBottom="@dimen/dp_50"
     android:tag="xjTaskDetailParent">
 
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/sh_xj_task_detail"
+        android:layout_marginLeft="@dimen/dp_12"
+        android:layout_marginRight="@dimen/dp_12">
     <LinearLayout
         android:id="@+id/llContent"
         android:tag="llContent"
         android:layout_width="match_parent"
-        android:layout_height="560dp"
+        android:layout_height="match_parent"
         android:orientation="vertical"
-        android:background="@drawable/sh_xj_task_detail"
-        android:layout_marginLeft="@dimen/dp_12"
-        android:layout_marginRight="@dimen/dp_12"
         >
         <RelativeLayout
             android:layout_width="match_parent"
@@ -50,16 +56,16 @@
                 android:text="@string/xj_patrol_status"
                 android:gravity="center"
                 />
-            <Button
-                android:layout_width="60dp"
-                android:layout_height="30dp"
-                android:id="@+id/xjTaskDetailTaskBtn"
-                android:tag="xjTaskDetailTaskBtn"
-                android:text="@string/xj_patrol_start"
+
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/xjTaskDetailScanBtn"
+                android:tag="xjTaskDetailScanBtn"
                 android:layout_alignParentRight="true"
-                android:background="@drawable/sl_xj_task_blue"
-                android:textColor="@color/white"
-                android:textSize="15sp"
+                android:src="@drawable/ic_xj_detail_scan"
+                android:layout_marginTop="@dimen/dp_5"
+                android:layout_marginRight="@dimen/dp_10"
                 />
           <RelativeLayout
               android:layout_width="match_parent"
@@ -69,17 +75,27 @@
               android:id="@+id/rlXjTaskDetailTableNo"
               android:layout_below="@+id/xjTaskDetailRouteName">
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:id="@+id/xjTaskDetailTableNo"
-                android:tag="xjTaskDetailTableNo"
-                android:lines="1"
-                android:text="potroltasknew_20180306_001"
-                android:layout_centerVertical="true"
-                android:textColor="#6B6B6B"
-                android:textSize="14sp"
-                />
+              <TextView
+                  android:id="@+id/xjTaskDetailTableNo"
+                  android:layout_width="wrap_content"
+                  android:layout_height="wrap_content"
+                  android:lines="1"
+                  android:tag="xjTaskDetailTableNo"
+                  android:text="potroltasknew_20180306_001"
+                  android:textColor="#6B6B6B"
+                  android:layout_centerVertical="true"
+                  android:textSize="14sp"/>
+              <Button
+                  android:layout_width="60dp"
+                  android:layout_height="30dp"
+                  android:id="@+id/xjTaskDetailTaskBtn"
+                  android:tag="xjTaskDetailTaskBtn"
+                  android:text="@string/xj_patrol_start"
+                  android:layout_alignParentRight="true"
+                  android:background="@drawable/sl_xj_task_blue"
+                  android:textColor="@color/white"
+                  android:textSize="15sp"
+                  />
 
           </RelativeLayout>
             <TextView
@@ -120,14 +136,14 @@
             android:layout_width="match_parent" android:layout_marginTop="@dimen/dp_15"/>
         <android.support.v7.widget.RecyclerView
             android:layout_width="match_parent"
-            android:layout_height="400dp"
+            android:layout_height="wrap_content"
             android:paddingTop="15dp"
             android:paddingLeft="@dimen/dp_12"
             android:paddingRight="@dimen/dp_12"
             android:paddingBottom="@dimen/dp_10"
             android:id="@+id/xjTaskDetailContentView"
             android:tag="xjTaskDetailContentView"/>
-
+    </LinearLayout>
         <ImageView
             android:layout_width="30dp"
             android:layout_height="30dp"
@@ -135,6 +151,9 @@
             android:tag="xjTaskDetailCloseBtn"
             android:src="@drawable/sl_xj_detail_close"
             android:layout_gravity="center_horizontal"
+            android:layout_alignParentBottom="true"
+            android:layout_centerHorizontal="true"
             />
-    </LinearLayout>
+
+    </RelativeLayout>
 </RelativeLayout>
