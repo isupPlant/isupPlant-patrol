@@ -272,6 +272,8 @@ public class XJWorkAdapter extends BaseListDataRecyclerViewAdapter<XJTaskWorkEnt
                 IntentRouter.go(context, Constant.Router.HAZARD_ADD, bundle);
             });
 
+            itemXJWorkResultInput.editText().setOnEditorActionListener((textView, i, keyEvent) -> true);
+
             RxTextView.textChanges(itemXJWorkResultInput.editText())
                     .skipInitialValue()
                     .debounce(500, TimeUnit.MILLISECONDS)
