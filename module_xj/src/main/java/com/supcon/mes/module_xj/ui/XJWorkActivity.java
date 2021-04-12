@@ -449,13 +449,15 @@ public class XJWorkActivity extends BaseRefreshRecyclerActivity<XJTaskWorkEntity
             case 2:
                 Bundle bundle = new Bundle();
                 StringBuilder idList = new StringBuilder();
-                if (deviceEntityList!=null){
+                if (deviceEntityList!=null&&deviceEntityList.size()>0){
                     for (DeviceEntity deviceEntity : deviceEntityList) {
                         idList.append(deviceEntity.code);
                         idList.append(",");
                     }
-                    idList.replace(idList.length() - 1, idList.length(), "");
-                    bundle.putString(Constant.IntentKey.XJ_AREA_EAMLISTS,  idList.toString());
+                    if(!TextUtils.isEmpty(idList)){
+                        idList.replace(idList.length() - 1, idList.length(), "");
+                        bundle.putString(Constant.IntentKey.XJ_AREA_EAMLISTS,  idList.toString());
+                    }
                 }
 
 
