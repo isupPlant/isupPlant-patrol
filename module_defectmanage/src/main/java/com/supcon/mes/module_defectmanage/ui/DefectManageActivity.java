@@ -129,6 +129,8 @@ public class DefectManageActivity extends BaseControllerActivity implements AddD
     ImageButton rightBtn;
     @BindByTag("titleText")
     TextView titleText;
+    @BindByTag("devicename_view")
+    View devicename_view;
 
     private SinglePickController mSinglePickController;
     private MyPickerController mDatePickController;
@@ -180,6 +182,14 @@ public class DefectManageActivity extends BaseControllerActivity implements AddD
             if (deviceIdList != null) {
                 HandleUtils.setDeviceIdList(deviceIdList);//存储一下
                 deviceEntities = getDeviceList(deviceIdList);
+
+                if (deviceEntities == null || deviceEntities.size() == 0) {
+                    devicename.setVisibility(View.GONE);
+                    devicename_view.setVisibility(View.GONE);
+                }
+            } else {
+                devicename.setVisibility(View.GONE);
+                devicename_view.setVisibility(View.GONE);
             }
 
             if (dataId != null && dataId.longValue() > 0) {
@@ -215,10 +225,11 @@ public class DefectManageActivity extends BaseControllerActivity implements AddD
         super.initView();
         StatusBarUtils.setWindowStatusBarColor(this, R.color.themeColor);
 
-        titleText.setText(R.string.defect_add_file);
+        titleText.setText(R.string.defect_title_add);
         rightBtn.setVisibility(View.VISIBLE);
         rightBtn.setImageDrawable(getResources().getDrawable(R.drawable.ic_top_list));
 
+        devicename_view = findViewById(R.id.devicename_view);
         source.setContent(R.string.defect_source_osi);
 
         file_list.setFileListView(new FileListView.FileListViewListener() {
@@ -588,13 +599,18 @@ public class DefectManageActivity extends BaseControllerActivity implements AddD
         selectedArea.setName(defectModelEntity.areaName);
         selectedArea.setCode(defectModelEntity.areaCode);
 
-        selectedDevice = new DeviceEntity();
-        selectedDevice.setCode(defectModelEntity.getEamCode());
-        selectedDevice.setName(defectModelEntity.eamName);
-        devicename.setContent(selectedDevice.name);
-
         //从全局变量中获取，如果第一次进来的时候就会去获取
         deviceEntities = getDeviceList(HandleUtils.getDeviceIdList());
+        if (deviceEntities == null || deviceEntities.size() == 0) {
+            devicename.setVisibility(View.GONE);
+            devicename_view.setVisibility(View.GONE);
+        }
+        if (devicename.getVisibility() == View.VISIBLE) {
+            selectedDevice = new DeviceEntity();
+            selectedDevice.setCode(defectModelEntity.getEamCode());
+            selectedDevice.setName(defectModelEntity.eamName);
+            devicename.setContent(selectedDevice.name);
+        }
 
         address.setContent(selectedArea.getCode());
     }

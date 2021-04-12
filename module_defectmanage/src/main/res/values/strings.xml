@@ -1,5 +1,6 @@
 <resources>
     <string name="defect_add_title">缺陷单</string>
+    <string name="defect_title_add">录入缺陷</string>
     <string name="defect_off_line_list_title">缺陷单记录</string>
     <string name="defect_name">缺陷名称</string>
     <string name="defect_status">状态</string>
@@ -14,7 +15,6 @@
     <string name="defect_address">区域</string>
     <string name="defect_find_time">发现时间</string>
     <string name="defect_plan_handle_time">计划消缺时间</string>
-    <string name="defect_add_file">添加附件</string>
     <string name="defect_source_osi">巡检</string>
 
 

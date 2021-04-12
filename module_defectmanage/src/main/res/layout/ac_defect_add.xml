@@ -102,8 +102,9 @@
                 app:editable="true"
                 app:key="@string/defect_device_name" />
 
-            <include layout="@layout/v_divider_gray" />
-
+            <include
+                android:id="@+id/devicename_view"
+                layout="@layout/v_divider_gray" />
 
             <com.supcon.mes.mbap.view.CustomTextView
                 android:id="@+id/equip_department"
