@@ -45,11 +45,15 @@ public class XJAbnormalSelectDialog extends Dialog{
     XJAbnormalChoiceAdapter adapter;
     String selectAbnormalName = null;
     private Map<String, String> abnormalReasonMap;     //异常原因
+    private String defaultId;
     public XJAbnormalSelectDialog(Context context,String title, Map<String, String> abnormalReasonMap){
         super(context, R.style.DialogStyle);
         this.context=context;
         this.title=title;
         this.abnormalReasonMap=abnormalReasonMap;
+    }
+    public void setPosition(String id){
+        this.defaultId=id;
     }
 
     @Override
@@ -90,10 +94,19 @@ public class XJAbnormalSelectDialog extends Dialog{
         List<String> values = new ArrayList<>();
         values.addAll(abnormalReasonMap.values());
         adapter.setList(values);
-        adapter.selectPostion=0;
-        selectAbnormalName=values.get(0);
-        contentView.setAdapter(adapter);
+        if (defaultId!=null){
+            for (int i=0;i<values.size();i++){
+                if (values.get(i).equals(defaultId)){
+                    adapter.selectPostion=i;
+                    selectAbnormalName=values.get(i);
+                }
+            }
+        }else{
+            adapter.selectPostion=0;
+            selectAbnormalName=values.get(0);
+        }
 
+        contentView.setAdapter(adapter);
         ViewGroup.LayoutParams lp = contentView.getLayoutParams();
         if (values.size() > 4) {
             lp.height = DensityUtil.dp2px(context,40 * 4);

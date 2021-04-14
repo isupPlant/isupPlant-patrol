@@ -1221,6 +1221,9 @@ public class XJWorkActivity extends BaseRefreshRecyclerActivity<XJTaskWorkEntity
     private void showPopUp(XJTaskWorkEntity xjWorkEntity) {
         if (abnormalSelectDialog==null)
             abnormalSelectDialog=new XJAbnormalSelectDialog(context,context.getResources().getString(R.string.detailed_reasons)+xjWorkEntity.eamName,abnormalReasonMap);
+            if ( xjWorkEntity.abnormalReason!=null){
+                abnormalSelectDialog.setPosition(xjWorkEntity.abnormalReason.value);
+            }
             abnormalSelectDialog.show();
             abnormalSelectDialog.setOnSureListener((selectAbnormalId, season) -> {
             xjWorkEntity.abnormalReason = SystemCodeManager.getInstance().getSystemCodeEntity(selectAbnormalId);

@@ -253,7 +253,7 @@ public class XJWorkAdapter extends BaseListDataRecyclerViewAdapter<XJTaskWorkEnt
 
 //            itemXJWorkPics.setSheetEntity(new String[]{"拍摄照片", "拍摄短视频"});
             itemXJWorkPics.setTile(context.getResources().getString(R.string.xj_patrol_give_photo_method));
-
+            itemAbnormalReason.setVisibility(View.GONE);
         }
 
 
@@ -313,15 +313,11 @@ public class XJWorkAdapter extends BaseListDataRecyclerViewAdapter<XJTaskWorkEnt
                                         if ("PATROL_realValue/normal".equals(xjWorkItemEntity.conclusionID)) {
 //                                            initSpinner(itemXJWorkConclusionSpinner, realValueMap.get("PATROL_realValue/normal"), realValues);
                                             itemXJWorkConclusionSpinner.setSelection(realValues.indexOf(realValueMap.get("PATROL_realValue/normal")));
-                                            itemAbnormalReason.setVisibility(View.GONE);
-                                            xjWorkItemEntity.abnormalReason=null;
-                                            xjWorkItemEntity.reason=null;
                                         } else {
 //                                            initSpinner(itemXJWorkConclusionSpinner, realValueMap.get("PATROL_realValue/abnormal"), realValues);
                                             itemXJWorkConclusionSpinner.setSelection(realValues.indexOf(realValueMap.get("PATROL_realValue/abnormal")));
                                             xjWorkItemEntity.isFold=true;
                                             toggleFoldView();
-                                            itemAbnormalReason.setVisibility(View.VISIBLE);
                                         }
 
                                     }
@@ -491,15 +487,18 @@ public class XJWorkAdapter extends BaseListDataRecyclerViewAdapter<XJTaskWorkEnt
                         } else {
                             setSpinnerState(itemXJWorkConclusionSpinner, 0);
                         }
+                        itemAbnormalReason.setVisibility(View.GONE);
+                        xjWorkItemEntity.abnormalReason=null;
+                        xjWorkItemEntity.reason=null;
                     } else if (realValueMap.get("PATROL_realValue/abnormal").equals(xjWorkItemEntity.conclusionName)) {
                         xjWorkItemEntity.conclusionID = "PATROL_realValue/abnormal";
                         if (xjWorkItemEntity.isAutoJudge) {
                             setSpinnerState(itemXJWorkConclusionSpinner, 9);
                         } else {
                             setSpinnerState(itemXJWorkConclusionSpinner, 1);
-
                         }
                         tv.setTextColor(context.getResources().getColor(R.color.customRed));
+                        itemAbnormalReason.setVisibility(View.VISIBLE);
                     } else if (realValueMap.get("PATROL_realValue/doubtful").equals(xjWorkItemEntity.conclusionName)) {
                         xjWorkItemEntity.conclusionID = "PATROL_realValue/doubtful";
                         if (xjWorkItemEntity.isAutoJudge) {

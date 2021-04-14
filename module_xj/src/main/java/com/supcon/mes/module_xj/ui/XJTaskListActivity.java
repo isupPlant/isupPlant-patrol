@@ -14,7 +14,7 @@ import com.app.annotation.Controller;
 import com.app.annotation.Presenter;
 import com.app.annotation.apt.Router;
 import com.jakewharton.rxbinding2.view.RxView;
-import com.mes.supcon.expert_ewg01p.service.ExpertService;
+import com.mes.supcon.expert_ewg01p.util.ExpertHelper;
 import com.supcon.common.view.base.activity.BaseRefreshRecyclerActivity;
 import com.supcon.common.view.base.adapter.IListAdapter;
 import com.supcon.common.view.util.DisplayUtil;
@@ -138,7 +138,7 @@ public class XJTaskListActivity extends BaseRefreshRecyclerActivity<XJTaskGroupE
     @Override
     protected void onInit() {
         super.onInit();
-        ExpertService.bindDevice(context);
+
         ExpertUHFRFIDController.initSerialPort(this);
         refreshListController.setAutoPullDownRefresh(false);
         refreshListController.setPullDownRefreshEnabled(true);
@@ -162,7 +162,6 @@ public class XJTaskListActivity extends BaseRefreshRecyclerActivity<XJTaskGroupE
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        ExpertService.callService(context, ExpertService.DISCONNECT_DEVICE);
         if (mXJTaskEntities != null && mXJTaskEntities.size() > 0) {
             SharedPreferencesUtils.setParam(context, Constant.SPKey.XJ_TASKS_CACHE + dateFilter + taskStatusPosition, GsonUtil.gsonString(mXJTaskEntities));
         } else {

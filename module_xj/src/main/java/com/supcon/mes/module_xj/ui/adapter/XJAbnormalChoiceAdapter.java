@@ -52,7 +52,8 @@ public class XJAbnormalChoiceAdapter extends BaseListDataRecyclerViewAdapter<Str
             RxView.clicks(itemView)
                     .throttleFirst(2000, TimeUnit.MILLISECONDS)
                     .subscribe(o->{
-                       onItemChildViewClick(itemView,0);
+                        String s = getItem(getAdapterPosition());
+                       onItemChildViewClick(itemView,0,s);
                     });
         }
 
