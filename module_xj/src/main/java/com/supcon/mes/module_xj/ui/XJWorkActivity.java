@@ -1220,7 +1220,7 @@ public class XJWorkActivity extends BaseRefreshRecyclerActivity<XJTaskWorkEntity
     //巡检项异常原因选择框
     private void showPopUp(XJTaskWorkEntity xjWorkEntity) {
         if (abnormalSelectDialog==null)
-            abnormalSelectDialog=new XJAbnormalSelectDialog(context,context.getResources().getString(R.string.detailed_reasons)+xjWorkEntity.eamName,abnormalReasonMap);
+           abnormalSelectDialog=new XJAbnormalSelectDialog(context,context.getResources().getString(R.string.detailed_reasons)+xjWorkEntity.eamName==null?"":xjWorkEntity.eamName,abnormalReasonMap);
             if ( xjWorkEntity.abnormalReason!=null){
                 abnormalSelectDialog.setPosition(xjWorkEntity.abnormalReason.value);
             }
