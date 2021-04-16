@@ -612,7 +612,7 @@ public class DefectManageActivity extends BaseControllerActivity implements AddD
             devicename.setContent(selectedDevice.name);
         }
 
-        address.setContent(selectedArea.getCode());
+        address.setContent(selectedArea.getName());
     }
 
     private void swithLeakly(String code) {
@@ -646,7 +646,7 @@ public class DefectManageActivity extends BaseControllerActivity implements AddD
         leakTimeLong = calendar.getTimeInMillis();
         leak_time.setDate(DateUtil.dateFormat(handleTimeLong, "yyyy-MM-dd HH:mm:ss"));
 
-        address.setContent(selectedArea.getCode());
+        address.setContent(selectedArea.getName());
     }
 
     /**
