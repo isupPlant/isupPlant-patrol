@@ -18,7 +18,7 @@ import com.supcon.mes.middleware.model.bean.xj.XJTaskWorkEntity;
 import com.supcon.mes.middleware.model.bean.xj.XJTaskWorkEntityDao;
 import com.supcon.mes.middleware.model.bean.xj.XJWorkEntity;
 import com.supcon.mes.middleware.model.bean.xj.XJWorkEntityDao;
-import com.supcon.mes.module_xj.R;
+import com.supcon.mes.patrol.R;
 
 import java.util.List;
 

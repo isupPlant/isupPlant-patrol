@@ -1,16 +1,16 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.supcon.mes.module_xj" >
+    package="com.supcon.mes.patrol" >
 
     <application
         android:allowBackup="true"
         android:supportsRtl="true">
 
         <activity-alias
-            android:name=".ui.XJSlashActivity"
+            android:name="com.supcon.mes.module_xj.ui.XJSlashActivity"
             android:screenOrientation="portrait"
             android:enabled="false"
             android:theme="@style/AppNoTitleBarTheme"
-            android:targetActivity=".ui.XJSlashActivity"
+            android:targetActivity="com.supcon.mes.module_xj.ui.XJSlashActivity"
             android:icon="@drawable/ic_xj_launcher"
             android:label="移动巡检"
             >
@@ -25,45 +25,45 @@
         </activity-alias>
 
         <activity
-            android:name=".ui.XJSlashActivity"
+            android:name="com.supcon.mes.module_xj.ui.XJSlashActivity"
             android:launchMode="singleTask"
             android:screenOrientation="portrait"
             android:theme="@style/XJLaunchTheme"
             android:windowSoftInputMode="adjustPan|stateAlwaysHidden"
             />
         <activity
-            android:name=".ui.XJTaskListActivity"
+            android:name="com.supcon.mes.module_xj.ui.XJTaskListActivity"
             android:screenOrientation="portrait"
             android:theme="@style/AppNoTitleBarTheme"
             android:windowSoftInputMode="adjustPan|stateAlwaysHidden"
             />
         <activity
-            android:name=".ui.XJTaskDetailActivity"
+            android:name="com.supcon.mes.module_xj.ui.XJTaskDetailActivity"
             android:theme="@style/XJFloatStyle"
             android:screenOrientation="portrait"
             android:launchMode="singleTask"
             android:windowSoftInputMode="adjustPan|stateAlwaysHidden"
             />
         <activity
-            android:name=".ui.XJTaskGetActivity"
+            android:name="com.supcon.mes.module_xj.ui.XJTaskGetActivity"
             android:screenOrientation="portrait"
             android:theme="@style/AppNoTitleBarTheme"
             android:windowSoftInputMode="adjustPan|stateAlwaysHidden"
             />
         <activity
-            android:name=".ui.XJTaskUploadActivity"
+            android:name="com.supcon.mes.module_xj.ui.XJTaskUploadActivity"
             android:screenOrientation="portrait"
             android:theme="@style/AppNoTitleBarTheme"
             android:windowSoftInputMode="adjustPan|stateAlwaysHidden"
             />
         <activity
-            android:name=".ui.XJWorkActivity"
+            android:name="com.supcon.mes.module_xj.ui.XJWorkActivity"
             android:screenOrientation="portrait"
             android:theme="@style/AppNoTitleBarTheme"
             android:windowSoftInputMode="adjustPan|stateAlwaysHidden"
             />
         <activity
-            android:name=".ui.XJWorkViewActivity"
+            android:name="com.supcon.mes.module_xj.ui.XJWorkViewActivity"
             android:screenOrientation="portrait"
             android:theme="@style/AppNoTitleBarTheme"
             android:windowSoftInputMode="adjustPan|stateAlwaysHidden"

@@ -62,3 +62,7 @@ dependencies {
     annotationProcessor "com.supcon.mes.common:apt:$rootProject.ext.aptVersion@jar"
 
 }
+this.afterEvaluate {
+    generateReleaseBuildConfig.enabled = false
+    generateDebugBuildConfig.enabled = false
+}

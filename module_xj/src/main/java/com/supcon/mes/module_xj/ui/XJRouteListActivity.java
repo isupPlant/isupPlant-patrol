@@ -27,7 +27,7 @@ import com.supcon.mes.middleware.model.bean.xj.XJRouteEntity;
 import com.supcon.mes.middleware.model.event.SelectDataEvent;
 import com.supcon.mes.middleware.model.inter.SystemCode;
 import com.supcon.mes.middleware.util.ErrorMsgHelper;
-import com.supcon.mes.module_xj.R;
+import com.supcon.mes.patrol.R;
 import com.supcon.mes.module_xj.model.api.LSXJRouterAPI;
 import com.supcon.mes.module_xj.model.api.XJRouteAPI;
 import com.supcon.mes.module_xj.model.bean.LSXJRouterEntity;

@@ -41,7 +41,7 @@ import com.supcon.mes.middleware.util.SystemCodeManager;
 import com.supcon.mes.middleware.util.XJTaskCacheUtil;
 import com.supcon.mes.module_xj.model.event.XJTempTaskAddEvent;
 import com.supcon.mes.module_xj_temp.IntentRouter;
-import com.supcon.mes.module_xj_temp.R;
+import com.supcon.mes.patrol.R;
 import com.supcon.mes.module_xj_temp.controller.XJTempTimeController;
 import com.supcon.mes.module_xj_temp.ui.adapter.XJTempAreaAdapter;
 

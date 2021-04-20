@@ -21,7 +21,7 @@ import com.supcon.mes.middleware.IntentRouter;
 import com.supcon.mes.middleware.SupPlantApplication;
 import com.supcon.mes.middleware.constant.Constant;
 import com.supcon.mes.middleware.model.listener.OnAPIResultListener;
-import com.supcon.mes.module_xj.R;
+import com.supcon.mes.patrol.R;
 import com.supcon.mes.module_xj.controller.XJTaskIssuedController;
 import com.supcon.mes.module_xj.controller.XJTaskNoIssuedController;
 import com.supcon.mes.module_xj.controller.XJTaskUploadController;

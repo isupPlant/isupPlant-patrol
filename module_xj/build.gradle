@@ -67,3 +67,8 @@ dependencies {
     implementation (name:'../libs/blemulti-release', ext: 'aar')
 
 }
+
+this.afterEvaluate {
+    generateReleaseBuildConfig.enabled = false
+    generateDebugBuildConfig.enabled = false
+}

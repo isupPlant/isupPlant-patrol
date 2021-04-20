@@ -1,0 +1,66 @@
+boolean IS_PATCH = true
+rootProject.ext.modules["APPLICATION_ID"] = 'com.supcon.mes.patrol'
+rootProject.ext.modules["MODULE_NAME"] = 'MPS_APP'
+rootProject.ext.modules["MODULE_VERSION"] = '5.2.0.1'
+rootProject.ext.modules["RES_ID"] = 0x52
+rootProject.ext.isPatch = IS_PATCH
+
+
+apply plugin: 'com.android.application'
+apply from:'../../patch.gradle'
+
+android{
+    flavorDimensions "patrol-channel"
+    productFlavors {
+        dajin {
+//            applicationId 'com.supcon.mes.patrol_dj'
+            manifestPlaceholders = [PATROL_CHANNEL : name]
+        }
+        zhongtai {
+//            applicationId 'com.supcon.mes.patrol_zt'
+            manifestPlaceholders = [PATROL_CHANNEL : name]
+        }
+        official {
+//            applicationId 'com.supcon.mes.patrol_zt'
+            manifestPlaceholders = [PATROL_CHANNEL : name]
+        }
+    }
+}
+
+dependencies {
+    implementation fileTree(include: ['*.jar'], dir: 'libs')
+    if (IS_PATCH) {
+        //Do things while compile mode is PATCH Mode
+        compileOnly project(':isupplant-shell:middleware')
+        compileOnly project(':isupplant-shell:module_webview')
+        compileOnly project(':isupplant-shell:module_scan')
+//        compileOnly project(':isupplant-shell:module_login')
+//        compileOnly project(':isupplant-shell:module_contact')
+//        compileOnly project(':isupplant-shell:home')
+//        compileOnly project(':isupplant-shell:module_map')
+//        compileOnly project(':isupplant-shell:module_data_manage')
+//        compileOnly project(':isupplant-shell:module_push')
+//        compileOnly project(':isupplant-shell:module_search')
+//        compileOnly project(':isupplant-shell:module_iweb_flowchart')
+//        compileOnly project(':isupplant-shell:module_livevideo')
+//        compileOnly project(':isupplant-shell:module_comprehensive')
+    } else {
+        implementation project(':isupplant-shell:middleware')
+        implementation project(':isupplant-shell:module_webview')
+        implementation project(':isupplant-shell:module_scan')
+//        implementation project(':isupplant-shell:module_login')
+//        implementation project(':isupplant-shell:module_contact')
+//        implementation project(':isupplant-shell:home')
+//        implementation project(':isupplant-shell:module_map')
+//        implementation project(':isupplant-shell:module_data_manage')
+//        implementation project(':isupplant-shell:module_push')
+//        implementation project(':isupplant-shell:module_search')
+//        implementation project(':isupplant-shell:module_iweb_flowchart')
+//        implementation project(':isupplant-shell:module_livevideo')
+//        implementation project(':isupplant-shell:module_comprehensive')
+    }
+    implementation project(':isupplant-patrol:module_xj')
+    implementation project(':isupplant-patrol:module_xj_temp')
+
+}
+

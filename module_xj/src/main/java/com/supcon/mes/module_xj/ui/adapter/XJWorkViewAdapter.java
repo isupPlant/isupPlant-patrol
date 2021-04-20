@@ -22,7 +22,7 @@ import com.supcon.mes.middleware.constant.Constant;
 import com.supcon.mes.middleware.model.bean.xj.XJInputTypeEntity;
 import com.supcon.mes.middleware.model.bean.xj.XJInputTypeEntityDao;
 import com.supcon.mes.middleware.model.bean.xj.XJTaskWorkEntity;
-import com.supcon.mes.module_xj.R;
+import com.supcon.mes.patrol.R;
 import com.supcon.mes.module_xj.controller.XJCameraController;
 import com.supcon.mes.module_xj.ui.XJWorkViewActivity;
 import com.supcon.mes.module_xj.util.FaultPicHelper;

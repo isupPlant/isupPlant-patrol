@@ -46,7 +46,7 @@ import com.supcon.mes.middleware.ui.view.search.CustomPopTextView;
 import com.supcon.mes.middleware.util.SBTUtil;
 import com.supcon.mes.middleware.util.SystemCodeManager;
 import com.supcon.mes.module_xj.IntentRouter;
-import com.supcon.mes.module_xj.R;
+import com.supcon.mes.patrol.R;
 import com.supcon.mes.module_xj.controller.XJCameraController;
 import com.supcon.mes.module_xj.ui.XJWorkActivity;
 import com.supcon.mes.module_xj.util.FaultPicHelper;

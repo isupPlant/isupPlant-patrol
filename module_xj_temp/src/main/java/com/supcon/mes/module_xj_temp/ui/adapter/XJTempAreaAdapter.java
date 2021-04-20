@@ -17,7 +17,7 @@ import com.supcon.mes.middleware.model.bean.xj.XJTaskAreaEntity;
 import com.supcon.mes.middleware.model.bean.xj.XJTaskWorkEntity;
 import com.supcon.mes.middleware.model.bean.xj.XJWorkEntity;
 import com.supcon.mes.middleware.model.bean.xj.XJWorkEntityDao;
-import com.supcon.mes.module_xj_temp.R;
+import com.supcon.mes.patrol.R;
 
 import java.util.List;
 import java.util.concurrent.TimeUnit;

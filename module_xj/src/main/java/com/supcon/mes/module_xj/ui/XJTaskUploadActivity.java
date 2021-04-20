@@ -29,7 +29,7 @@ import com.supcon.mes.middleware.model.bean.xj.XJTaskEntity;
 import com.supcon.mes.middleware.model.event.RefreshEvent;
 import com.supcon.mes.middleware.util.ErrorMsgHelper;
 import com.supcon.mes.middleware.util.XJTaskCacheUtil;
-import com.supcon.mes.module_xj.R;
+import com.supcon.mes.patrol.R;
 import com.supcon.mes.module_xj.model.api.XJLocalTaskAPI;
 import com.supcon.mes.module_xj.model.api.XJTaskSubmitAPI;
 import com.supcon.mes.module_xj.model.bean.XJTaskGroupEntity;

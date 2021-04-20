@@ -11,9 +11,9 @@ import com.supcon.common.view.util.ToastUtils;
 import com.supcon.common.view.view.custom.ICustomView;
 import com.supcon.mes.mbap.utils.DateUtil;
 import com.supcon.mes.mbap.view.CustomDialog;
-import com.supcon.mes.middleware.R;
 import com.supcon.mes.middleware.controller.MyPickerController;
 import com.supcon.mes.middleware.model.listener.DateSelectListener;
+import com.supcon.mes.patrol.R;
 
 /**
  * Created by wangshizhan on 2019/11/14
@@ -131,12 +131,12 @@ public class XJTempTimeController extends BaseViewController {
                     .bindClickListener(R.id.customTimeViewOkBtn, v -> {
 
                         if (TextUtils.isEmpty(customDateStart)) {
-                            ToastUtils.show(context,context.getResources().getString(com.supcon.mes.module_xj_temp.R.string.xj_patrol_selete_start_time));
+                            ToastUtils.show(context,context.getResources().getString(R.string.xj_patrol_selete_start_time));
                             return;
                         }
 
                         if (TextUtils.isEmpty(customDateEnd)) {
-                            ToastUtils.show(context, context.getResources().getString(com.supcon.mes.module_xj_temp.R.string.xj_patrol_selete_end_time));
+                            ToastUtils.show(context, context.getResources().getString(R.string.xj_patrol_selete_end_time));
                             return;
                         }
 

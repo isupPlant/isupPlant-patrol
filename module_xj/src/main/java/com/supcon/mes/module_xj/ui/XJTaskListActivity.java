@@ -48,7 +48,7 @@ import com.supcon.mes.middleware.util.StartLocationUtils;
 import com.supcon.mes.middleware.util.TimeUtil;
 import com.supcon.mes.middleware.util.XJTaskCacheUtil;
 import com.supcon.mes.module_xj.IntentRouter;
-import com.supcon.mes.module_xj.R;
+import com.supcon.mes.patrol.R;
 import com.supcon.mes.module_xj.controller.XJLocalTaskController;
 import com.supcon.mes.module_xj.controller.XJTaskDateFilterController;
 import com.supcon.mes.module_xj.controller.XJTaskNoIssuedController;
