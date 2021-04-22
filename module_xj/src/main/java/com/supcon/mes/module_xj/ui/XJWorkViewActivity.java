@@ -311,7 +311,7 @@ public class XJWorkViewActivity extends BaseRefreshRecyclerActivity<XJTaskWorkEn
                         //TODO
                     },true)
                     .bindClickListener(R.id.redBtn,v -> {
-
+                        mXJAreaEntity.finishNum--;
                         xjWorkEntity.isFinished = false;
                         xjWorkEntity.completeDate = 0;
                         xjWorkEntity.taskDetailState = SystemCodeManager.getInstance().getSystemCodeEntity("PATROL_taskDetailState/uncheck");

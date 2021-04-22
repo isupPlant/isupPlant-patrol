@@ -132,6 +132,9 @@ public class XJTaskDetailActivity extends BaseControllerActivity implements XJTa
     @BindByTag("xjTaskDetailCloseBtn")
     ImageView xjTaskDetailCloseBtn;
 
+    @BindByTag("xjTaskDetailScanBtn")
+    ImageView xjTaskDetailScanBtn;
+
     Map<String, String> signTypeInfoMap;     //签到原因
     private XJTaskEntity mXJTaskEntity;
     private XJAreaAdapter mXJAreaAdapter;
@@ -412,7 +415,7 @@ public class XJTaskDetailActivity extends BaseControllerActivity implements XJTa
         RxView.clicks(xjTaskDetailCloseBtn)
                 .subscribe(o -> back());
 
-        RxView.clicks(xjTaskDetailTableNo)
+        RxView.clicks(xjTaskDetailScanBtn)
                 .subscribe(o -> {
                     driverController.openCameraScan();
                 });

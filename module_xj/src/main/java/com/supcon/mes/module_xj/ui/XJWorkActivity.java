@@ -1148,6 +1148,9 @@ public class XJWorkActivity extends BaseRefreshRecyclerActivity<XJTaskWorkEntity
 
                         mXJWorkAdapter.notifyItemChanged(xjPosition);
 
+                    }else{
+                        xjWorkItemEntity.concluse = "";
+                        mXJWorkAdapter.notifyItemChanged(xjPosition);
                     }
                 }).show();
 
