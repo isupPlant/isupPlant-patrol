@@ -803,11 +803,11 @@ public class DefectManageActivity extends BaseControllerActivity implements AddD
             return false;
         }
 
-//        //缺陷来源
-//        if (StringUtil.isBlank(source.getContent())) {
-//            toastTip(needToastTip, getString(R.string.defect_source_is_null));
-//            return false;
-//        }
+        //缺陷来源
+        if (selectedDepartment == null) {
+            toastTip(needToastTip, getString(R.string.defect_equip_department_is_null));
+            return false;
+        }
 
         //类型
         if (StringUtil.isBlank(type.getContent())) {

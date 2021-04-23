@@ -32,9 +32,9 @@
                     style="@style/KeyText_ex_height"
                     android:layout_width="wrap_content"
                     android:layout_weight="1"
+                    android:paddingLeft="5dp"
                     android:tag="devicename"
                     android:text="@string/defect_add_title"
-                    android:paddingLeft="5dp"
                     android:translationZ="1dp" />
 
                 <TextView
@@ -71,34 +71,25 @@
                 app:icon="@drawable/ic_hazard_content"
                 app:title="@string/defect_name" />
 
-            <LinearLayout
+
+            <com.supcon.mes.middleware.ui.view.CustomTitleValueSmall
+                android:id="@+id/findtime"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal">
+                android:paddingLeft="5dp"
+                android:tag="findtime"
+                app:icon="@drawable/ic_time"
+                app:title="@string/defect_find_time" />
 
-                <com.supcon.mes.middleware.ui.view.CustomTitleValueSmall
-                    android:id="@+id/findtime"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:paddingLeft="5dp"
-                    android:tag="findtime"
-                    app:icon="@drawable/ic_time"
-                    app:title="@string/defect_find_time" />
-
-
-                <com.supcon.mes.middleware.ui.view.CustomTitleValueSmall
-                    android:id="@+id/finder"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:paddingLeft="5dp"
-                    android:tag="finder"
-                    app:icon="@drawable/ic_person"
-                    app:title="@string/defect_discover" />
-
-
-            </LinearLayout>
+            <com.supcon.mes.middleware.ui.view.CustomTitleValueSmall
+                android:id="@+id/finder"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:paddingLeft="5dp"
+                android:tag="finder"
+                app:icon="@drawable/ic_person"
+                app:title="@string/defect_discover" />
 
 
             <com.supcon.mes.middleware.ui.view.CustomTitleValueSmall
