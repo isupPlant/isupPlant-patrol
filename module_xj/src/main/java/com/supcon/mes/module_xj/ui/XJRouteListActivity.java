@@ -19,6 +19,7 @@ import com.supcon.common.view.listener.OnRefreshListener;
 import com.supcon.common.view.util.LogUtil;
 import com.supcon.common.view.util.StatusBarUtils;
 import com.supcon.mes.mbap.utils.SpaceItemDecoration;
+import com.supcon.mes.mbap.view.CustomImageButton;
 import com.supcon.mes.middleware.constant.Constant;
 import com.supcon.mes.middleware.controller.SystemCodeJsonController;
 import com.supcon.mes.middleware.model.bean.BAP5CommonListEntity;
@@ -63,6 +64,9 @@ import io.reactivex.schedulers.Schedulers;
 })
 @Controller(value = {SystemCodeJsonController.class})
 public class XJRouteListActivity extends BaseRefreshRecyclerActivity implements XJRouteContract.View, LSXJRouterContract.View {
+
+    @BindByTag("leftBtn")
+    CustomImageButton leftBtn;
 
     @BindByTag("titleText")
     TextView titleText;
@@ -119,7 +123,7 @@ public class XJRouteListActivity extends BaseRefreshRecyclerActivity implements 
     protected void initListener() {
         super.initListener();
 
-        RxView.clicks(findViewById(R.id.leftBtn))
+        RxView.clicks(leftBtn)
                 .throttleFirst(200, TimeUnit.MILLISECONDS)
                 .subscribe(new Consumer<Object>() {
                     @Override

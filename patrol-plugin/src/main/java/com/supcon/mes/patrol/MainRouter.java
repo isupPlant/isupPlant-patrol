@@ -47,7 +47,6 @@ public class MainRouter implements IRouter {
         }
     }
 
-
     public static Map<String, Class<?>> getRoutes(){
         List<String> classPaths = new ArrayList<>();
         Map<String, Class<?>> routers = new HashMap<>();

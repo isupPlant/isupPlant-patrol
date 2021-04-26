@@ -13,6 +13,11 @@
         <meta-data
             android:value="${PATROL_CHANNEL}"
             android:name="PATROL_CHANNEL"/>
+
+        <meta-data
+            android:value="${MODULES}"
+            android:name="MODULES"/>
+
     </application>
 
 

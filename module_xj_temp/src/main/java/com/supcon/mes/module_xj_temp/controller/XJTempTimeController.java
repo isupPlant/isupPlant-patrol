@@ -4,12 +4,14 @@ import android.app.Activity;
 import android.text.TextUtils;
 import android.view.View;
 
+import com.app.annotation.BindByTag;
 import com.supcon.common.view.base.controller.BaseViewController;
 import com.supcon.common.view.listener.OnChildViewClickListener;
 import com.supcon.common.view.util.LogUtil;
 import com.supcon.common.view.util.ToastUtils;
 import com.supcon.common.view.view.custom.ICustomView;
 import com.supcon.mes.mbap.utils.DateUtil;
+import com.supcon.mes.mbap.view.CustomDateView;
 import com.supcon.mes.mbap.view.CustomDialog;
 import com.supcon.mes.middleware.controller.MyPickerController;
 import com.supcon.mes.middleware.model.listener.DateSelectListener;
@@ -26,6 +28,8 @@ public class XJTempTimeController extends BaseViewController {
     DateSelectListener mDateSelectListener;
 
     CustomDialog mCustomDialog;
+    CustomDateView customStartTimeView;
+    CustomDateView customEndTimeView;
 
     private MyPickerController mDatePickController;
 
@@ -88,8 +92,8 @@ public class XJTempTimeController extends BaseViewController {
 
                                             customDateStart = dateStr;
 
-                                            ((ICustomView)childView).setContent(customDateStart);
-
+                                            customStartTimeView.setContent(customDateStart);
+                                            customStartTimeView.invalidate();
                                         })
                                         .show(DateUtil.dateFormat(customDateStart, "yyyy-MM-dd HH:mm:ss"));
                             }
@@ -121,8 +125,8 @@ public class XJTempTimeController extends BaseViewController {
 
                                             customDateEnd = dateStr;
 
-                                            ((ICustomView)childView).setContent(customDateEnd);
-
+                                            customEndTimeView.setContent(customDateEnd);
+                                            customEndTimeView.invalidate();
                                         })
                                         .show(DateUtil.dateFormat(customDateEnd, "yyyy-MM-dd HH:mm:ss"));
                             }
@@ -158,6 +162,10 @@ public class XJTempTimeController extends BaseViewController {
                         }
 
                     }, true);
+
+            customStartTimeView = mCustomDialog.getDialog().findViewById(R.id.customStartTimeView);
+            customEndTimeView = mCustomDialog.getDialog().findViewById(R.id.customEndTimeView);
+
         }
 
         mCustomDialog.show();
