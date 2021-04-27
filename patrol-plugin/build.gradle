@@ -1,19 +1,17 @@
 boolean IS_PATCH = true
 rootProject.ext.modules["APPLICATION_ID"] = 'com.supcon.mes.patrol'
 rootProject.ext.modules["MODULE_NAME"] = 'MPS_APP'
-rootProject.ext.modules["MODULE_VERSION"] = '5.2.0.1'
+rootProject.ext.modules["MODULE_VERSION"] = '6.0.3.0.1'
 rootProject.ext.modules["RES_ID"] = 0x53
 rootProject.ext.isPatch = IS_PATCH
 
 String folderName = path.toString().split(":")[1]
-String folderPath = project.getRootDir().getPath()+"/"+folderName
+String folderPath = project.getRootDir().getPath()+"\\"+folderName
 rootProject.ext.modules["FOLDER_NAME"] = folderName
 rootProject.ext.modules["FOLDER_PATH"] = folderPath
 
-
 apply plugin: 'com.android.application'
 apply from:'../../patch.gradle'
-
 
 android{
 
@@ -58,6 +56,9 @@ dependencies {
         implementation project(':isupplant-shell:module_webview')
         implementation project(':isupplant-shell:module_scan')
     }
+
+    implementation project(':isupplant-patrol:module_xj')
+    implementation project(':isupplant-patrol:module_xj_temp')
 }
 
 
