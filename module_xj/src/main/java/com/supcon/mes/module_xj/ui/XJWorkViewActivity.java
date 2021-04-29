@@ -313,6 +313,7 @@ public class XJWorkViewActivity extends BaseRefreshRecyclerActivity<XJTaskWorkEn
                     .bindClickListener(R.id.redBtn,v -> {
                         mXJAreaEntity.finishNum--;
                         xjWorkEntity.isFinished = false;
+                        xjWorkEntity.xjImgName=null;
                         xjWorkEntity.completeDate = 0;
                         xjWorkEntity.conclusionID = null;
                         xjWorkEntity.realValue = null;
@@ -320,6 +321,7 @@ public class XJWorkViewActivity extends BaseRefreshRecyclerActivity<XJTaskWorkEn
                         xjWorkEntity.concluse = null;
                         xjWorkEntity.taskDetailState = SystemCodeManager.getInstance().getSystemCodeEntity("PATROL_taskDetailState/uncheck");
                         xjWorkEntity.isRealPass = false;
+                        xjWorkEntity.isRealPhoto=false;
                         if (mXJAreaEntity.isFinished){
                             mXJAreaEntity.isFinished=false;
 //                            SupPlantApplication.dao().getXJTaskAreaEntityDao().update(mXJAreaEntity);
