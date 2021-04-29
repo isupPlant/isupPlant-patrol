@@ -329,7 +329,7 @@ public class XJTaskDetailActivity extends BaseControllerActivity implements XJTa
     private void updateView() {
         if (mXJTaskEntity != null) {
             if (mXJTaskEntity.workRoute != null)
-                xjTaskDetailRouteName.setText(mXJTaskEntity.workRoute.name);
+            xjTaskDetailRouteName.setText(mXJTaskEntity.workRoute.name);
             xjTaskDetailTableNo.setText(mXJTaskEntity.tableNo);
             xjTaskDetailTaskState.setText(mXJTaskEntity.isFinished ? getString(R.string.xj_task_checked) : getString(R.string.xj_task_uncheck));
             xjTaskDetailTaskState.setTextColor(getResources().getColor(R.color.xjBtnColor));

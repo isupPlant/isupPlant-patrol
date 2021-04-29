@@ -25,5 +25,6 @@ public class XJAreaUploadEntity extends BaseEntity {
     public long id;
     public StringIdEntity payCardType;
     public long cardTime;
+    public long completeTime;
     public StringIdEntity signInReason;
 }

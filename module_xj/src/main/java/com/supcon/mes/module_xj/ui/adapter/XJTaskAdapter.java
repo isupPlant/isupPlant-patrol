@@ -8,13 +8,17 @@ import android.widget.CompoundButton;
 import android.widget.TextView;
 
 import com.app.annotation.BindByTag;
+import com.jakewharton.rxbinding2.view.RxView;
 import com.supcon.common.view.base.adapter.BaseListDataRecyclerViewAdapter;
 import com.supcon.common.view.base.adapter.viewholder.BaseRecyclerViewHolder;
 import com.supcon.mes.mbap.utils.DateUtil;
+import com.supcon.mes.middleware.IntentRouter;
+import com.supcon.mes.middleware.constant.Constant;
 import com.supcon.mes.middleware.model.bean.xj.XJTaskEntity;
 import com.supcon.mes.patrol.R;
 
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Created by wangshizhan on 2020/3/24
@@ -73,7 +77,9 @@ public class XJTaskAdapter extends BaseListDataRecyclerViewAdapter<XJTaskEntity>
         @Override
         protected void initListener() {
             super.initListener();
-            itemTaskStatus.setOnClickListener(v -> onItemChildViewClick(itemTaskStatus, 0, getItem(getAdapterPosition())));
+            RxView.clicks(itemTaskStatus)
+                    .throttleFirst(200, TimeUnit.MILLISECONDS)
+                    .subscribe(o -> onItemChildViewClick(itemTaskStatus, 0, getItem(getAdapterPosition())));
         }
 
         @Override
