@@ -314,6 +314,10 @@ public class XJWorkViewActivity extends BaseRefreshRecyclerActivity<XJTaskWorkEn
                         mXJAreaEntity.finishNum--;
                         xjWorkEntity.isFinished = false;
                         xjWorkEntity.completeDate = 0;
+                        xjWorkEntity.conclusionID = null;
+                        xjWorkEntity.realValue = null;
+                        xjWorkEntity.conclusionName = null;
+                        xjWorkEntity.concluse = null;
                         xjWorkEntity.taskDetailState = SystemCodeManager.getInstance().getSystemCodeEntity("PATROL_taskDetailState/uncheck");
                         xjWorkEntity.isRealPass = false;
                         if (mXJAreaEntity.isFinished){
