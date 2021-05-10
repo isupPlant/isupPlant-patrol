@@ -282,6 +282,9 @@ public class XJWorkActivity extends BaseRefreshRecyclerActivity<XJTaskWorkEntity
 
         mXJAreaEntity.finishNum = finishNum;
         mXJAreaEntity.isFinished = mXJAreaEntity.finishNum == mXJAreaEntity.works.size();
+        if (mXJAreaEntity.isFinished){
+            mXJAreaEntity.completeTime=new Date().getTime();
+        }
         XJTaskCacheUtil.insertTasksArea(mXJAreaEntity);
         EventBus.getDefault().post(new XJAreaRefreshEvent());
 
@@ -473,11 +476,13 @@ public class XJWorkActivity extends BaseRefreshRecyclerActivity<XJTaskWorkEntity
         mXJAreaEntity.finishNum = finishNum;
         if (mXJAreaEntity.finishNum == mXJAreaEntity.works.size()) {
             mXJAreaEntity.isFinished = true;
+            mXJAreaEntity.completeTime=new Date().getTime();
             return true;
         } else {
             mXJAreaEntity.isFinished = false;
             return false;
         }
+
     }
 
     private void showAllJumpDialog() {
@@ -937,6 +942,9 @@ public class XJWorkActivity extends BaseRefreshRecyclerActivity<XJTaskWorkEntity
                                     }
                                 });
                                 mXJAreaEntity.isFinished = mXJAreaEntity.finishNum == mXJAreaEntity.works.size();
+                                if (mXJAreaEntity.isFinished){
+                                    mXJAreaEntity.completeTime=new Date().getTime();
+                                }
                                 XJTaskCacheUtil.insertTasksArea(mXJAreaEntity);
                                 if (xjWorkEntities.size() == mXJAreaEntity.works.size()) {
                                     onLoadSuccessAndExit(context.getResources().getString(R.string.xj_patrol_over), this::finish);
@@ -1076,6 +1084,9 @@ public class XJWorkActivity extends BaseRefreshRecyclerActivity<XJTaskWorkEntity
                             }
                         });
                         mXJAreaEntity.isFinished = mXJAreaEntity.finishNum == mXJAreaEntity.works.size();
+                        if (mXJAreaEntity.isFinished){
+                            mXJAreaEntity.completeTime=new Date().getTime();
+                        }
                         XJTaskCacheUtil.insertTasksArea(mXJAreaEntity);
                         if (xjWorkItemEntities.size() == mXJAreaEntity.works.size()) {
                             mXJAreaEntity.isFinished = true;
@@ -1148,6 +1159,9 @@ public class XJWorkActivity extends BaseRefreshRecyclerActivity<XJTaskWorkEntity
 
                         mXJWorkAdapter.notifyItemChanged(xjPosition);
 
+                    }else{
+                        xjWorkItemEntity.concluse = "";
+                        mXJWorkAdapter.notifyItemChanged(xjPosition);
                     }
                 }).show();
 

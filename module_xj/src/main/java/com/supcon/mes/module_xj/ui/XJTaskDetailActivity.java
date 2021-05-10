@@ -132,6 +132,9 @@ public class XJTaskDetailActivity extends BaseControllerActivity implements XJTa
     @BindByTag("xjTaskDetailCloseBtn")
     ImageView xjTaskDetailCloseBtn;
 
+    @BindByTag("xjTaskDetailScanBtn")
+    ImageView xjTaskDetailScanBtn;
+
     Map<String, String> signTypeInfoMap;     //签到原因
     private XJTaskEntity mXJTaskEntity;
     private XJAreaAdapter mXJAreaAdapter;
@@ -326,7 +329,7 @@ public class XJTaskDetailActivity extends BaseControllerActivity implements XJTa
     private void updateView() {
         if (mXJTaskEntity != null) {
             if (mXJTaskEntity.workRoute != null)
-                xjTaskDetailRouteName.setText(mXJTaskEntity.workRoute.name);
+            xjTaskDetailRouteName.setText(mXJTaskEntity.workRoute.name);
             xjTaskDetailTableNo.setText(mXJTaskEntity.tableNo);
             xjTaskDetailTaskState.setText(mXJTaskEntity.isFinished ? getString(R.string.xj_task_checked) : getString(R.string.xj_task_uncheck));
             xjTaskDetailTaskState.setTextColor(getResources().getColor(R.color.xjBtnColor));
@@ -412,7 +415,7 @@ public class XJTaskDetailActivity extends BaseControllerActivity implements XJTa
         RxView.clicks(xjTaskDetailCloseBtn)
                 .subscribe(o -> back());
 
-        RxView.clicks(xjTaskDetailTableNo)
+        RxView.clicks(xjTaskDetailScanBtn)
                 .subscribe(o -> {
                     driverController.openCameraScan();
                 });
