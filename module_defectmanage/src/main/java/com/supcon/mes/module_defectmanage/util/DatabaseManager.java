@@ -31,8 +31,7 @@ public class DatabaseManager {
 
     public static SQLiteDatabase getWritableDb() {
         //创建数据库equipment.db"
-        DaoMaster.DevOpenHelper helper = new DaoMaster.DevOpenHelper(SupPlantApplication.isIsAlone() ? SupPlantApplication.getAloneManager().getHostContext()
-                : SupPlantApplication.getAppContext(), "DMisupPlant.db", null);
+        DaoMaster.DevOpenHelper helper = new DaoMaster.DevOpenHelper(SupPlantApplication.getAppContext(), "DMisupPlant.db", null);
         //获取可写数据库
         SQLiteDatabase db = helper.getWritableDatabase();
         return db;
