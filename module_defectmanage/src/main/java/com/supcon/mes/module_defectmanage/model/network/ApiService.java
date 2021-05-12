@@ -6,8 +6,10 @@ import com.supcon.mes.middleware.model.bean.BapPageResultEntity;
 import com.supcon.mes.module_defectmanage.model.bean.DefectModelEntity;
 import com.supcon.mes.module_defectmanage.model.bean.DefectOnlineEntity;
 import com.supcon.mes.module_defectmanage.model.bean.DefectRequestListEntity;
+import com.supcon.mes.module_defectmanage.model.bean.DefectSourceEntity;
 
 import java.util.List;
+import java.util.Map;
 
 import io.reactivex.Flowable;
 import retrofit2.http.Body;
@@ -41,4 +43,8 @@ public interface ApiService {
      */
     @POST("/msService/DefectManage/problemManage/problemManage/getDefectPage")
     Flowable<BAP5CommonEntity<BapPageResultEntity<DefectOnlineEntity>>> getDefectList(@Body DefectRequestListEntity map);
+
+
+    @POST("/msService/DefectManage/problemSource/problemSource/sourcePartRef-query")
+    Flowable<BAP5CommonEntity<BapPageResultEntity<DefectSourceEntity>>> sourcePartRefQuery(@Body Map<String, Object> queryParam);
 }

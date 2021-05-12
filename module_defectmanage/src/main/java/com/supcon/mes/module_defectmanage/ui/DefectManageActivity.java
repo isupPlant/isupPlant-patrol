@@ -33,8 +33,10 @@ import com.supcon.mes.middleware.SupPlantApplication;
 import com.supcon.mes.middleware.constant.Constant;
 import com.supcon.mes.middleware.controller.MyPickerController;
 import com.supcon.mes.middleware.controller.SystemCodeJsonController;
+import com.supcon.mes.middleware.model.RegionExEntity;
 import com.supcon.mes.middleware.model.api.AddFileListAPI;
 import com.supcon.mes.middleware.model.bean.BAP5CommonEntity;
+import com.supcon.mes.middleware.model.bean.BapPageResultEntity;
 import com.supcon.mes.middleware.model.bean.BaseCodeIdNameEntity;
 import com.supcon.mes.middleware.model.bean.BaseIntIdNameEntity;
 import com.supcon.mes.middleware.model.bean.ContactEntity;
@@ -54,12 +56,16 @@ import com.supcon.mes.middleware.util.StringUtil;
 import com.supcon.mes.middleware.util.SystemCodeManager;
 import com.supcon.mes.module_defectmanage.R;
 import com.supcon.mes.module_defectmanage.model.api.AddDefectAPI;
+import com.supcon.mes.module_defectmanage.model.api.GetDefectSourceListAPI;
 import com.supcon.mes.module_defectmanage.model.bean.DefectModelEntity;
 import com.supcon.mes.module_defectmanage.model.bean.DefectModelEntityDao;
+import com.supcon.mes.module_defectmanage.model.bean.DefectSourceEntity;
 import com.supcon.mes.module_defectmanage.model.bean.DeviceSelected;
 import com.supcon.mes.module_defectmanage.model.bean.FileUploadDefectEntity;
 import com.supcon.mes.module_defectmanage.model.contract.AddDefectContract;
+import com.supcon.mes.module_defectmanage.model.contract.GetDefectSourceListContract;
 import com.supcon.mes.module_defectmanage.presenter.AddDefectPresenter;
+import com.supcon.mes.module_defectmanage.presenter.GetDefectSourceListPresenter;
 import com.supcon.mes.module_defectmanage.util.DatabaseManager;
 import com.supcon.mes.module_defectmanage.util.HandleUtils;
 import com.supcon.mes.module_defectmanage.util.Utils;
@@ -76,12 +82,13 @@ import java.util.concurrent.TimeUnit;
 import io.reactivex.disposables.Disposable;
 
 
-@Presenter(value = {AddDefectPresenter.class, AddFileListPresenter.class})
+@Presenter(value = {AddDefectPresenter.class, AddFileListPresenter.class, GetDefectSourceListPresenter.class})
 @Controller(value = {SystemCodeJsonController.class})
 @SystemCode(entityCodes = {Constant.SystemCode.DefectManage_problemClass, Constant.SystemCode.DefectManage_problemLevel,
 Utils.SystemCode.DefectManage_problemState})
 @Router(value = Constant.AppCode.DEFECT_MANAGEMENT_ADD)
-public class DefectManageActivity extends BaseControllerActivity implements AddDefectContract.View, AddFileListContract.View {
+public class DefectManageActivity extends BaseControllerActivity implements AddDefectContract.View, AddFileListContract.View
+, GetDefectSourceListContract.View {
 
     @BindByTag("leftBtn")
     ImageButton leftBtn;
@@ -93,8 +100,8 @@ public class DefectManageActivity extends BaseControllerActivity implements AddD
     CustomTextView source;
     @BindByTag("type")
     CustomTextView type;
-    @BindByTag("level")
-    CustomTextView level;
+//    @BindByTag("level")
+//    CustomTextView level;
     @BindByTag("devicename")
     CustomTextView devicename;
     @BindByTag("equip_department")
@@ -104,11 +111,11 @@ public class DefectManageActivity extends BaseControllerActivity implements AddD
     @BindByTag("discover")
     CustomTextView discover;
     @BindByTag("address")
-    CustomEditText address;
+    CustomTextView address;
     @BindByTag("findtime")
     CustomDateView findtime;
-    @BindByTag("planhandletime")
-    CustomDateView planhandletime;
+//    @BindByTag("planhandletime")
+//    CustomDateView planhandletime;
     @BindByTag("leak_name")
     CustomEditText leak_name;
     @BindByTag("leak_status")
@@ -129,13 +136,11 @@ public class DefectManageActivity extends BaseControllerActivity implements AddD
     ImageButton rightBtn;
     @BindByTag("titleText")
     TextView titleText;
-    @BindByTag("devicename_view")
-    View devicename_view;
 
     private SinglePickController mSinglePickController;
     private MyPickerController mDatePickController;
 
-    SystemCodeEntity selectedType, selectLevel;
+    SystemCodeEntity selectedType/*, selectLevel**/;
     Boolean haslist;//是否挂牌
     BaseCodeIdNameEntity selectSource;
 //    BaseCodeIdNameEntity selectedEamInfo;
@@ -144,14 +149,18 @@ public class DefectManageActivity extends BaseControllerActivity implements AddD
     BaseIntIdNameEntity selectedAssor, selectedFinder;
 
     BaseCodeIdNameEntity  selectedArea = new BaseCodeIdNameEntity();
-    long findTimeLong, handleTimeLong, leakTimeLong;
+    long findTimeLong, /*handleTimeLong,**/ leakTimeLong;
     DefectModelEntity defectModelEntity;
     DeviceEntity selectedDevice;
     List<DeviceEntity> deviceEntities;
     String tableNo;
+    boolean isDevice = false;//巡检过来的缺陷才有的字段
 
     String chooseType;
-
+    ArrayList<DefectSourceEntity> sourceTypeList;
+    String TAG_AREA = "TAG_AREA";
+    String TAG_DEVICE_REF = "deviceName";
+    boolean isFromAll = false;//从首页入口来的
 
     @Override
     protected int getLayoutID() {
@@ -163,46 +172,70 @@ public class DefectManageActivity extends BaseControllerActivity implements AddD
         super.initData();
 
         selectSource = new BaseCodeIdNameEntity();
-        selectSource.setCode("OSI");
-        selectSource.setName(getString(R.string.defect_source_osi));
 
         Long dataId = null;
+        String areaCode = null,areaName = null, deviceIdList = null;
         //情况分类：1、从巡检传过来的数据2、从列表中过来的某一条数据
         Bundle bundle = getIntent().getExtras();
         if (bundle != null) {
             dataId = bundle.getLong(Constant.INTENT_EXTRA_ID);
-
             tableNo = bundle.getString(Constant.IntentKey.XJ_TASK_TABLENO);
-            String areaCode= bundle.getString(Constant.IntentKey.XJ_AREA_CODE);
-            String areaName = bundle.getString(Constant.IntentKey.XJ_AREA_NAME);
-            selectedArea = new BaseCodeIdNameEntity();
-            selectedArea.setCode(areaCode);
-            selectedArea.setName(areaName);
-            String deviceIdList = bundle.getString(Constant.IntentKey.XJ_AREA_EAMLISTS);
-            if (deviceIdList != null) {
-                HandleUtils.setDeviceIdList(deviceIdList);//存储一下
-                deviceEntities = getDeviceList(deviceIdList);
+            areaCode= bundle.getString(Constant.IntentKey.XJ_AREA_CODE);
+            areaName = bundle.getString(Constant.IntentKey.XJ_AREA_NAME);
+            deviceIdList = bundle.getString(Constant.IntentKey.XJ_AREA_EAMLISTS);
+        }
 
-                if (deviceEntities == null || deviceEntities.size() == 0) {
-                    devicename.setVisibility(View.GONE);
-                    devicename_view.setVisibility(View.GONE);
+        if (dataId != null && dataId.longValue() > 0) {
+            //说明是从列表中过来的
+            rightBtn.setVisibility(View.GONE);
+            List<DefectModelEntity> list = DatabaseManager.getDao().getDefectModelEntityDao().queryBuilder()
+                    .where(DefectModelEntityDao.Properties.DbId.eq(dataId)).list();
+            if (list != null && list.size() > 0) {
+                defectModelEntity = list.get(0);
+            }
+
+            if (defectModelEntity.getDefectSource() != null) {
+                selectSource.setCode(defectModelEntity.getDefectSource());
+                source.setVisibility(View.GONE);
+            }
+        } else {
+            //从另外的实体来的进行初始化
+            defectModelEntity = new DefectModelEntity();
+            //如果有区域说明就是巡检
+            if (!StringUtil.isBlank(tableNo) || !StringUtil.isBlank(areaCode)) {
+                selectSource.setCode("OSI");
+                selectSource.setName(getString(R.string.defect_source_osi));
+                source.setVisibility(View.GONE);
+
+            } else {
+                isFromAll = true;
+                address.setEditable(true);
+                presenterRouter.create(GetDefectSourceListAPI.class).getDefectSourceList(1);//如果是分页的就要改了目前就三种方式;
+            }
+            //如果是从巡检过来的就设置为巡检，不显示巡检来源；
+        }
+
+        //这里的逻辑要修改：缺陷过来的与其他地方的不一样
+        if (StringUtil.isBlank(areaCode)) {
+        } else {
+            if (isDevice) {
+                address.setVisibility(View.GONE);
+
+                if (deviceIdList != null) {
+                    HandleUtils.setDeviceIdList(deviceIdList);//存储一下
+                    deviceEntities = getDeviceList(deviceIdList);
+
+                    if (deviceEntities == null || deviceEntities.size() == 0) {
+                        devicename.setVisibility(View.GONE);
+                    }
                 }
             } else {
                 devicename.setVisibility(View.GONE);
-                devicename_view.setVisibility(View.GONE);
-            }
 
-            if (dataId != null && dataId.longValue() > 0) {
-                //说明是从列表中过来的
-                rightBtn.setVisibility(View.GONE);
-                List<DefectModelEntity> list = DatabaseManager.getDao().getDefectModelEntityDao().queryBuilder()
-                        .where(DefectModelEntityDao.Properties.DbId.eq(dataId)).list();
-                if (list != null && list.size() > 0) {
-                    defectModelEntity = list.get(0);
-                }
-            } else {
-                //从另外的实体来的进行初始化
-                defectModelEntity = new DefectModelEntity();
+                selectedArea = new BaseCodeIdNameEntity();
+                selectedArea.setCode(areaCode);
+                selectedArea.setName(areaName);
+                address.setContent(areaName);
             }
         }
 
@@ -228,9 +261,6 @@ public class DefectManageActivity extends BaseControllerActivity implements AddD
         titleText.setText(R.string.defect_title_add);
         rightBtn.setVisibility(View.VISIBLE);
         rightBtn.setImageDrawable(getResources().getDrawable(R.drawable.ic_top_list));
-
-        devicename_view = findViewById(R.id.devicename_view);
-        source.setContent(R.string.defect_source_osi);
 
         file_list.setFileListView(new FileListView.FileListViewListener() {
             @Override
@@ -278,21 +308,29 @@ public class DefectManageActivity extends BaseControllerActivity implements AddD
                     selectedDevice = null;
                 } else {
                     //转换为小狄的
-                    ArrayList<DeviceSelected> selectedList = new ArrayList<>();
-                    if (deviceEntities == null || deviceEntities.size() < 1) {
-                        return;
+                    if (isFromAll) {
+                        //
+                        Bundle bundle = new Bundle();
+                        bundle.putString(Constant.IntentKey.SELECT_TAG, TAG_DEVICE_REF);
+                        com.supcon.mes.middleware.IntentRouter.go(context, Constant.Router.DEVICE_REFER, bundle);
+                    } else {
+                        ArrayList<DeviceSelected> selectedList = new ArrayList<>();
+                        if (deviceEntities == null || deviceEntities.size() < 1) {
+                            return;
+                        }
+                        for (DeviceEntity deviceEntity : deviceEntities) {
+                            DeviceSelected deviceSelected = new DeviceSelected();
+                            deviceSelected.id = deviceEntity.id;
+                            deviceSelected.name = deviceEntity.name;
+                            selectedList.add(deviceSelected);
+                        }
+                        Bundle bundle = new Bundle();
+                        bundle.putSerializable(Constant.INTENT_EXTRA_OBJECT, selectedList);
+                        bundle.putInt(Constant.INTENT_EXTRA_INT, 1);
+                        bundle.putString(Constant.INTENT_EXTRA_OBJECT_CHAT, "device");
+                        IntentRouter.go(context, Constant.Router.SELECT, bundle);
                     }
-                    for (DeviceEntity deviceEntity : deviceEntities) {
-                        DeviceSelected deviceSelected = new DeviceSelected();
-                        deviceSelected.id = deviceEntity.id;
-                        deviceSelected.name = deviceEntity.name;
-                        selectedList.add(deviceSelected);
-                    }
-                    Bundle bundle = new Bundle();
-                    bundle.putSerializable(Constant.INTENT_EXTRA_OBJECT, selectedList);
-                    bundle.putInt(Constant.INTENT_EXTRA_INT, 1);
-                    bundle.putString(Constant.INTENT_EXTRA_OBJECT_CHAT, "device");
-                    IntentRouter.go(context, Constant.Router.SELECT, bundle);
+
                 }
             }
         });
@@ -333,19 +371,19 @@ public class DefectManageActivity extends BaseControllerActivity implements AddD
             }
         });
 
-        planhandletime.setOnChildViewClickListener((childView, action, obj) -> {
-            if (action == -1) {
-            } else {
-                mDatePickController
-                        .listener((year, month, day, hour, minute, second) -> {
-
-                            String dateStr = year + "-" + month + "-" + day + " " + hour + ":" + minute + ":" + second;
-                            handleTimeLong = DateUtil.dateFormat(dateStr, "yyyy-MM-dd HH:mm:ss");
-                            planhandletime.setDate(DateUtil.dateFormat(handleTimeLong, "yyyy-MM-dd HH:mm:ss"));
-                        })
-                        .show(handleTimeLong);
-            }
-        });
+//        planhandletime.setOnChildViewClickListener((childView, action, obj) -> {
+//            if (action == -1) {
+//            } else {
+//                mDatePickController
+//                        .listener((year, month, day, hour, minute, second) -> {
+//
+//                            String dateStr = year + "-" + month + "-" + day + " " + hour + ":" + minute + ":" + second;
+//                            handleTimeLong = DateUtil.dateFormat(dateStr, "yyyy-MM-dd HH:mm:ss");
+//                            planhandletime.setDate(DateUtil.dateFormat(handleTimeLong, "yyyy-MM-dd HH:mm:ss"));
+//                        })
+//                        .show(handleTimeLong);
+//            }
+//        });
 
         leak_time.setOnChildViewClickListener((childView, action, obj) -> {
             if (action == -1) {
@@ -368,18 +406,41 @@ public class DefectManageActivity extends BaseControllerActivity implements AddD
                     //什么情况下会这样？？？
                     selectSource = null;
                 } else {
-//                //跳转到哪个页面去到底
-//                if (regionEntityList == null || regionEntityList.size() == 0) {
-//                    //选中的不展示；如果列表为空就不能跳转
-//                    return;
-//                }
-//                clickTag = tag_target;
-//
-//                startByDeviceController = true;
-//                Bundle bundle = new Bundle();
-//                bundle.putSerializable(Constant.INTENT_EXTRA_OBJECT, regionEntityList);
-//                bundle.putString(Constant.INTENT_EXTRA_ID, context.getString(R.string.psc_device_region_choose));
-//                IntentRouter.go(context, Constant.Router.NODE_TREE, bundle);
+                    if (sourceTypeList == null || sourceTypeList.size() == 0) {
+                        ToastUtils.show(context, getString(R.string.defect_source_list_is_null));
+                        return;
+                    }
+                    //跳转到选择页面
+//                    Bundle bundle = new Bundle();
+//                    bundle.putSerializable(Constant.INTENT_EXTRA_OBJECT, sourceTypeList);
+//                    bundle.putInt(Constant.INTENT_EXTRA_INT, 1);
+//                    bundle.putString(Constant.INTENT_EXTRA_OBJECT_CHAT, TAG_SOURCE_TYPE);
+//                    IntentRouter.go(context, Constant.Router.SELECT, bundle);
+
+                    SinglePickController<String> stringSinglePickController = mSinglePickController
+                            .list(sourceTypeList)
+                            .listener((index, item) -> {
+                                DefectSourceEntity sourceEntity = sourceTypeList.get(index);
+                                source.setContent(sourceEntity.getName());
+                                selectSource = new BaseCodeIdNameEntity();
+                                selectSource.setCode(sourceEntity.get_code());
+                                selectSource.setName(sourceEntity.getName());
+                            });
+                    stringSinglePickController.show(source.getContent());
+                }
+            }
+        });
+
+        address.setOnChildViewClickListener(new OnChildViewClickListener() {
+            @Override
+            public void onChildViewClick(View childView, int action, Object obj) {
+                if (action == -1) {
+                    selectedArea = null;
+                } else {
+                    Bundle bundle = new Bundle();
+                    bundle.putInt(Constant.INTENT_EXTRA_INT, 1);
+                    bundle.putString(Constant.INTENT_EXTRA_OBJECT_CHAT, TAG_AREA);
+                    IntentRouter.go(context, Constant.Router.SELECT_REGION, bundle);
                 }
             }
         });
@@ -443,35 +504,35 @@ public class DefectManageActivity extends BaseControllerActivity implements AddD
             }
         });
 
-        level.setOnChildViewClickListener(new OnChildViewClickListener() {
-            @Override
-            public void onChildViewClick(View childView, int action, Object obj) {
-                if (action == -1) {
-                    selectLevel = null;
-                    leak_ly.setVisibility(View.GONE);
-                } else {
-                    //如果选择的是泄漏的话
-                    final List<SystemCodeEntity> systemCodeEntityList = SystemCodeManager.getInstance().getSystemCodeListByCode(Constant.SystemCode.DefectManage_problemLevel);
-                    if (systemCodeEntityList == null || systemCodeEntityList.size() < 1) {
-                        ToastUtils.show(context, getString(R.string.defect_data_is_null));
-                        return;
-                    }
-
-                    List<String> nameList = new ArrayList<>();
-                    for (SystemCodeEntity systemCodeEntity : systemCodeEntityList) {
-                        nameList.add(systemCodeEntity.getValue());
-                    }
-
-                    SinglePickController<String> stringSinglePickController = mSinglePickController
-                            .list(nameList)
-                            .listener((index, item) -> {
-                                selectLevel = systemCodeEntityList.get(index);
-                                level.setContent((String) item);
-                            });
-                    stringSinglePickController.show(level.getContent());
-                }
-            }
-        });
+//        level.setOnChildViewClickListener(new OnChildViewClickListener() {
+//            @Override
+//            public void onChildViewClick(View childView, int action, Object obj) {
+//                if (action == -1) {
+//                    selectLevel = null;
+//                    leak_ly.setVisibility(View.GONE);
+//                } else {
+//                    //如果选择的是泄漏的话
+//                    final List<SystemCodeEntity> systemCodeEntityList = SystemCodeManager.getInstance().getSystemCodeListByCode(Constant.SystemCode.DefectManage_problemLevel);
+//                    if (systemCodeEntityList == null || systemCodeEntityList.size() < 1) {
+//                        ToastUtils.show(context, getString(R.string.defect_data_is_null));
+//                        return;
+//                    }
+//
+//                    List<String> nameList = new ArrayList<>();
+//                    for (SystemCodeEntity systemCodeEntity : systemCodeEntityList) {
+//                        nameList.add(systemCodeEntity.getValue());
+//                    }
+//
+//                    SinglePickController<String> stringSinglePickController = mSinglePickController
+//                            .list(nameList)
+//                            .listener((index, item) -> {
+//                                selectLevel = systemCodeEntityList.get(index);
+//                                level.setContent((String) item);
+//                            });
+//                    stringSinglePickController.show(level.getContent());
+//                }
+//            }
+//        });
 
         Disposable disposable = RxView.clicks(submitBtn)
                 .throttleFirst(200, TimeUnit.MILLISECONDS)
@@ -483,10 +544,6 @@ public class DefectManageActivity extends BaseControllerActivity implements AddD
                 .throttleFirst(200, TimeUnit.MILLISECONDS)
                 .subscribe(o -> {
                     saveToLocal();
-
-                    if (tableNo == null) {
-                        finish();
-                    }
                 });
 
         Disposable disposableList = RxView.clicks(rightBtn)
@@ -536,16 +593,16 @@ public class DefectManageActivity extends BaseControllerActivity implements AddD
             }
         }
 
-        selectLevel = new SystemCodeEntity();
-        List<SystemCodeEntity> levelList = SystemCodeManager.getInstance().getSystemCodeListByCode(Constant.SystemCode.DefectManage_problemLevel);
-        if (levelList != null && levelList.size() > 0) {
-            for (SystemCodeEntity systemCodeEntity : levelList) {
-                if (StringUtil.contains(systemCodeEntity.getCode(), defectModelEntity.problemLevel)) {
-                    selectLevel = systemCodeEntity;
-                    level.setContent(systemCodeEntity.getValue());
-                }
-            }
-        }
+//        selectLevel = new SystemCodeEntity();
+//        List<SystemCodeEntity> levelList = SystemCodeManager.getInstance().getSystemCodeListByCode(Constant.SystemCode.DefectManage_problemLevel);
+//        if (levelList != null && levelList.size() > 0) {
+//            for (SystemCodeEntity systemCodeEntity : levelList) {
+//                if (StringUtil.contains(systemCodeEntity.getCode(), defectModelEntity.problemLevel)) {
+//                    selectLevel = systemCodeEntity;
+//                    level.setContent(systemCodeEntity.getValue());
+//                }
+//            }
+//        }
 
         selectedDepartment = new BaseIntIdNameEntity();
         selectedDepartment.setName(defectModelEntity.eamDeptName);
@@ -557,10 +614,10 @@ public class DefectManageActivity extends BaseControllerActivity implements AddD
             findTimeLong = DateUtil.dateFormat(defectModelEntity.findTime, "yyyy-MM-dd HH:mm:ss");
         }
 
-        planhandletime.setContent(defectModelEntity.eliminateTime);
-        if (!StringUtil.isBlank(defectModelEntity.eliminateTime)) {
-            handleTimeLong = DateUtil.dateFormat(defectModelEntity.eliminateTime, "yyyy-MM-dd HH:mm:ss");
-        }
+//        planhandletime.setContent(defectModelEntity.eliminateTime);
+//        if (!StringUtil.isBlank(defectModelEntity.eliminateTime)) {
+//            handleTimeLong = DateUtil.dateFormat(defectModelEntity.eliminateTime, "yyyy-MM-dd HH:mm:ss");
+//        }
 
         assessor.setContent(defectModelEntity.assessorName);
         selectedAssor = new BaseIntIdNameEntity();
@@ -603,7 +660,6 @@ public class DefectManageActivity extends BaseControllerActivity implements AddD
         deviceEntities = getDeviceList(HandleUtils.getDeviceIdList());
         if (deviceEntities == null || deviceEntities.size() == 0) {
             devicename.setVisibility(View.GONE);
-            devicename_view.setVisibility(View.GONE);
         }
         if (devicename.getVisibility() == View.VISIBLE) {
             selectedDevice = new DeviceEntity();
@@ -640,11 +696,11 @@ public class DefectManageActivity extends BaseControllerActivity implements AddD
         Calendar calendar = Calendar.getInstance();
         findTimeLong = calendar.getTimeInMillis();
         calendar.add(Calendar.HOUR, 8);
-        handleTimeLong = calendar.getTimeInMillis();
-        planhandletime.setDate(DateUtil.dateFormat(handleTimeLong, "yyyy-MM-dd HH:mm:ss"));
+//        handleTimeLong = calendar.getTimeInMillis();
+//        planhandletime.setDate(DateUtil.dateFormat(handleTimeLong, "yyyy-MM-dd HH:mm:ss"));
 
         leakTimeLong = calendar.getTimeInMillis();
-        leak_time.setDate(DateUtil.dateFormat(handleTimeLong, "yyyy-MM-dd HH:mm:ss"));
+        leak_time.setDate(DateUtil.dateFormat(leakTimeLong, "yyyy-MM-dd HH:mm:ss"));
 
         address.setContent(selectedArea.getName());
     }
@@ -709,7 +765,7 @@ public class DefectManageActivity extends BaseControllerActivity implements AddD
         defectModelEntity.name = name.getContent();
         defectModelEntity.hiddenApperance = describe.getContent();
 
-        if (selectSource != null) {
+        if (selectSource != null ) {
             defectModelEntity.defectSource = selectSource.getCode();
         }
 
@@ -717,9 +773,9 @@ public class DefectManageActivity extends BaseControllerActivity implements AddD
             defectModelEntity.defectType =  selectedType.getCode();
         }
 
-        if (selectLevel != null) {
-            defectModelEntity.problemLevel =  selectLevel.getCode();
-        }
+//        if (selectLevel != null) {
+//            defectModelEntity.problemLevel =  selectLevel.getCode();
+//        }
 
         //:{
         //            "id":70290724115712,
@@ -765,9 +821,9 @@ public class DefectManageActivity extends BaseControllerActivity implements AddD
             defectModelEntity.findTime = DateUtil.dateTimeFormat(findTimeLong);
         }
 
-        if (handleTimeLong > 0) {
-            defectModelEntity.eliminateTime = DateUtil.dateTimeFormat(handleTimeLong);
-        }
+//        if (handleTimeLong > 0) {
+//            defectModelEntity.eliminateTime = DateUtil.dateTimeFormat(handleTimeLong);
+//        }
 
         if (defectModelEntity.tableNo == null) {
             defectModelEntity.tableNo = tableNo;
@@ -815,15 +871,15 @@ public class DefectManageActivity extends BaseControllerActivity implements AddD
             return false;
         }
 
+//        //等级
+//        if (StringUtil.isBlank(level.getContent())) {
+//            toastTip(needToastTip, getString(R.string.defect_level_is_null));
+//            return false;
+//        }
+//
         //等级
-        if (StringUtil.isBlank(level.getContent())) {
-            toastTip(needToastTip, getString(R.string.defect_level_is_null));
-            return false;
-        }
-
-        //等级
-        if (StringUtil.isBlank(level.getContent())) {
-            toastTip(needToastTip, getString(R.string.defect_level_is_null));
+        if (StringUtil.isBlank(source.getContent())) {
+            toastTip(needToastTip, getString(R.string.defect_source_is_null));
             return false;
         }
 
@@ -853,11 +909,11 @@ public class DefectManageActivity extends BaseControllerActivity implements AddD
             return false;
         }
 
-        //消缺时间
-        if (StringUtil.isBlank(planhandletime.getContent())) {
-            toastTip(needToastTip, getString(R.string.defect_plan_handle_time_is_null));
-            return false;
-        }
+//        //消缺时间
+//        if (StringUtil.isBlank(planhandletime.getContent())) {
+//            toastTip(needToastTip, getString(R.string.defect_plan_handle_time_is_null));
+//            return false;
+//        }
 
         return true;
     }
@@ -928,6 +984,31 @@ public class DefectManageActivity extends BaseControllerActivity implements AddD
     private void chooseDepartment(String type) {
         chooseType = type;
         IntentRouter.go(context, Constant.Router.DEPART_SELECT);
+    }
+
+    /**
+     * @param event
+     *
+     */
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onDataSelectSourceType(SelectDataEvent event) {
+        if (StringUtil.equalsIgnoreCase(event.getSelectTag(), TAG_AREA)) {
+            ArrayList<RegionExEntity> onelist = (ArrayList<RegionExEntity>) event.getEntity();
+            if (onelist != null) {
+                RegionExEntity selectEntity = onelist.get(0);
+                selectedArea = new BaseCodeIdNameEntity();
+                selectedArea.setCode(selectEntity.get_code());
+                selectedArea.setName(selectEntity.getRegionName());
+
+                address.setContent(selectEntity.getRegionName());
+            }
+        } else if (StringUtil.equalsIgnoreCase(event.getSelectTag(), TAG_DEVICE_REF)) {
+            DeviceEntity deviceEntity = (DeviceEntity) event.getEntity();
+            if (deviceEntity != null) {
+                selectedDevice = deviceEntity;
+                devicename.setContent(deviceEntity.getName());
+            }
+        }
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
@@ -1033,7 +1114,7 @@ public class DefectManageActivity extends BaseControllerActivity implements AddD
     private List<DeviceEntity> getDeviceList(String idList) {
         if (!TextUtils.isEmpty(idList)) {
             List<DeviceEntity> deviceEntityList = new ArrayList<>();
-            String[] eamIdList = idList.split(",");
+            Object[] eamIdList = idList.split(",");
 //            for (String eamCode : eamIdList) {
                 //根据设备eamId获取CommonDeviceEntity
                 try {
@@ -1054,4 +1135,20 @@ public class DefectManageActivity extends BaseControllerActivity implements AddD
     }
 
 
+    @Override
+    public void getDefectSourceListSuccess(BAP5CommonEntity entity) {
+        if (entity == null) {
+            return;
+        }
+        BapPageResultEntity pageResultEntity = (BapPageResultEntity) entity.data;
+        if (pageResultEntity == null) {
+            return;
+        }
+        sourceTypeList = (ArrayList<DefectSourceEntity>) pageResultEntity.getResult();
+    }
+
+    @Override
+    public void getDefectSourceListFailed(String errorMsg) {
+
+    }
 }
