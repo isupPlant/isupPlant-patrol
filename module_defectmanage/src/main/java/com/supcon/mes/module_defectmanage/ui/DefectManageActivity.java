@@ -812,10 +812,10 @@ public class DefectManageActivity extends BaseControllerActivity implements AddD
         }
 
         if (selectedArea != null) {
+            defectModelEntity.areaId = selectedArea.getId();
             defectModelEntity.areaCode = selectedArea.getCode();
             defectModelEntity.areaName = selectedArea.getName();
         }
-//        defectModelEntity.areaId = 1005L;
 
         if (findTimeLong > 0) {
             defectModelEntity.findTime = DateUtil.dateTimeFormat(findTimeLong);
@@ -928,13 +928,22 @@ public class DefectManageActivity extends BaseControllerActivity implements AddD
 
     @Override
     public void defectEntrySuccess(BAP5CommonEntity entity) {
+        onLoadSuccess(context.getString(R.string.submit_success));
+
         DatabaseManager.getDao().getDefectModelEntityDao().deleteInTx(defectModelEntity);
-
-        onLoadSuccess();
-        ToastUtils.show(context, context.getString(R.string.submit_success));
-
 //        if (tableNo == null) {
-            finish();
+
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    Thread.sleep(1000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                back();
+            }
+        }).start();
 //        }
     }
 
@@ -997,6 +1006,7 @@ public class DefectManageActivity extends BaseControllerActivity implements AddD
             if (onelist != null) {
                 RegionExEntity selectEntity = onelist.get(0);
                 selectedArea = new BaseCodeIdNameEntity();
+                selectedArea.setId(selectEntity.getId());
                 selectedArea.setCode(selectEntity.get_code());
                 selectedArea.setName(selectEntity.getRegionName());
 
