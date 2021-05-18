@@ -174,7 +174,7 @@ public class DefectManageActivity extends BaseControllerActivity implements AddD
         selectSource = new BaseCodeIdNameEntity();
 
         Long dataId = null;
-        String areaCode = null,areaName = null, deviceIdList = null;
+        String areaCode = null,areaName = null;
         //情况分类：1、从巡检传过来的数据2、从列表中过来的某一条数据
         Bundle bundle = getIntent().getExtras();
         if (bundle != null) {
@@ -222,9 +222,9 @@ public class DefectManageActivity extends BaseControllerActivity implements AddD
             if (isDevice) {
                 address.setVisibility(View.GONE);
 
-                if (deviceIdList != null) {
-                    HandleUtils.setDeviceIdList(deviceIdList);//存储一下
-                    deviceEntities = getDeviceList(deviceIdList);
+                if (areaCode != null) {
+                    HandleUtils.setDeviceIdList(areaCode);//存储一下
+                    deviceEntities = getDeviceList(areaCode);
 
                     if (deviceEntities == null || deviceEntities.size() == 0) {
                         devicename.setVisibility(View.GONE);
