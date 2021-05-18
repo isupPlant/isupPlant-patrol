@@ -152,7 +152,7 @@ public class XJWorkActivity extends BaseRefreshRecyclerActivity<XJTaskWorkEntity
     boolean isOneKeyOver = false;
     boolean isCanEndAll = true;
     private Map<String, String> passReasonMap, realValueMap;
-    private List<PopupWindowEntity> mPopupWindowEntityList=new ArrayList<>();
+    private List<PopupWindowEntity> mPopupWindowEntityList = new ArrayList<>();
     private CustomPopupWindow mCustomPopupWindow;
     private SinglePickController<String> mSingPicker;
     private String thermometervalue = ""; // 全局测温值
@@ -187,7 +187,7 @@ public class XJWorkActivity extends BaseRefreshRecyclerActivity<XJTaskWorkEntity
         String xjAreaEntityStr = getIntent().getStringExtra(Constant.IntentKey.XJ_AREA_ENTITY_STR);
         exceptionIdsStr = getIntent().getStringExtra(Constant.IntentKey.XJ_AREA_EXCEPTION_IDS);
         //Todo: swap begin
-        if(!TextUtils.isEmpty(exceptionIdsStr))
+        if (!TextUtils.isEmpty(exceptionIdsStr))
             exceptionIds = Arrays.asList(exceptionIdsStr.split(","));
         //Todo: swap end
 
@@ -204,13 +204,13 @@ public class XJWorkActivity extends BaseRefreshRecyclerActivity<XJTaskWorkEntity
         }
 
         if (xjAreaEntityStr != null && mXJTaskEntity != null) {
-            for(XJTaskAreaEntity areaEntity: mXJTaskEntity.areas){
-                if(xjAreaEntityStr.equals(String.valueOf(areaEntity.id))){
+            for (XJTaskAreaEntity areaEntity : mXJTaskEntity.areas) {
+                if (xjAreaEntityStr.equals(String.valueOf(areaEntity.id))) {
                     mXJAreaEntity = areaEntity;
                     break;
                 }
             }
-            mXJAreaEntity.works= XJTaskCacheUtil.getTaskWork(taskNo,Long.valueOf(xjAreaEntityStr));
+            mXJAreaEntity.works = XJTaskCacheUtil.getTaskWork(taskNo, Long.valueOf(xjAreaEntityStr));
         }
 
         refreshListController.setPullDownRefreshEnabled(false);
@@ -246,7 +246,7 @@ public class XJWorkActivity extends BaseRefreshRecyclerActivity<XJTaskWorkEntity
         if (tempMode == TemperatureMode.SBT.getCode() && SBTUtil.isSupportTemp()) {
             mXJWorkAdapter.setSb2ThermometerHelper();
         }
-        if (mXJAreaEntity!=null&&!TextUtils.isEmpty(mXJAreaEntity.name)){
+        if (mXJAreaEntity != null && !TextUtils.isEmpty(mXJAreaEntity.name)) {
             titleTextMiddle.setText(mXJAreaEntity.name);
         }
     }
@@ -312,7 +312,7 @@ public class XJWorkActivity extends BaseRefreshRecyclerActivity<XJTaskWorkEntity
 
         rightBtn.setImageResource(R.drawable.sl_xj_work_top_finish);
         rightBtn_sec.setImageResource(R.drawable.sl_top_more);
-        LinearLayoutManager mLayoutManager=new XLinearLayoutManager(this, LinearLayoutManager.VERTICAL, false);
+        LinearLayoutManager mLayoutManager = new XLinearLayoutManager(this, LinearLayoutManager.VERTICAL, false);
         contentView.setLayoutManager(mLayoutManager);
         contentView.addItemDecoration(new SpaceItemDecoration(DisplayUtil.dip2px(1, context)));
         contentView.setAdapter(mXJWorkAdapter);
@@ -324,17 +324,16 @@ public class XJWorkActivity extends BaseRefreshRecyclerActivity<XJTaskWorkEntity
     }
 
 
-
     private void initPopupWindowData() {
-        createPopupWindowEntityData(context.getString(R.string.xj_work_over), R.drawable.ic_xj_work_finish,0);
-        createPopupWindowEntityData(context.getString(R.string.xj_work_jump), R.drawable.ic_xj_work_skip,1);
-        createPopupWindowEntityData(context.getString(R.string.input_defect), R.drawable.ic_input_defect,2);
+        createPopupWindowEntityData(context.getString(R.string.xj_work_over), R.drawable.ic_xj_work_finish, 0);
+        createPopupWindowEntityData(context.getString(R.string.xj_work_jump), R.drawable.ic_xj_work_skip, 1);
+        createPopupWindowEntityData(context.getString(R.string.input_defect), R.drawable.ic_input_defect, 2);
         mCustomPopupWindow = new CustomPopupWindow(context, mPopupWindowEntityList);
     }
 
 
-    public void createPopupWindowEntityData(String name,int iconId,int tag){
-        PopupWindowEntity popupWindowEntity=new PopupWindowEntity();
+    public void createPopupWindowEntityData(String name, int iconId, int tag) {
+        PopupWindowEntity popupWindowEntity = new PopupWindowEntity();
         popupWindowEntity.setText(name);
         popupWindowEntity.setIconId(iconId);
         popupWindowEntity.setTag(tag);
@@ -359,7 +358,7 @@ public class XJWorkActivity extends BaseRefreshRecyclerActivity<XJTaskWorkEntity
                 .throttleFirst(200, TimeUnit.MILLISECONDS)
                 .subscribe(o -> {
                     Bundle bundle = new Bundle();
-                    bundle.putString(Constant.IntentKey.XJ_AREA_ENTITY_STR,  mXJAreaEntity.id+"");
+                    bundle.putString(Constant.IntentKey.XJ_AREA_ENTITY_STR, mXJAreaEntity.id + "");
                     bundle.putString(Constant.IntentKey.XJ_TASK_NO_STR, mXJTaskEntity.tableNo);
 
 //                    BundleSaveUtil.instance
@@ -449,21 +448,22 @@ public class XJWorkActivity extends BaseRefreshRecyclerActivity<XJTaskWorkEntity
             case 2:
                 Bundle bundle = new Bundle();
                 StringBuilder idList = new StringBuilder();
-                if (deviceEntityList!=null&&deviceEntityList.size()>0){
+                if (deviceEntityList != null && deviceEntityList.size() > 0) {
                     for (DeviceEntity deviceEntity : deviceEntityList) {
                         idList.append(deviceEntity.code);
                         idList.append(",");
                     }
-                    if(!TextUtils.isEmpty(idList)){
+                    if (!TextUtils.isEmpty(idList)) {
                         idList.replace(idList.length() - 1, idList.length(), "");
-                        bundle.putString(Constant.IntentKey.XJ_AREA_EAMLISTS,  idList.toString());
+                        bundle.putString(Constant.IntentKey.XJ_AREA_EAMLISTS, idList.toString());
                     }
                 }
 
 
-                bundle.putString(Constant.IntentKey.XJ_AREA_CODE,  mXJAreaEntity.code);
-                bundle.putString(Constant.IntentKey.XJ_AREA_NAME,  mXJAreaEntity.name);
-                bundle.putString(Constant.IntentKey.XJ_TASK_TABLENO,  mXJTaskEntity.tableNo);
+                bundle.putString(Constant.IntentKey.XJ_AREA_CODE, mXJAreaEntity.code);
+                bundle.putString(Constant.IntentKey.XJ_AREA_NAME, mXJAreaEntity.name);
+                bundle.putString(Constant.IntentKey.XJ_TASK_TABLENO, mXJTaskEntity.tableNo);
+                bundle.putBoolean(Constant.IntentKey.XJ_IS_DEVICE, mXJAreaEntity.isDevice);
                 IntentRouter.go(context, Constant.AppCode.DEFECT_MANAGEMENT_ADD, bundle);
 
 //                if (!TextUtils.isEmpty(获取到的设备idListString)) {
@@ -607,21 +607,21 @@ public class XJWorkActivity extends BaseRefreshRecyclerActivity<XJTaskWorkEntity
         });
     }
 
-    public void checkDeviceState(){
-        if (mXJAreaEntity!=null&& mXJAreaEntity.works!=null){
-            deviceEntityList=new ArrayList<>();
+    public void checkDeviceState() {
+        if (mXJAreaEntity != null && mXJAreaEntity.works != null) {
+            deviceEntityList = new ArrayList<>();
             for (XJTaskWorkEntity xjWorkEntity : mXJAreaEntity.works) {
                 if (xjWorkEntity.eamId != null || xjWorkEntity.eamId.id != null) {
                     //根据设备eamId获取CommonDeviceEntity
                     try {
                         DeviceEntity commonDeviceEntity = SupPlantApplication.dao().getDeviceEntityDao().queryBuilder()
-                                .where(DeviceEntityDao.Properties.Code.eq( xjWorkEntity.eamId.code)).unique();
-                        if (commonDeviceEntity!=null){
+                                .where(DeviceEntityDao.Properties.Code.eq(xjWorkEntity.eamId.code)).unique();
+                        if (commonDeviceEntity != null) {
                             if (!deviceEntityList.contains(commonDeviceEntity)) {
                                 deviceEntityList.add(commonDeviceEntity);
                             }
                         }
-                    }catch (Exception e){
+                    } catch (Exception e) {
 
                     }
                 }
@@ -672,8 +672,8 @@ public class XJWorkActivity extends BaseRefreshRecyclerActivity<XJTaskWorkEntity
                             workEntity.isEamView = true;
                             workEntity.eamName = mDevice.name;
                             workEntity.eamNum = deviceNames.size() + 1;
-                            for (DeviceEntity deviceEntity:deviceEntityList){
-                                if (deviceEntity.id==workEntity.eamLongId) {
+                            for (DeviceEntity deviceEntity : deviceEntityList) {
+                                if (deviceEntity.id == workEntity.eamLongId) {
                                     if (deviceEntity.areaNum != null) {
                                         workEntity.areaNum = deviceEntity.areaNum;
                                     }
@@ -734,7 +734,7 @@ public class XJWorkActivity extends BaseRefreshRecyclerActivity<XJTaskWorkEntity
     private void showWorks(String deviceName) {
 //        LogUtil.e("ciruy", "showWorks:"+deviceName);
         isAll = getString(R.string.xj_work_eam_all).equals(deviceName);
-        if(isAll){
+        if (isAll) {
             refreshListController.refreshComplete(mWorkEntities);
             return;
         }
@@ -829,6 +829,7 @@ public class XJWorkActivity extends BaseRefreshRecyclerActivity<XJTaskWorkEntity
         super.onStop();
         if (expertViberController != null) expertViberController.onStop();
     }
+
     private void showTempView(XJTaskWorkEntity xjWorkEntity) {
         int tempMode = SharedPreferencesUtils.getParam(context, Constant.SPKey.TEMP_MODE, 0);
         if (tempMode == TemperatureMode.AIC.getCode()) {
@@ -889,15 +890,14 @@ public class XJWorkActivity extends BaseRefreshRecyclerActivity<XJTaskWorkEntity
     private void showAICDialog(int position, XJTaskWorkEntity xjWorkItemEntity, boolean isTempTest) {
 
 
-        if(mAICVibController==null) {
+        if (mAICVibController == null) {
 
             mAICVibController = new AICVibServiceController(AICVibServiceController.getLayoutView(context), true);
             mAICVibController.onInit();
             mAICVibController.initView();
             mAICVibController.initListener();
             mAICVibController.initData();
-        }
-        else{
+        } else {
             mAICVibController.reset();
         }
 
@@ -961,7 +961,7 @@ public class XJWorkActivity extends BaseRefreshRecyclerActivity<XJTaskWorkEntity
                                 }
                                 sb.append(context.getResources().getString(R.string.xj_patrol_xj_content)).append(xjWorkItemEntity.content).append(context.getResources().getString(R.string.xj_patrol_take_photo));
                                 msg = sb.toString();
-                            }else if(xjWorkItemEntity.conclusionID.equals("PATROL_realValue/abnormal")&&xjWorkItemEntity.abnormalReason==null){
+                            } else if (xjWorkItemEntity.conclusionID.equals("PATROL_realValue/abnormal") && xjWorkItemEntity.abnormalReason == null) {
                                 StringBuilder sb = new StringBuilder();
                                 if (xjWorkItemEntity.eamLongId == 0) {
                                     sb.append("");
@@ -1217,15 +1217,16 @@ public class XJWorkActivity extends BaseRefreshRecyclerActivity<XJTaskWorkEntity
 
 
     XJAbnormalSelectDialog abnormalSelectDialog;
+
     //巡检项异常原因选择框
     private void showPopUp(XJTaskWorkEntity xjWorkEntity) {
-        if (abnormalSelectDialog==null)
-           abnormalSelectDialog=new XJAbnormalSelectDialog(context,context.getResources().getString(R.string.detailed_reasons)+xjWorkEntity.eamName==null?"":xjWorkEntity.eamName,abnormalReasonMap);
-            if ( xjWorkEntity.abnormalReason!=null){
-                abnormalSelectDialog.setPosition(xjWorkEntity.abnormalReason.value);
-            }
-            abnormalSelectDialog.show();
-            abnormalSelectDialog.setOnSureListener((selectAbnormalId, season) -> {
+        if (abnormalSelectDialog == null)
+            abnormalSelectDialog = new XJAbnormalSelectDialog(context, context.getResources().getString(R.string.detailed_reasons) + xjWorkEntity.eamName == null ? "" : xjWorkEntity.eamName, abnormalReasonMap);
+        if (xjWorkEntity.abnormalReason != null) {
+            abnormalSelectDialog.setPosition(xjWorkEntity.abnormalReason.value);
+        }
+        abnormalSelectDialog.show();
+        abnormalSelectDialog.setOnSureListener((selectAbnormalId, season) -> {
             xjWorkEntity.abnormalReason = SystemCodeManager.getInstance().getSystemCodeEntity(selectAbnormalId);
             xjWorkEntity.reason = season;
         });
@@ -1251,9 +1252,6 @@ public class XJWorkActivity extends BaseRefreshRecyclerActivity<XJTaskWorkEntity
     }
 
 
-
-
-
     @SuppressLint("CheckResult")
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onAreaUpdate(XJWorkRefreshEvent workRefreshEvent) {
@@ -1274,7 +1272,7 @@ public class XJWorkActivity extends BaseRefreshRecyclerActivity<XJTaskWorkEntity
 //                        }
 
 //                    } else {
-                    mXJAreaEntity.works= XJTaskCacheUtil.getTaskWork(mXJTaskEntity.tableNo,mXJAreaEntity.id);
+                    mXJAreaEntity.works = XJTaskCacheUtil.getTaskWork(mXJTaskEntity.tableNo, mXJAreaEntity.id);
                     needRefresh = true;
 
                     //                      mXJWorkAdapter.notifyDataSetChanged();
