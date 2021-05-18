@@ -24,8 +24,8 @@ public class AddDefectPresenter extends AddDefectContract.Presenter {
                     @Override
                     public BAP5CommonEntity apply(Throwable throwable)  {
                         //写入到本地接口日志文件中；
-                        String fileName = FileUtil.getFilePathAndName(FileUtil.NETWORK_REQUEST_LOG);
-                        FileUtil.write2FileAppend(fileName, (Throwable) throwable);
+//                        String fileName = FileUtil.getFilePathAndName(FileUtil.NETWORK_REQUEST_LOG);
+//                        FileUtil.write2FileAppend(fileName, (Throwable) throwable);
                         return super.apply(throwable);
                     }
                 }).subscribe(new Consumer<BAP5CommonEntity<Object>>() {

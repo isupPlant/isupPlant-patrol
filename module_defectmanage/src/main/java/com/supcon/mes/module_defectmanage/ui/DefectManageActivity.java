@@ -182,7 +182,7 @@ public class DefectManageActivity extends BaseControllerActivity implements AddD
             tableNo = bundle.getString(Constant.IntentKey.XJ_TASK_TABLENO);
             areaCode= bundle.getString(Constant.IntentKey.XJ_AREA_CODE);
             areaName = bundle.getString(Constant.IntentKey.XJ_AREA_NAME);
-            deviceIdList = bundle.getString(Constant.IntentKey.XJ_AREA_EAMLISTS);
+            isDevice = bundle.getBoolean(Constant.IntentKey.XJ_IS_DEVICE);
         }
 
         if (dataId != null && dataId.longValue() > 0) {
@@ -208,8 +208,8 @@ public class DefectManageActivity extends BaseControllerActivity implements AddD
                 source.setVisibility(View.GONE);
 
             } else {
+                rightBtn.setVisibility(View.GONE);
                 isFromAll = true;
-                address.setEditable(true);
                 presenterRouter.create(GetDefectSourceListAPI.class).getDefectSourceList(1);//如果是分页的就要改了目前就三种方式;
             }
             //如果是从巡检过来的就设置为巡检，不显示巡检来源；
@@ -217,6 +217,7 @@ public class DefectManageActivity extends BaseControllerActivity implements AddD
 
         //这里的逻辑要修改：缺陷过来的与其他地方的不一样
         if (StringUtil.isBlank(areaCode)) {
+
         } else {
             if (isDevice) {
                 address.setVisibility(View.GONE);
@@ -949,15 +950,16 @@ public class DefectManageActivity extends BaseControllerActivity implements AddD
 
     @Override
     public void defectEntryFailed(String errorMsg) {
-        closeLoader();
+        onLoadFailed(context.getString(R.string.defect_submit_failed) + errorMsg + context.getString(R.string.defect_submit_failed_save_to_local));
 
-        defectModelEntity.setDefectFile(null);//如果提交失败了 就要重新上传
-        //提示用户保存在本地，但是不能重复保存啊,数据库的id是怎么回事
-        ToastUtils.show(context, context.getString(R.string.defect_submit_failed) + errorMsg + context.getString(R.string.defect_submit_failed_save_to_local));
+        if (!isFromAll) {
+            defectModelEntity.setDefectFile(null);//如果提交失败了 就要重新上传
+            //提示用户保存在本地，但是不能重复保存啊,数据库的id是怎么回事
+            saveFileToString();
+            //把数据在本地数据库中更新
+            DatabaseManager.getDao().getDefectModelEntityDao().update(defectModelEntity);
+        }
 
-        saveFileToString();
-        //把数据在本地数据库中更新
-        DatabaseManager.getDao().getDefectModelEntityDao().update(defectModelEntity);
     }
 
     @Override
