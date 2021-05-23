@@ -879,7 +879,7 @@ public class DefectManageActivity extends BaseControllerActivity implements AddD
 //        }
 //
         //等级
-        if (StringUtil.isBlank(source.getContent())) {
+        if (selectSource == null) {
             toastTip(needToastTip, getString(R.string.defect_source_is_null));
             return false;
         }
