@@ -47,6 +47,7 @@ import com.supcon.mes.middleware.model.bean.FileEntity;
 import com.supcon.mes.middleware.model.bean.SelectEntity;
 import com.supcon.mes.middleware.model.bean.SystemCodeEntity;
 import com.supcon.mes.middleware.model.contract.AddFileListContract;
+import com.supcon.mes.middleware.model.event.RefreshEvent;
 import com.supcon.mes.middleware.model.event.SelectDataEvent;
 import com.supcon.mes.middleware.model.inter.SystemCode;
 import com.supcon.mes.middleware.presenter.AddFileListPresenter;
@@ -933,6 +934,12 @@ public class DefectManageActivity extends BaseControllerActivity implements AddD
 
         DatabaseManager.getDao().getDefectModelEntityDao().deleteInTx(defectModelEntity);
 //        if (tableNo == null) {
+
+        if (isFromAll) {
+            RefreshEvent refreshEvent = new RefreshEvent();
+            refreshEvent.setTag("refreshDefectAdd");
+            EventBus.getDefault().post(refreshEvent);
+        }
 
         new Thread(new Runnable() {
             @Override
