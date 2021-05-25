@@ -8,6 +8,7 @@ import android.support.annotation.CheckResult;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
+import android.util.Pair;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
@@ -27,6 +28,7 @@ import com.supcon.common.view.util.LogUtil;
 import com.supcon.common.view.util.SharedPreferencesUtils;
 import com.supcon.common.view.util.ToastUtils;
 import com.supcon.mes.expert_uhf.controller.ExpertUHFRFIDController;
+import com.supcon.mes.expert_uhf.helper.InventoryBuffer;
 import com.supcon.mes.mbap.utils.DateUtil;
 import com.supcon.mes.mbap.utils.GsonUtil;
 import com.supcon.mes.mbap.utils.controllers.SinglePickController;
@@ -102,7 +104,7 @@ import io.reactivex.schedulers.Schedulers;
         Constant.SystemCode.PATROL_passReason
 })
 public class XJTaskDetailActivity extends BaseControllerActivity implements XJTaskSubmitContract.View
-        , IMap ,
+        , IMap,
         XJUpdateStatusContract.View {
 
     @BindByTag("xjTaskDetailRouteName")
@@ -283,14 +285,17 @@ public class XJTaskDetailActivity extends BaseControllerActivity implements XJTa
     @Override
     protected void onResume() {
         super.onResume();
-        mExpertUHFRFIDController.start(result -> {
-            if (TextUtils.isEmpty(result.first)) {
-                char[] str = result.second.strEPC.replaceAll(" ", "").toCharArray();
-                StringBuilder stringBuilder = new StringBuilder();
-                for (char c : str)
-                    if (c >= '0' && c <= '9' && stringBuilder.length() < 8)
-                        stringBuilder.append(c);
-                EventBus.getDefault().post(new UhfRfidEvent(stringBuilder.toString()));
+        mExpertUHFRFIDController.start(new ExpertUHFRFIDController.UHFResult() {
+            @Override
+            public void result(Pair<String, InventoryBuffer.InventoryTagMap> result) {
+                if (TextUtils.isEmpty(result.first)) {
+                    char[] str = result.second.strEPC.replaceAll(" ", "").toCharArray();
+                    StringBuilder stringBuilder = new StringBuilder();
+                    for (char c : str)
+                        if (c >= '0' && c <= '9' && stringBuilder.length() < 8)
+                            stringBuilder.append(c);
+                    EventBus.getDefault().post(new UhfRfidEvent(stringBuilder.toString()));
+                }
             }
         });
     }
@@ -329,7 +334,7 @@ public class XJTaskDetailActivity extends BaseControllerActivity implements XJTa
     private void updateView() {
         if (mXJTaskEntity != null) {
             if (mXJTaskEntity.workRoute != null)
-            xjTaskDetailRouteName.setText(mXJTaskEntity.workRoute.name);
+                xjTaskDetailRouteName.setText(mXJTaskEntity.workRoute.name);
             xjTaskDetailTableNo.setText(mXJTaskEntity.tableNo);
             xjTaskDetailTaskState.setText(mXJTaskEntity.isFinished ? getString(R.string.xj_task_checked) : getString(R.string.xj_task_uncheck));
             xjTaskDetailTaskState.setTextColor(getResources().getColor(R.color.xjBtnColor));
@@ -356,9 +361,9 @@ public class XJTaskDetailActivity extends BaseControllerActivity implements XJTa
                     + " - " + DateUtil.dateFormat(mXJTaskEntity.endTime, "MM-dd HH:mm"));
 
             if (mXJTaskEntity.attrMap != null)
-                for(String key : mXJTaskEntity.attrMap.keySet()) {
+                for (String key : mXJTaskEntity.attrMap.keySet()) {
                     String value = (String) mXJTaskEntity.attrMap.get(key);
-                    if (!TextUtils.isEmpty(value)){
+                    if (!TextUtils.isEmpty(value)) {
                         xjTaskDetailStaff.setText("" + value);
                     }
                 }
@@ -382,9 +387,9 @@ public class XJTaskDetailActivity extends BaseControllerActivity implements XJTa
                     .list();
 
 
-            String s=GsonUtil.gsonString(areaEntities);
+            String s = GsonUtil.gsonString(areaEntities);
 
-            List<XJTaskAreaEntity> xjTaskAreaEntities=GsonUtil.jsonToList(s,XJTaskAreaEntity.class);
+            List<XJTaskAreaEntity> xjTaskAreaEntities = GsonUtil.jsonToList(s, XJTaskAreaEntity.class);
             mXJTaskEntity.areas = xjTaskAreaEntities;
             XJTaskCacheUtil.insertTasksAreas(mXJTaskEntity);
 
@@ -454,20 +459,20 @@ public class XJTaskDetailActivity extends BaseControllerActivity implements XJTa
                                 showDialog();
                                 return;
                             }
-                            if (mXJTaskEntity.advanceStartTime!=null) {
-                                double advanceStartTime=mXJTaskEntity.advanceStartTime*(60*60*1000);
-                                long currentTime =System.currentTimeMillis();
-                                if ((mXJTaskEntity.startTime-advanceStartTime)>currentTime){
+                            if (mXJTaskEntity.advanceStartTime != null) {
+                                double advanceStartTime = mXJTaskEntity.advanceStartTime * (60 * 60 * 1000);
+                                long currentTime = System.currentTimeMillis();
+                                if ((mXJTaskEntity.startTime - advanceStartTime) > currentTime) {
 
-                                    ToastUtils.show(this, context.getResources().getString(R.string .xj_no_allow_advance)+new DecimalFormat("0.00").format(mXJTaskEntity.advanceStartTime)+context.getResources().getString(R.string.hour_begins));
+                                    ToastUtils.show(this, context.getResources().getString(R.string.xj_no_allow_advance) + new DecimalFormat("0.00").format(mXJTaskEntity.advanceStartTime) + context.getResources().getString(R.string.hour_begins));
                                     return;
                                 }
                             }
-                            if (mXJTaskEntity.delayStartTime!=null){
-                                double delayStartTime=mXJTaskEntity.delayStartTime*(60*60*1000);
-                                long currentTime =System.currentTimeMillis();
-                                if ((mXJTaskEntity.startTime+delayStartTime)<currentTime){
-                                    ToastUtils.show(this, context.getResources().getString(R.string.xj_no_allow_delay)+new DecimalFormat("0.00").format(mXJTaskEntity.delayStartTime)+context.getResources().getString(R.string.hour_begins));
+                            if (mXJTaskEntity.delayStartTime != null) {
+                                double delayStartTime = mXJTaskEntity.delayStartTime * (60 * 60 * 1000);
+                                long currentTime = System.currentTimeMillis();
+                                if ((mXJTaskEntity.startTime + delayStartTime) < currentTime) {
+                                    ToastUtils.show(this, context.getResources().getString(R.string.xj_no_allow_delay) + new DecimalFormat("0.00").format(mXJTaskEntity.delayStartTime) + context.getResources().getString(R.string.hour_begins));
                                     return;
                                 }
                             }
@@ -480,12 +485,12 @@ public class XJTaskDetailActivity extends BaseControllerActivity implements XJTa
                                 presenterRouter.create(XJUpdateStatusAPI.class).updateXJTaskStatus(mXJTaskEntity.id, "PATROL_taskState/running");
                             }
                         } else {
-                            if (mXJTaskEntity.delayEndTime!=null){
-                                double delayEndTime=mXJTaskEntity.delayEndTime*(60*60*1000);
-                                long currentTime =System.currentTimeMillis();
+                            if (mXJTaskEntity.delayEndTime != null) {
+                                double delayEndTime = mXJTaskEntity.delayEndTime * (60 * 60 * 1000);
+                                long currentTime = System.currentTimeMillis();
 
-                                if ((mXJTaskEntity.endTime+delayEndTime)<currentTime){
-                                    ToastUtils.show(this, context.getResources().getString(R.string.xj_no_allow_delay)+new DecimalFormat("0.00").format(mXJTaskEntity.delayEndTime)+context.getResources().getString(R.string.hour_end));
+                                if ((mXJTaskEntity.endTime + delayEndTime) < currentTime) {
+                                    ToastUtils.show(this, context.getResources().getString(R.string.xj_no_allow_delay) + new DecimalFormat("0.00").format(mXJTaskEntity.delayEndTime) + context.getResources().getString(R.string.hour_end));
                                     return;
                                 }
                             }
@@ -542,7 +547,7 @@ public class XJTaskDetailActivity extends BaseControllerActivity implements XJTa
                     mXJTaskEntity.isFinished = true;
                     mXJTaskEntity.realEndTime = new Date().getTime();
 
-                    XJTaskCacheUtil.putStringAsync( mXJTaskEntity.toString(), new XJTaskCacheUtil.Callback() {
+                    XJTaskCacheUtil.putStringAsync(mXJTaskEntity.toString(), new XJTaskCacheUtil.Callback() {
                         @Override
                         public void apply() {
                             LogUtil.d("493 保存成功");
@@ -683,9 +688,9 @@ public class XJTaskDetailActivity extends BaseControllerActivity implements XJTa
     @SuppressLint("CheckResult")
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onTempTaskUploadRefresh(XJTempTaskUploadRefreshEvent event) {
-        if (event.getId()!=0){
-            mXJTaskEntity.id=event.getId();
-            XJTaskCacheUtil.putStringAsync( mXJTaskEntity.toString(), new XJTaskCacheUtil.Callback() {
+        if (event.getId() != 0) {
+            mXJTaskEntity.id = event.getId();
+            XJTaskCacheUtil.putStringAsync(mXJTaskEntity.toString(), new XJTaskCacheUtil.Callback() {
                 @Override
                 public void apply() {
                     LogUtil.d("493 保存成功");
@@ -729,7 +734,17 @@ public class XJTaskDetailActivity extends BaseControllerActivity implements XJTa
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void getUhfRfidEpcCode(UhfRfidEvent uhfRfidEvent) {
         LogUtil.d("EPC:" + uhfRfidEvent.getEpcCode());
-        dealSign(uhfRfidEvent.getEpcCode());
+        if (uhfRfidEvent.getEpcCode() != null) {
+            if (mExpertUHFRFIDController != null) {
+                mExpertUHFRFIDController.stop();
+                mExpertUHFRFIDController.onDestroy();
+            }
+            if (em55UHFRFIDHelper != null) {
+                em55UHFRFIDHelper.inventoryStop();
+                em55UHFRFIDHelper.close();
+            }
+            dealSign(uhfRfidEvent.getEpcCode());
+        }
     }
 //
 //    /**
@@ -746,6 +761,7 @@ public class XJTaskDetailActivity extends BaseControllerActivity implements XJTa
 //    }
 
 //    private Set<String> scannedCodeSet = new HashSet<>();
+
     /**
      * @param
      * @return
@@ -765,7 +781,7 @@ public class XJTaskDetailActivity extends BaseControllerActivity implements XJTa
         }
         boolean isExist = false;
         for (XJTaskAreaEntity areaEntity : mXJTaskEntity.areas) {
-            if (code.equals(areaEntity.signCode)) {
+            if (code.trim().equals(areaEntity.signCode)) {
                 isExist = true;
                 updateXJAreaEntity(areaEntity);//update数据
                 LogUtil.i("BarcodeEvent1", code);
