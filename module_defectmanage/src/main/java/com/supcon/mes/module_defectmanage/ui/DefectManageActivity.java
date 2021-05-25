@@ -61,7 +61,6 @@ import com.supcon.mes.module_defectmanage.model.api.GetDefectSourceListAPI;
 import com.supcon.mes.module_defectmanage.model.bean.DefectModelEntity;
 import com.supcon.mes.module_defectmanage.model.bean.DefectModelEntityDao;
 import com.supcon.mes.module_defectmanage.model.bean.DefectSourceEntity;
-import com.supcon.mes.module_defectmanage.model.bean.DeviceSelected;
 import com.supcon.mes.module_defectmanage.model.bean.FileUploadDefectEntity;
 import com.supcon.mes.module_defectmanage.model.contract.AddDefectContract;
 import com.supcon.mes.module_defectmanage.model.contract.GetDefectSourceListContract;
@@ -153,7 +152,7 @@ public class DefectManageActivity extends BaseControllerActivity implements AddD
     long findTimeLong, /*handleTimeLong,**/ leakTimeLong;
     DefectModelEntity defectModelEntity;
     DeviceEntity selectedDevice;
-    List<DeviceEntity> deviceEntities;
+//    List<DeviceEntity> deviceEntities;
     String tableNo;
     boolean isDevice = false;//巡检过来的缺陷才有的字段
 
@@ -221,18 +220,22 @@ public class DefectManageActivity extends BaseControllerActivity implements AddD
 
         } else {
             if (isDevice) {
-                address.setVisibility(View.GONE);
+//                address.setVisibility(View.GONE);
 
+                address.setNecessary(false);
+                devicename.setNecessary(true);
                 if (areaCode != null) {
                     HandleUtils.setDeviceIdList(areaCode);//存储一下
-                    deviceEntities = getDeviceList(areaCode);
+                    List<DeviceEntity> deviceEntities = getDeviceList(areaCode);
 
-                    if (deviceEntities == null || deviceEntities.size() == 0) {
-                        devicename.setVisibility(View.GONE);
+                    if (deviceEntities != null && deviceEntities.size() > 0) {
+//                        devicename.setVisibility(View.GONE);
+                        selectedDevice = deviceEntities.get(0);
+                        devicename.setContent(selectedDevice.getName());
                     }
                 }
             } else {
-                devicename.setVisibility(View.GONE);
+//                devicename.setVisibility(View.GONE);
 
                 selectedArea = new BaseCodeIdNameEntity();
                 selectedArea.setCode(areaCode);
@@ -310,28 +313,28 @@ public class DefectManageActivity extends BaseControllerActivity implements AddD
                     selectedDevice = null;
                 } else {
                     //转换为小狄的
-                    if (isFromAll) {
+//                    if (isFromAll) {
                         //
                         Bundle bundle = new Bundle();
                         bundle.putString(Constant.IntentKey.SELECT_TAG, TAG_DEVICE_REF);
                         com.supcon.mes.middleware.IntentRouter.go(context, Constant.Router.DEVICE_REFER, bundle);
-                    } else {
-                        ArrayList<DeviceSelected> selectedList = new ArrayList<>();
-                        if (deviceEntities == null || deviceEntities.size() < 1) {
-                            return;
-                        }
-                        for (DeviceEntity deviceEntity : deviceEntities) {
-                            DeviceSelected deviceSelected = new DeviceSelected();
-                            deviceSelected.id = deviceEntity.id;
-                            deviceSelected.name = deviceEntity.name;
-                            selectedList.add(deviceSelected);
-                        }
-                        Bundle bundle = new Bundle();
-                        bundle.putSerializable(Constant.INTENT_EXTRA_OBJECT, selectedList);
-                        bundle.putInt(Constant.INTENT_EXTRA_INT, 1);
-                        bundle.putString(Constant.INTENT_EXTRA_OBJECT_CHAT, "device");
-                        IntentRouter.go(context, Constant.Router.SELECT, bundle);
-                    }
+//                    } else {
+//                        ArrayList<DeviceSelected> selectedList = new ArrayList<>();
+//                        if (deviceEntities == null || deviceEntities.size() < 1) {
+//                            return;
+//                        }
+//                        for (DeviceEntity deviceEntity : deviceEntities) {
+//                            DeviceSelected deviceSelected = new DeviceSelected();
+//                            deviceSelected.id = deviceEntity.id;
+//                            deviceSelected.name = deviceEntity.name;
+//                            selectedList.add(deviceSelected);
+//                        }
+//                        Bundle bundle = new Bundle();
+//                        bundle.putSerializable(Constant.INTENT_EXTRA_OBJECT, selectedList);
+//                        bundle.putInt(Constant.INTENT_EXTRA_INT, 1);
+//                        bundle.putString(Constant.INTENT_EXTRA_OBJECT_CHAT, "device");
+//                        IntentRouter.go(context, Constant.Router.SELECT, bundle);
+//                    }
 
                 }
             }
@@ -659,10 +662,10 @@ public class DefectManageActivity extends BaseControllerActivity implements AddD
         selectedArea.setCode(defectModelEntity.areaCode);
 
         //从全局变量中获取，如果第一次进来的时候就会去获取
-        deviceEntities = getDeviceList(HandleUtils.getDeviceIdList());
-        if (deviceEntities == null || deviceEntities.size() == 0) {
-            devicename.setVisibility(View.GONE);
-        }
+//        deviceEntities = getDeviceList(HandleUtils.getDeviceIdList());
+//        if (deviceEntities == null || deviceEntities.size() == 0) {
+//            devicename.setVisibility(View.GONE);
+//        }
         if (devicename.getVisibility() == View.VISIBLE) {
             selectedDevice = new DeviceEntity();
             selectedDevice.setCode(defectModelEntity.getEamCode());
@@ -900,11 +903,16 @@ public class DefectManageActivity extends BaseControllerActivity implements AddD
             toastTip(needToastTip, getString(R.string.defect_discover_is_null));
             return false;
         }
-//        //地点
-//        if (StringUtil.isBlank(address.getContent())) {
-//            toastTip(needToastTip, getString(R.string.defect_address_is_null));
-//            return false;
-//        }
+        //设备不能为空
+        if (isDevice && StringUtil.isBlank(devicename.getContent())) {
+            toastTip(needToastTip, getString(R.string.defect_device_is_null));
+            return false;
+        }
+        //地点
+        if (!isDevice && StringUtil.isBlank(address.getContent())) {
+            toastTip(needToastTip, getString(R.string.defect_address_is_null));
+            return false;
+        }
         //时间
         if (StringUtil.isBlank(findtime.getContent())) {
             toastTip(needToastTip, getString(R.string.defect_find_time_is_null));
@@ -1072,19 +1080,12 @@ public class DefectManageActivity extends BaseControllerActivity implements AddD
                     break;
 
             }
-        } else if (StringUtil.equalsIgnoreCase(event.getSelectTag(), "device")){
-            if (event.getEntity() instanceof List) {
-                List<SelectEntity> selectEntity = (List<SelectEntity>) event.getEntity();
-                if (selectEntity != null&& selectEntity.size() > 0 && deviceEntities != null) {
-
-                    for (DeviceEntity deviceEntity : deviceEntities) {
-                        if (deviceEntity.id != null && deviceEntity.id != null && deviceEntity.id.equals(selectEntity.get(0).get_id())) {
-                            selectedDevice = deviceEntity;
-                            devicename.setContent(selectedDevice.name);
-                            break;
-                        }
-                    }
-
+        } else if (StringUtil.equalsIgnoreCase(event.getSelectTag(), TAG_DEVICE_REF)){
+            if (event instanceof SelectDataEvent) {
+                DeviceEntity selectEntity = (DeviceEntity) event.getEntity();
+                if (selectEntity != null) {
+                    selectedDevice = selectEntity;
+                    devicename.setContent(selectedDevice.name);
                 }
             }
         }

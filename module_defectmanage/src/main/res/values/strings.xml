@@ -34,6 +34,7 @@
     <string name="defect_assesor_is_null">评估人不能为空</string>
     <string name="defect_discover_is_null">发现人不能为空</string>
     <string name="defect_address_is_null">发现区域不能为空</string>
+    <string name="defect_device_is_null">设备名称不能为空</string>
     <string name="defect_find_time_is_null">发现时间不能为空</string>
     <string name="defect_plan_handle_time_is_null">计划消缺时间不能为空</string>
     <string name="defect_choose">选择</string>
