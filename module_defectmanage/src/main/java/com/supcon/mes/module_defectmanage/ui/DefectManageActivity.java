@@ -120,6 +120,8 @@ public class DefectManageActivity extends BaseControllerActivity implements AddD
     CustomEditText leak_name;
     @BindByTag("leak_status")
     CustomTextView leak_status;
+    @BindByTag("isdeviceView")
+    CustomTextView isdeviceView;
     @BindByTag("leak_number")
     CustomEditText leak_number;
     @BindByTag("leak_time")
@@ -220,22 +222,17 @@ public class DefectManageActivity extends BaseControllerActivity implements AddD
 
         } else {
             if (isDevice) {
-//                address.setVisibility(View.GONE);
 
-                address.setNecessary(false);
-                devicename.setNecessary(true);
                 if (areaCode != null) {
                     HandleUtils.setDeviceIdList(areaCode);//存储一下
                     List<DeviceEntity> deviceEntities = getDeviceList(areaCode);
 
                     if (deviceEntities != null && deviceEntities.size() > 0) {
-//                        devicename.setVisibility(View.GONE);
                         selectedDevice = deviceEntities.get(0);
                         devicename.setContent(selectedDevice.getName());
                     }
                 }
             } else {
-//                devicename.setVisibility(View.GONE);
 
                 selectedArea = new BaseCodeIdNameEntity();
                 selectedArea.setCode(areaCode);
@@ -256,6 +253,8 @@ public class DefectManageActivity extends BaseControllerActivity implements AddD
         } else {
             initByEditInfo();
         }
+
+        setViewByDeviceFlag();
     }
 
     @Override
@@ -436,6 +435,33 @@ public class DefectManageActivity extends BaseControllerActivity implements AddD
             }
         });
 
+        isdeviceView.setOnChildViewClickListener(new OnChildViewClickListener() {
+            @Override
+            public void onChildViewClick(View childView, int action, Object obj) {
+                if (action == -1) {
+                    //什么情况下会这样？？？
+                    isDevice = false;
+                    setViewByDeviceFlag();
+                } else {
+                    List<String> nameList = new ArrayList<>();
+                    nameList.add(getString(R.string.defect_no));
+                    nameList.add(getString(R.string.defect_yes));
+
+                    SinglePickController<String> stringSinglePickController = mSinglePickController
+                            .list(nameList)
+                            .listener((index, item) -> {
+                                if (index == 0) {
+                                    isDevice = false;
+                                } else {
+                                    isDevice = true;
+                                }
+                                setViewByDeviceFlag();
+                            });
+                    stringSinglePickController.show(isdeviceView.getContent());
+                }
+            }
+        });
+
         address.setOnChildViewClickListener(new OnChildViewClickListener() {
             @Override
             public void onChildViewClick(View childView, int action, Object obj) {
@@ -458,8 +484,8 @@ public class DefectManageActivity extends BaseControllerActivity implements AddD
                 } else {
                     //如果选择的是泄漏的话
                     List<String> nameList = new ArrayList<>();
-                    nameList.add(getString(R.string.defect_yes));
                     nameList.add(getString(R.string.defect_no));
+                    nameList.add(getString(R.string.defect_yes));
 
                     SinglePickController<String> stringSinglePickController = mSinglePickController
                             .list(nameList)
@@ -573,6 +599,21 @@ public class DefectManageActivity extends BaseControllerActivity implements AddD
         mDatePickController.setCycleDisable(false);
         mDatePickController.setSecondVisible(true);
         mDatePickController.setCanceledOnTouchOutside(true);
+    }
+
+    /**
+     * 根据是不是设备的切换UI
+     */
+    private void setViewByDeviceFlag() {
+        if (isDevice) {
+            address.setNecessary(false);
+            devicename.setNecessary(true);
+            isdeviceView.setContent(getString(R.string.defect_yes));
+        } else {
+            address.setNecessary(true);
+            devicename.setNecessary(false);
+            isdeviceView.setContent(getString(R.string.defect_no));
+        }
     }
 
     /**
@@ -708,6 +749,7 @@ public class DefectManageActivity extends BaseControllerActivity implements AddD
         leak_time.setDate(DateUtil.dateFormat(leakTimeLong, "yyyy-MM-dd HH:mm:ss"));
 
         address.setContent(selectedArea.getName());
+        isdeviceView.setContent(getString(R.string.defect_no));
     }
 
     /**

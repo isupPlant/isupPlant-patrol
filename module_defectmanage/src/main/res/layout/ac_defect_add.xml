@@ -124,6 +124,15 @@
                 app:key="@string/defect_discover"
                 app:necessary="true" />
 
+            <com.supcon.mes.mbap.view.CustomTextView
+                android:id="@+id/isdeviceView"
+                style="@style/psc_edit_date_horizontal_style_text_view"
+                android:tag="isdeviceView"
+                app:editable="true"
+                android:translationZ="2dp"
+                app:icon_res="@drawable/ic_unfold66"
+                app:key="@string/defect_is_device"
+                app:necessary="true" />
 
             <com.supcon.mes.mbap.view.CustomTextView
                 android:id="@+id/address"
@@ -141,6 +150,7 @@
                 app:editable="true"
                 android:translationZ="2px"
                 app:text="@string/defect_device_name" />
+
 
 
             <com.supcon.mes.mbap.view.CustomDateView
