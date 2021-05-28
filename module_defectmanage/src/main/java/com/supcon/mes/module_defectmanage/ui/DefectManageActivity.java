@@ -44,7 +44,6 @@ import com.supcon.mes.middleware.model.bean.DepartmentEntity;
 import com.supcon.mes.middleware.model.bean.DeviceEntity;
 import com.supcon.mes.middleware.model.bean.DeviceEntityDao;
 import com.supcon.mes.middleware.model.bean.FileEntity;
-import com.supcon.mes.middleware.model.bean.SelectEntity;
 import com.supcon.mes.middleware.model.bean.SystemCodeEntity;
 import com.supcon.mes.middleware.model.contract.AddFileListContract;
 import com.supcon.mes.middleware.model.event.RefreshEvent;
@@ -58,14 +57,18 @@ import com.supcon.mes.middleware.util.SystemCodeManager;
 import com.supcon.mes.module_defectmanage.R;
 import com.supcon.mes.module_defectmanage.model.api.AddDefectAPI;
 import com.supcon.mes.module_defectmanage.model.api.GetDefectSourceListAPI;
+import com.supcon.mes.module_defectmanage.model.api.RefDefectAPI;
+import com.supcon.mes.module_defectmanage.model.bean.DefectListNumEntity;
 import com.supcon.mes.module_defectmanage.model.bean.DefectModelEntity;
 import com.supcon.mes.module_defectmanage.model.bean.DefectModelEntityDao;
 import com.supcon.mes.module_defectmanage.model.bean.DefectSourceEntity;
 import com.supcon.mes.module_defectmanage.model.bean.FileUploadDefectEntity;
 import com.supcon.mes.module_defectmanage.model.contract.AddDefectContract;
 import com.supcon.mes.module_defectmanage.model.contract.GetDefectSourceListContract;
+import com.supcon.mes.module_defectmanage.model.contract.RefDefectContract;
 import com.supcon.mes.module_defectmanage.presenter.AddDefectPresenter;
 import com.supcon.mes.module_defectmanage.presenter.GetDefectSourceListPresenter;
+import com.supcon.mes.module_defectmanage.presenter.RefDefectPresenter;
 import com.supcon.mes.module_defectmanage.util.DatabaseManager;
 import com.supcon.mes.module_defectmanage.util.HandleUtils;
 import com.supcon.mes.module_defectmanage.util.Utils;
@@ -82,13 +85,13 @@ import java.util.concurrent.TimeUnit;
 import io.reactivex.disposables.Disposable;
 
 
-@Presenter(value = {AddDefectPresenter.class, AddFileListPresenter.class, GetDefectSourceListPresenter.class})
+@Presenter(value = {AddDefectPresenter.class, AddFileListPresenter.class, GetDefectSourceListPresenter.class, RefDefectPresenter.class})
 @Controller(value = {SystemCodeJsonController.class})
 @SystemCode(entityCodes = {Constant.SystemCode.DefectManage_problemClass, Constant.SystemCode.DefectManage_problemLevel,
 Utils.SystemCode.DefectManage_problemState})
 @Router(value = Constant.AppCode.DEFECT_MANAGEMENT_ADD)
 public class DefectManageActivity extends BaseControllerActivity implements AddDefectContract.View, AddFileListContract.View
-, GetDefectSourceListContract.View {
+, GetDefectSourceListContract.View, RefDefectContract.View {
 
     @BindByTag("leftBtn")
     ImageButton leftBtn;
@@ -123,7 +126,7 @@ public class DefectManageActivity extends BaseControllerActivity implements AddD
     @BindByTag("isdeviceView")
     CustomTextView isdeviceView;
     @BindByTag("leak_number")
-    CustomEditText leak_number;
+    CustomTextView leak_number;
     @BindByTag("leak_time")
     CustomDateView leak_time;
     @BindByTag("file_list")
@@ -163,6 +166,8 @@ public class DefectManageActivity extends BaseControllerActivity implements AddD
     String TAG_AREA = "TAG_AREA";
     String TAG_DEVICE_REF = "deviceName";
     boolean isFromAll = false;//从首页入口来的
+    List<DefectListNumEntity> numEntityList;
+    String selectedListedNum;
 
     @Override
     protected int getLayoutID() {
@@ -245,6 +250,7 @@ public class DefectManageActivity extends BaseControllerActivity implements AddD
             finish();
         }
 
+        presenterRouter.create(RefDefectAPI.class).listedRefQuery();
         initDatePickController();
         initSinglePickController();
 
@@ -389,17 +395,38 @@ public class DefectManageActivity extends BaseControllerActivity implements AddD
 //            }
 //        });
 
-        leak_time.setOnChildViewClickListener((childView, action, obj) -> {
+        leak_time.setOnChildViewClickListener(new OnChildViewClickListener() {
+            @Override
+            public void onChildViewClick(View childView, int action, Object obj) {
+                if (action == -1) {
+                } else {
+                    mDatePickController
+                            .listener((year, month, day, hour, minute, second) -> {
+
+                                String dateStr = year + "-" + month + "-" + day + " " + hour + ":" + minute + ":" + second;
+                                leakTimeLong = DateUtil.dateFormat(dateStr, "yyyy-MM-dd HH:mm:ss");
+                                leak_time.setDate(DateUtil.dateFormat(leakTimeLong, "yyyy-MM-dd HH:mm:ss"));
+                            })
+                            .show(leakTimeLong);
+                }
+            }
+        });
+
+        leak_number.setOnChildViewClickListener((childView, action, obj) -> {
             if (action == -1) {
             } else {
-                mDatePickController
-                        .listener((year, month, day, hour, minute, second) -> {
-
-                            String dateStr = year + "-" + month + "-" + day + " " + hour + ":" + minute + ":" + second;
-                            leakTimeLong = DateUtil.dateFormat(dateStr, "yyyy-MM-dd HH:mm:ss");
-                            leak_time.setDate(DateUtil.dateFormat(leakTimeLong, "yyyy-MM-dd HH:mm:ss"));
-                        })
-                        .show(leakTimeLong);
+                if (numEntityList == null || numEntityList.size() == 0) {
+                    ToastUtils.show(context, getString(R.string.defect_listnumber_list_is_null));
+                    return;
+                }
+                SinglePickController<String> stringSinglePickController = mSinglePickController
+                        .list(numEntityList)
+                        .listener((index, item) -> {
+                            DefectListNumEntity listNumEntity = numEntityList.get(index);
+                            leak_number.setContent(listNumEntity.getListedNumber());
+                            selectedListedNum = listNumEntity.getListedNumber();
+                        });
+                stringSinglePickController.show(source.getContent());
             }
         });
 
@@ -818,6 +845,13 @@ public class DefectManageActivity extends BaseControllerActivity implements AddD
 
         if (selectedType != null) {
             defectModelEntity.defectType =  selectedType.getCode();
+            if (StringUtil.contains(selectedType.getCode(), "Leak")){
+                //如果是泄露 把其他字段传过去
+                defectModelEntity.leakName = leak_name.getContent();
+                defectModelEntity.listed = haslist;
+                defectModelEntity.listedTime = DateUtil.dateTimeFormat(leakTimeLong);
+                defectModelEntity.listedNumber = selectedListedNum;
+            }
         }
 
 //        if (selectLevel != null) {
@@ -1211,6 +1245,18 @@ public class DefectManageActivity extends BaseControllerActivity implements AddD
 
     @Override
     public void getDefectSourceListFailed(String errorMsg) {
+
+    }
+
+    @Override
+    public void listedRefQuerySuccess(BapPageResultEntity entity) {
+        if (entity != null) {
+            numEntityList = entity.getResult();
+        }
+    }
+
+    @Override
+    public void listedRefQueryFailed(String errorMsg) {
 
     }
 }

@@ -3,6 +3,7 @@ package com.supcon.mes.module_defectmanage.model.network;
 import com.app.annotation.apt.ApiFactory;
 import com.supcon.mes.middleware.model.bean.BAP5CommonEntity;
 import com.supcon.mes.middleware.model.bean.BapPageResultEntity;
+import com.supcon.mes.module_defectmanage.model.bean.DefectListNumEntity;
 import com.supcon.mes.module_defectmanage.model.bean.DefectModelEntity;
 import com.supcon.mes.module_defectmanage.model.bean.DefectOnlineEntity;
 import com.supcon.mes.module_defectmanage.model.bean.DefectRequestListEntity;
@@ -47,4 +48,8 @@ public interface ApiService {
 
     @POST("/msService/DefectManage/problemSource/problemSource/sourcePartRef-query")
     Flowable<BAP5CommonEntity<BapPageResultEntity<DefectSourceEntity>>> sourcePartRefQuery(@Body Map<String, Object> queryParam);
+
+    @POST("/msService/DefectManage/problemListed/listedNumber/listedRef-query")
+    Flowable<BAP5CommonEntity<BapPageResultEntity<DefectListNumEntity>>> listedRefQuery(@Body Map<String, Object> queryParam);
+
 }

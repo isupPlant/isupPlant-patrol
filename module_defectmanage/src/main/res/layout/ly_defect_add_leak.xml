@@ -30,13 +30,14 @@
     <include layout="@layout/v_divider_gray" />
 
 
-    <com.supcon.mes.mbap.view.CustomEditText
+    <com.supcon.mes.mbap.view.CustomTextView
         android:id="@+id/leak_number"
         android:layout_width="match_parent"
         android:layout_height="46dp"
         android:tag="leak_number"
-        app:edit_hint="@string/defect_leak_number"
-        app:text="@string/defect_leak_number" />
+        app:icon_res="@drawable/ic_unfold66"
+        app:editable="true"
+        app:key="@string/defect_leak_number" />
 
     <include layout="@layout/v_divider_gray" />
 

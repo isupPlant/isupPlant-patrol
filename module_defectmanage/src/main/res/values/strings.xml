@@ -18,6 +18,7 @@
     <string name="defect_plan_handle_time">计划消缺时间</string>
     <string name="defect_source_osi">巡检</string>
     <string name="defect_source_list_is_null">来源列表为空，请稍后再试</string>
+    <string name="defect_listnumber_list_is_null">挂牌号列表为空，请稍后再试</string>
 
 
     <string name="defect_leak_name">漏点名称</string>
