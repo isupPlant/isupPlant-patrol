@@ -414,6 +414,7 @@ public class DefectManageActivity extends BaseControllerActivity implements AddD
 
         leak_number.setOnChildViewClickListener((childView, action, obj) -> {
             if (action == -1) {
+                selectedListedNum = "";
             } else {
                 if (numEntityList == null || numEntityList.size() == 0) {
                     ToastUtils.show(context, getString(R.string.defect_listnumber_list_is_null));
