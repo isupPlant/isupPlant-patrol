@@ -1042,8 +1042,8 @@ public class DefectManageActivity extends BaseControllerActivity implements AddD
 
     @Override
     public void defectEntryFailed(String errorMsg) {
-        onLoadFailed(context.getString(R.string.defect_submit_failed) + errorMsg + context.getString(R.string.defect_submit_failed_save_to_local));
-
+//        onLoadFailed(context.getString(R.string.defect_submit_failed) + errorMsg + context.getString(R.string.defect_submit_failed_save_to_local));
+        onLoadFailed(context.getString(R.string.defect_submit_failed) + errorMsg);
         if (!isFromAll) {
             defectModelEntity.setDefectFile(null);//如果提交失败了 就要重新上传
             //提示用户保存在本地，但是不能重复保存啊,数据库的id是怎么回事
