@@ -28,7 +28,7 @@ public class DefectListNumEntity extends BaseEntity {
      */
 
     private Object attrMap;
-    private int cid;
+    private long cid;
     private Object createStaff;
     private Object createTime;
     private long id;
@@ -50,7 +50,7 @@ public class DefectListNumEntity extends BaseEntity {
         this.attrMap = attrMap;
     }
 
-    public int getCid() {
+    public long getCid() {
         return cid;
     }
 
