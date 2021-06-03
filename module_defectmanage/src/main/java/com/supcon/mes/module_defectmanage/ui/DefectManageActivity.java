@@ -738,6 +738,7 @@ public class DefectManageActivity extends BaseControllerActivity implements AddD
         if (devicename.getVisibility() == View.VISIBLE) {
             selectedDevice = new DeviceEntity();
             selectedDevice.setCode(defectModelEntity.getEamCode());
+            selectedDevice.setId(defectModelEntity.getEamId());
             selectedDevice.setName(defectModelEntity.eamName);
             devicename.setContent(selectedDevice.name);
         }
@@ -875,6 +876,7 @@ public class DefectManageActivity extends BaseControllerActivity implements AddD
         if (selectedDevice != null) {
             LogUtil.e(selectedDevice.getName());
             defectModelEntity.eamCode = selectedDevice.getCode();
+            defectModelEntity.eamId = selectedDevice.getId();
             defectModelEntity.eamName = selectedDevice.getName();
         }
 
