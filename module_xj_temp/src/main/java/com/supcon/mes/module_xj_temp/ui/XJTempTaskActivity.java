@@ -6,6 +6,7 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
 import android.view.View;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.app.annotation.BindByTag;
@@ -85,7 +86,10 @@ public class XJTempTaskActivity extends BaseControllerActivity {
     private XJTempAreaAdapter mXJTempAreaAdapter;
     private XJTaskEntity mXJTaskEntity;
     private long eamId;
+    @BindByTag("itemXJTempAreaCheckbox")
+    ImageView itemXJTempAreaCheckbox;
 
+    boolean isAllCheck = false;
     @Override
     protected int getLayoutID() {
         return R.layout.ac_xj_temp_task;
@@ -206,6 +210,27 @@ public class XJTempTaskActivity extends BaseControllerActivity {
     @Override
     protected void initListener() {
         super.initListener();
+
+        RxView.clicks(itemXJTempAreaCheckbox)
+                .throttleFirst(200, TimeUnit.MILLISECONDS)
+                .subscribe(new Consumer<Object>() {
+                    @Override
+                    public void accept(Object o) throws Exception {
+
+                        if(isAllCheck){
+                            itemXJTempAreaCheckbox.setImageResource(R.drawable.ic_choose_no);
+                            isAllCheck = false;
+                        }else{
+                            itemXJTempAreaCheckbox.setImageResource(R.drawable.ic_choose_yes);
+                            isAllCheck = true;
+                        }
+
+                        for (XJTaskAreaEntity areaEntity :mXJTaskEntity.areas){
+                            areaEntity.isChecked = !areaEntity.isChecked;
+                        }
+                        mXJTempAreaAdapter.notifyDataSetChanged();
+                    }
+                });
 
         RxView.clicks(leftBtn)
                 .throttleFirst(200, TimeUnit.MILLISECONDS)

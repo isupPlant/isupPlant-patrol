@@ -59,6 +59,24 @@
             android:tag="xjTempTaskTimeSelect" />
     </LinearLayout>
     <include layout="@layout/ly_line_light"/>
+<!--    <LinearLayout-->
+<!--        android:layout_width="match_parent"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        android:orientation="horizontal"-->
+<!--        android:layout_marginLeft="14dp"-->
+<!--        android:paddingTop="@dimen/dp_8"-->
+<!--        android:paddingBottom="@dimen/dp_3"-->
+<!--        >-->
+<!--        <include layout="@layout/ly_title_pic"/>-->
+<!--        <TextView-->
+<!--            android:layout_width="wrap_content"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            android:text="@string/xj_patrol_xj_qy"-->
+<!--            android:textColor="@color/xjTitleColor"-->
+<!--            android:textSize="15sp"-->
+<!--            android:layout_marginLeft="6dp"-->
+<!--            />-->
+<!--    </LinearLayout>-->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -66,9 +84,11 @@
         android:layout_marginLeft="14dp"
         android:paddingTop="@dimen/dp_8"
         android:paddingBottom="@dimen/dp_3"
+
         >
         <include layout="@layout/ly_title_pic"/>
         <TextView
+            android:layout_weight="1"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/xj_patrol_xj_qy"
@@ -76,7 +96,33 @@
             android:textSize="15sp"
             android:layout_marginLeft="6dp"
             />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="全选"
+            android:textSize="13sp"
+            android:layout_marginRight="@dimen/dp_4"
+            />
+
+        <ImageView
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:id="@+id/itemXJTempAreaCheckbox"
+            android:tag="itemXJTempAreaCheckbox"
+            android:src="@drawable/ic_choose_no"
+            android:layout_alignParentRight="true"
+            android:layout_marginRight="@dimen/dp_22"
+            android:layout_centerVertical="true"
+            android:scaleType="center"
+            android:visibility="visible"
+            />
+
+
     </LinearLayout>
+
+
+
     <android.support.v7.widget.RecyclerView
         android:id="@+id/xjTempAreaList"
         android:tag="xjTempAreaList"
