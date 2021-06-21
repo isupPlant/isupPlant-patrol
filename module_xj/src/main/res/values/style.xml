@@ -16,7 +16,18 @@
         <item name="windowActionBar">true</item>
         <item name="android:windowFullscreen">true</item>
     </style>
-
+    <style name="yh_custom_view_horizontal_style">
+        <item name="android:paddingStart">@dimen/dp_15</item>
+        <item name="android:textSize">@dimen/dp_16</item>
+        <item name="bold">false</item>
+        <item name="android:background">@color/white</item>
+        <item name="android:layout_width">match_parent</item>
+        <item name="edit_maxLine">5</item>
+        <item name="text_width">@dimen/dp_120</item>
+        <item name="android:paddingRight">@dimen/dp_10</item>
+        <item name="android:layout_height">46dp</item>
+        <item name="key_width">@dimen/dp_120</item>
+    </style>
     <style name="XJFilterStyle">
         <item name="android:layout_width">0dp</item>
         <item name="android:layout_weight">1</item>

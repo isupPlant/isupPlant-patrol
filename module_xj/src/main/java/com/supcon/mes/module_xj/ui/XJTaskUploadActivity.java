@@ -465,6 +465,16 @@ public class XJTaskUploadActivity extends BaseRefreshRecyclerActivity<XJTaskGrou
     }
 
     @Override
+    public void uploadXJWorkFileSuccess(Long entity) {
+
+    }
+
+    @Override
+    public void uploadXJWorkFileFailed(String errorMsg) {
+
+    }
+
+    @Override
     public void uploadXJDataSuccess(Long id) {
         onLoadSuccess(context.getResources().getString(R.string.operate_succeed));
         for(XJTaskEntity xjTaskEntity : mUploadTasks){

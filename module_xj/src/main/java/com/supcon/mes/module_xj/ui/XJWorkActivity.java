@@ -1291,6 +1291,16 @@ public class XJWorkActivity extends BaseRefreshRecyclerActivity<XJTaskWorkEntity
     }
 
     @Override
+    public void uploadXJWorkFileSuccess(Long entity) {
+
+    }
+
+    @Override
+    public void uploadXJWorkFileFailed(String errorMsg) {
+
+    }
+
+    @Override
     public void uploadXJDataSuccess(Long id) {
         onLoadSuccess();
         onBackPressed();

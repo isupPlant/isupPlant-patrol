@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:tag="xjBegin"
+    >
+
+
+    <com.supcon.mes.mbap.view.CustomDateView
+        android:id="@+id/cdCheckTime"
+        style="@style/yh_custom_view_horizontal_style"
+        android:tag="cdCheckTime"
+        app:editable="true"
+        app:gravity="right|center_vertical"
+        app:necessary="true"
+        app:text="@string/xj_device_begintime"
+        app:text_color="@color/font_333333" />
+
+    <include
+        android:id="@+id/line1"
+        layout="@layout/ly_line_light"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/dp_1"
+        android:layout_marginLeft="@dimen/dp_5"
+        android:layout_marginRight="@dimen/dp_5" />
+
+    <com.supcon.mes.mbap.view.CustomTextView
+        android:id="@+id/ctCheckPeople"
+        style="@style/yh_custom_view_horizontal_style"
+        android:tag="ctCheckPeople"
+        app:content_color="@color/font_333333"
+        app:content_hint="@string/xj_device_personnel"
+        app:editable="true"
+        app:gravity="right|center_vertical"
+        app:necessary="true"
+        app:text="@string/xj_device_personnel" />
+
+    <include
+        android:id="@+id/line1"
+        layout="@layout/ly_line_light"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/dp_1"
+        android:layout_marginLeft="@dimen/dp_5"
+        android:layout_marginRight="@dimen/dp_5" />
+
+    <com.supcon.mes.mbap.view.CustomEditText
+        android:id="@+id/ceMaterielNum"
+        style="@style/yh_custom_view_horizontal_style"
+        android:tag="ceMaterielNum"
+        app:edit_hint="@string/input_work_name"
+        app:edit_hint_color="#A9A9A9"
+        app:editable="true"
+        app:gravity="right|center_vertical"
+        app:text="@string/xj_device_workname"
+        app:necessary="true"
+        app:text_color="@color/font_333333" />
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <Button
+            android:id="@+id/btn_begin"
+            android:tag="btnBegin"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/dp_40"
+            android:layout_alignParentBottom="true"
+            android:layout_marginLeft="@dimen/dp_30"
+            android:layout_marginTop="5dp"
+            android:layout_marginRight="@dimen/dp_30"
+            android:layout_marginBottom="@dimen/dp_100"
+            android:background="@color/themeColor"
+            android:text="@string/xj_device_begin"
+            android:textColor="@color/white"
+            android:textSize="@dimen/fontSize_17sp"
+            android:visibility="visible" />
+
+    </RelativeLayout>
+
+
+</LinearLayout>

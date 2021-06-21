@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/bgGray2"
+    android:orientation="vertical">
+
+
+    <include
+        android:id="@+id/title"
+        layout="@layout/ly_titlebar_local" />
+
+    <include
+        android:id="@+id/xj_begin"
+        layout="@layout/ly_xj_device_begin"
+        android:visibility="gone" />
+
+    <include layout="@layout/ly_xj_eam_spinner"/>
+
+
+    <include
+        layout="@layout/ly_recyclerview"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginLeft="@dimen/dp_10"
+        android:layout_marginRight="@dimen/dp_10"
+        android:layout_marginBottom="@dimen/dp_5"
+        android:layout_weight="1" />
+
+    <LinearLayout
+        android:id="@+id/ll_xj_commit"
+        android:tag ="llXjCommit"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_margin="@dimen/dp_20"
+        >
+
+        <Button
+            android:id="@+id/btn_upload"
+            android:tag="btnUpload"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="完成点检任务"
+            android:layout_weight="1"
+            android:layout_marginRight="@dimen/dp_5"
+            android:background="@drawable/sh_background_button_border_blue"
+            android:textColor="@color/xjBtnColor"
+            android:textSize="@dimen/fontSize_17sp"
+            />
+
+        <Button
+            android:id="@+id/btn_save"
+            android:tag= "btnSave"
+            android:layout_weight="1"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="@dimen/dp_5"
+            android:background="@drawable/save_continue_btn"
+            android:text="@string/xj_patrol_save_continue"
+            android:textColor="@color/white"
+            android:textSize="@dimen/fontSize_17sp"
+            />
+
+    </LinearLayout>
+
+
+</LinearLayout>

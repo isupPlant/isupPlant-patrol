@@ -74,6 +74,15 @@
             android:theme="@style/AppNoTitleBarTheme"
             android:windowSoftInputMode="adjustPan|stateAlwaysHidden"
             />
+
+        <activity
+            android:name="com.supcon.mes.module_xj.ui.XJDeviceWorkListActivity"
+            android:screenOrientation="portrait"
+            android:theme="@style/AppNoTitleBarTheme"
+            android:launchMode="singleTask"
+            android:windowSoftInputMode="adjustPan|stateAlwaysHidden" />
+
+
         <service android:name="com.supcon.mes.testo_805i.controller.InfraredService"/>
         <service android:name="com.supcon.mes.module_xj.service.RealTimeUploadLoactionService" />
     </application>

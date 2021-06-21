@@ -519,6 +519,16 @@ public class XJWorkViewActivity extends BaseRefreshRecyclerActivity<XJTaskWorkEn
     }
 
     @Override
+    public void uploadXJWorkFileSuccess(Long entity) {
+
+    }
+
+    @Override
+    public void uploadXJWorkFileFailed(String errorMsg) {
+
+    }
+
+    @Override
     public void uploadXJDataSuccess(Long id) {
         if (id==null){
             id=0l;

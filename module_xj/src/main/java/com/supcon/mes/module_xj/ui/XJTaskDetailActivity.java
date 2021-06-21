@@ -840,6 +840,16 @@ public class XJTaskDetailActivity extends BaseControllerActivity implements XJTa
     }
 
     @Override
+    public void uploadXJWorkFileSuccess(Long entity) {
+
+    }
+
+    @Override
+    public void uploadXJWorkFileFailed(String errorMsg) {
+
+    }
+
+    @Override
     public void uploadXJDataSuccess(Long id) {
 
     }
