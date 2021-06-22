@@ -115,7 +115,7 @@ import javax.annotation.Nullable;
 
        potrolTask = new PotrolTask();
        potrolTask.taskName = taskName;
-       potrolTask.taskType = Constant.SPOTCHECK;
+       potrolTask.taskType = Constant.SPOT_CHECK;
        potrolTask.taskState = new StringIdEntity(taskStateId);
        potrolTask.completeStaff = new ObjectEntity(SharedPreferencesUtils.getParam(SupPlantApplication.getAppContext(), Constant.BAPQuery.STAFF_ID, 0L));
 
@@ -134,7 +134,7 @@ import javax.annotation.Nullable;
 
     public XJTaskUploadEntity(XJTaskEntity xjTaskEntity, String taskStateId) {
         potrolTask = new PotrolTask();
-
+        potrolTask.taskType = Constant.DAILY_PATROL;
         potrolTask.taskState = new StringIdEntity(taskStateId);
         potrolTask.completeStaff = new ObjectEntity(SupPlantApplication.getAccountInfo().staffId);
         potrolTask.isTemp = xjTaskEntity.isTemp;

@@ -198,7 +198,7 @@ public class XJDeviceWorkListActivity extends BaseRefreshRecyclerActivity<XJWork
     private TextView tempTv;
     private ImageView viberStatusIv;
     private boolean isAll = true;
-    private List<DeviceEntity> deviceEntityList = new ArrayList<>();
+
     private List<String> exceptionIds = new ArrayList<>();
     //    private ExpertUHFRFIDController mExpertUHFRFIDController;
     boolean isContainsDevice = false;
@@ -210,6 +210,10 @@ public class XJDeviceWorkListActivity extends BaseRefreshRecyclerActivity<XJWork
     private boolean showBegin = false;
     String scanEamCode = "";
 
+    @Override
+    protected int getLayoutID() {
+        return R.layout.ac_xj_device;
+    }
 
     /**
      * 红外或UHF RFID（超高频）通用签到处理
@@ -249,17 +253,9 @@ public class XJDeviceWorkListActivity extends BaseRefreshRecyclerActivity<XJWork
         }
     }
 
-
-    @Override
-    protected int getLayoutID() {
-        return R.layout.ac_xj_device;
-    }
-
-
     @Override
     protected void onInit() {
         super.onInit();
-//        onLoading(getString(R.string.xj_task_uploading));
         EventBus.getDefault().register(this);
         refreshListController.setPullDownRefreshEnabled(false);
         refreshListController.setAutoPullDownRefresh(false);
@@ -283,11 +279,6 @@ public class XJDeviceWorkListActivity extends BaseRefreshRecyclerActivity<XJWork
         if (tempMode == TemperatureMode.SBT.getCode() && SBTUtil.isSupportTemp()) {
             mXJWorkAdapter.setSb2ThermometerHelper();
         }
-//        ((ViewGroup) eamSpinner.getParent()).setVisibility(View.GONE);
-//        xjEmptyView.setVisibility(View.VISIBLE);
-//        contentView.setVisibility(View.GONE);
-//        xjEmptyView.setEmptyContent("请用NFC、超高频、红外扫描获取数据");
-
     }
 
 
@@ -324,15 +315,11 @@ public class XJDeviceWorkListActivity extends BaseRefreshRecyclerActivity<XJWork
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribe(xjWorkEntity -> {
                         isContainsDevice = true;
-                        //|| xjWorkEntity.content.trim().equals(workEntity.content.trim())
-                        for (XJWorkEntity workEntity : mXjWorkDataList) {
+                         for (XJWorkEntity workEntity : mXjWorkDataList) {
                             if (xjWorkEntity.id.equals(workEntity.id)) {
                                 return;
                             }
                         }
-//                        if (!mXjWorkDataList.contains(xjWorkEntity)) {
-//                            noEamWorks.add(xjWorkEntity);
-//                        }
                         if (mDevice == null || mDevice.id != xjWorkEntity.eamLongId) {
                             mDevice = xjWorkEntity.eamId;
                             XJWorkEntity workEntity = new XJWorkEntity();
@@ -430,13 +417,9 @@ public class XJDeviceWorkListActivity extends BaseRefreshRecyclerActivity<XJWork
         super.initView();
         switchView(0);
         titleText.setText(R.string.xj_work_eam_check);
-//        refreshListController.setEmpterAdapter(EmptyAdapterHelper.getRecyclerEmptyAdapter(context, getString(R.string.middleware_no_data)));
         StatusBarUtils.setWindowStatusBarColor(this, R.color.themeColor);
-//        titleTextMiddle.setVisibility(View.VISIBLE);
         rightBtn.setVisibility(View.VISIBLE);
         rightBtn.setImageResource(R.drawable.ic_scan_history);
-//        rightBtn.setImageResource(R.drawable.ic_xj_multi_check);
-//        rightBtn.setImageResource(R.drawable.ic_scan_history);
         LinearLayoutManager mLayoutManager = new XLinearLayoutManager(this, LinearLayoutManager.VERTICAL, false);
         contentView.setLayoutManager(mLayoutManager);
         contentView.addItemDecoration(new SpaceItemDecoration(DisplayUtil.dip2px(1, context)));
@@ -687,42 +670,9 @@ public class XJDeviceWorkListActivity extends BaseRefreshRecyclerActivity<XJWork
 
     }
 
-
-    private void dealPosition(int position) {
-        if (mPopupWindowEntityList == null) {
-            return;
-        }
-        PopupWindowEntity popupWindowEntity = mPopupWindowEntityList.get(position);
-        switch (popupWindowEntity.getTag()) {
-            case 0:
-                mCustomPopupWindow.dismiss();
-                showAllFinishDialog();
-                break;
-
-            case 1:
-                mCustomPopupWindow.dismiss();
-                showAllJumpDialog();
-                break;
-            default:
-        }
-    }
-
-
-    private void showAllJumpDialog() {
-        new CustomDialog(context)
-                .twoButtonAlertDialog(getString(R.string.xj_work_jump_all))
-                .bindView(R.id.grayBtn, getString(R.string.no))
-                .bindView(R.id.redBtn, getString(R.string.yes))
-                .bindClickListener(R.id.grayBtn, null, true)
-                .bindClickListener(R.id.redBtn, v -> {
-                    if (mXjWorkDataList != null && mXjWorkDataList.size() > 0) {
-                        XJDeviceWorkListActivity.this.skipEam(0L);
-                    }
-                }, true)
-                .show();
-
-    }
-
+    /**
+     * 巡检内容上传提示窗
+     */
     public void showAllFinishDialog() {
         new CustomDialog(context)
                 .twoButtonAlertDialog(getString(R.string.xj_work_over_all))
@@ -730,8 +680,7 @@ public class XJDeviceWorkListActivity extends BaseRefreshRecyclerActivity<XJWork
                 .bindView(R.id.redBtn, getString(R.string.yes))
                 .bindClickListener(R.id.grayBtn, null, true)
                 .bindClickListener(R.id.redBtn, v -> {
-//                    remoteLocalRecord();
-                    if (mXjWorkDataList != null && mXjWorkDataList.size() > 0) {
+                     if (mXjWorkDataList != null && mXjWorkDataList.size() > 0) {
                         presenterRouter.create(XJTaskSubmitAPI.class).uploadXJWorkFile(mXjWorkDataList, true, ceMaterielNum.getContent().trim(), DateUtil.dateFormat(cdCheckTime.getContent()), System.currentTimeMillis());
                         onLoading(getString(R.string.xj_task_uploading));
                     }
@@ -739,6 +688,11 @@ public class XJDeviceWorkListActivity extends BaseRefreshRecyclerActivity<XJWork
                 .show();
     }
 
+    /**
+     * 备注信息弹窗框
+     * @param xjWorkEntity
+     * @param position
+     */
     @SuppressLint("CheckResult")
     private void showEditDialog(XJWorkEntity xjWorkEntity, int position) {
         CustomDialog remarkDialog = new CustomDialog(context)
@@ -773,7 +727,6 @@ public class XJDeviceWorkListActivity extends BaseRefreshRecyclerActivity<XJWork
         mXJWorkAdapter.setConclusions(getController(SystemCodeJsonController.class).getCodeMap(Constant.SystemCode.PATROL_realValue));
         passReasonMap = getController(SystemCodeJsonController.class).getCodeMap(Constant.SystemCode.PATROL_passReason);
         realValueMap = getController(SystemCodeJsonController.class).getCodeMap(Constant.SystemCode.PATROL_realValue);
-        checkDeviceState();
         String time = DateUtil.dateTimeFormat(0);
         cdCheckTime.setContent(time);
         AccountInfo accountInfo = SupPlantApplication.getAccountInfo();
@@ -781,25 +734,7 @@ public class XJDeviceWorkListActivity extends BaseRefreshRecyclerActivity<XJWork
         SharedPreferencesUtils.setParam(context, Constant.BAPQuery.STAFF_ID, accountInfo.staffId);
     }
 
-    public void checkDeviceState() {
-        if (mXJAreaEntity != null && mXJAreaEntity.works != null) {
-            deviceEntityList = new ArrayList<>();
-            for (XJTaskWorkEntity xjWorkEntity : mXJAreaEntity.works) {
-                if (xjWorkEntity.eamId != null || xjWorkEntity.eamId.id != null) {
-                    //根据设备eamId获取CommonDeviceEntity
-                    try {
-                        DeviceEntity commonDeviceEntity = SupPlantApplication.dao().getDeviceEntityDao().queryBuilder()
-                                .where(DeviceEntityDao.Properties.Code.eq(xjWorkEntity.eamId.code)).unique();
-                        if (commonDeviceEntity != null) {
-                            deviceEntityList.add(commonDeviceEntity);
-                        }
-                    } catch (Exception e) {
 
-                    }
-                }
-            }
-        }
-    }
 
 
     /**
@@ -835,8 +770,6 @@ public class XJDeviceWorkListActivity extends BaseRefreshRecyclerActivity<XJWork
     }
 
     private void showAV160Dialog(int position, XJWorkEntity xjWorkItemEntity) {
-
-
         if (mAV160Controller == null) {
             mAV160Controller = new AV160Controller(AV160Controller.getLayoutView(context), true);
             mAV160Controller.onInit();
