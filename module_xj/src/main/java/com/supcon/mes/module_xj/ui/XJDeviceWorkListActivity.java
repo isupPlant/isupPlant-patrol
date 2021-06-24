@@ -60,14 +60,11 @@ import com.supcon.mes.middleware.controller.SystemCodeJsonController;
 import com.supcon.mes.middleware.model.bean.AccountInfo;
 import com.supcon.mes.middleware.model.bean.BAP5CommonListEntity;
 import com.supcon.mes.middleware.model.bean.ContactEntity;
-import com.supcon.mes.middleware.model.bean.DeviceEntity;
-import com.supcon.mes.middleware.model.bean.DeviceEntityDao;
 import com.supcon.mes.middleware.model.bean.ObjectEntity;
 import com.supcon.mes.middleware.model.bean.PopupWindowEntity;
 import com.supcon.mes.middleware.model.bean.xj.XJInputTypeEntity;
 import com.supcon.mes.middleware.model.bean.xj.XJInputTypeEntityDao;
 import com.supcon.mes.middleware.model.bean.xj.XJTaskAreaEntity;
-import com.supcon.mes.middleware.model.bean.xj.XJTaskWorkEntity;
 import com.supcon.mes.middleware.model.bean.xj.XJWorkEntity;
 import com.supcon.mes.middleware.model.event.SelectDataEvent;
 import com.supcon.mes.middleware.model.inter.SystemCode;
@@ -199,7 +196,7 @@ public class XJDeviceWorkListActivity extends BaseRefreshRecyclerActivity<XJWork
     private ImageView viberStatusIv;
     private boolean isAll = true;
 
-    private List<String> exceptionIds = new ArrayList<>();
+    //    private List<String> exceptionIds = new ArrayList<>();
     //    private ExpertUHFRFIDController mExpertUHFRFIDController;
     boolean isContainsDevice = false;
     private DatePickController datePickController;
@@ -293,8 +290,8 @@ public class XJDeviceWorkListActivity extends BaseRefreshRecyclerActivity<XJWork
         getLocalData();
         if (localXJList.size() > 0) {
             for (XJWorkEntity entity : localXJList) {
-                LogUtil.i("entity------------id========" + entity.eamId.id);
-                if (content.trim().equals(entity.eamId.id.toString())) {
+                LogUtil.i("entity------------id========" + entity.eamId.code);
+                if (content.trim().equals(entity.eamId.code)) {
                     mXjWorkDataList.add(entity);
                 }
             }
@@ -307,11 +304,10 @@ public class XJDeviceWorkListActivity extends BaseRefreshRecyclerActivity<XJWork
         if (xjWorkEntityList != null && xjWorkEntityList.size() > 0) {
             Flowable.fromIterable(xjWorkEntityList)
                     .subscribeOn(Schedulers.newThread())
-                    .filter(xjWorkEntity -> xjWorkEntity.eamId != null && xjWorkEntity.eamId.id != null)
-                    .filter(xjWorkEntity -> xjWorkEntity.eamId.id.toString().equals(content))
+                    .filter(xjWorkEntity -> xjWorkEntity.eamId != null && xjWorkEntity.eamId.code != null)
+                    .filter(xjWorkEntity -> xjWorkEntity.eamId.code.trim().equals(content))
                     .filter(xjWorkEntity -> !xjWorkEntity.isFinished && xjWorkEntity.isRun)
                     .filter(xjWorkEntity -> xjWorkEntity.spotCheck)//是否点检。
-                    .filter(xjWorkEntity -> !exceptionIds.contains(String.valueOf(xjWorkEntity.id)))
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribe(xjWorkEntity -> {
                         isContainsDevice = true;
@@ -320,7 +316,7 @@ public class XJDeviceWorkListActivity extends BaseRefreshRecyclerActivity<XJWork
                                 return;
                             }
                         }
-                        if (mDevice == null || mDevice.id != xjWorkEntity.eamLongId) {
+                        if (mDevice == null || !mDevice.code.equals(xjWorkEntity.eamId.code)) {
                             mDevice = xjWorkEntity.eamId;
                             XJWorkEntity workEntity = new XJWorkEntity();
                             workEntity.eamId = mDevice;
@@ -904,19 +900,19 @@ public class XJDeviceWorkListActivity extends BaseRefreshRecyclerActivity<XJWork
                                     sb.append(context.getResources().getString(R.string.xj_patrol_xj_content)).append(xjWorkItemEntity.content).append(context.getResources().getString(R.string.xj_patrol_take_photo));
                                     msg = sb.toString();
                                 }
-                                if (msg == null) {
+                                if (msg == null && !xjWorkItemEntity.isEamView) {
                                     xjWorkEntities.add(xjWorkItemEntity);
                                 }
-                                if (!TextUtils.isEmpty(msg)) {
+                                if (!TextUtils.isEmpty(msg) && !xjWorkItemEntity.isEamView) {
                                     failWorkList.add(xjWorkItemEntity);
                                 }
-                                isCanEndAll = xjWorkEntities.size() > 1 ? true : false;
+                                isCanEndAll = xjWorkEntities.size() > 0 ? true : false;
                             }
                         },
                         throwable -> {
                         },
                         () -> {
-                            if (xjWorkEntities.size() > 1) {
+                            if (xjWorkEntities.size() > 0) {
                                 String diaLogMsg = "";
                                 if (!isCanEndAll) {
                                     diaLogMsg = getString(R.string.xj_device_scan_again);
@@ -959,27 +955,11 @@ public class XJDeviceWorkListActivity extends BaseRefreshRecyclerActivity<XJWork
                 ListIterator iterable = localXJList.listIterator();
                 while (iterable.hasNext()) {
                     XJWorkEntity xjWorkIterable = (XJWorkEntity) iterable.next();
-                    for (XJWorkEntity entity : xjWorkEntities) {
-                        if (xjWorkIterable.isEamView && entity.isEamView) {
-                            if (!entity.eamId.id.equals(xjWorkIterable.eamId.id)) {
-                                break;
-                            } else {
-                                localExist = true;
-                            }
-                        }
-                        if (!entity.isEamView && entity.eamId.id.equals(xjWorkIterable.eamId.id)) {
-                            if (entity.content.equals(xjWorkIterable.content) && entity.isFinished) {
-                                iterable.remove();
-                                iterable.add(entity);
-                                break;
-                            }
-                        }
-                    }
+                    if (xjWorkIterable.eamId.code.equals(scanEamCode))
+                        iterable.remove();
                 }
             }
-            if (!localExist) {
-                localXJList.addAll(xjWorkEntities);
-            }
+            localXJList.addAll(xjWorkEntities);
             SharedPreferencesUtils.setParam(context, Constant.SPKey.XJ_DEVICE_CACHE, localXJList.toString());
             saveDeviceNames();
             ToastUtils.show(context, getString(R.string.operate_succeed));
@@ -1293,7 +1273,7 @@ public class XJDeviceWorkListActivity extends BaseRefreshRecyclerActivity<XJWork
         }
         if (localXJList.size() > 0) {
             Flowable.fromIterable(localXJList)
-                    .filter(localEntity -> localEntity.eamId.id.toString().trim().equals(scanEamCode))
+                    .filter(localEntity -> localEntity.eamId.code.trim().equals(scanEamCode))
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribe(localEntity -> {
                         localXJList.remove(localEntity);
