@@ -44,6 +44,8 @@
     <string name="xj_device_work_empty">"该设备下没有巡检内容"</string>
     <string name="xj_device_work_query_empty">"未查询到该设备的巡检任务"</string>
     <string name="xj_device_please_inputname">"请输入任务名称"</string>
+    <string name="xj_device_please_select_user">"请选择巡检人员"</string>
+
     <string name="xj_device_local_empty">"本地暂无巡检记录"</string>
     <string name="xj_device_scan_again">"没有可提交的巡检项,是否重新扫描"</string>
     <string name="xj_device_continue_submit">"当前设备有未完成的巡检项，是否继续提交?"</string>

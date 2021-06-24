@@ -228,9 +228,7 @@ public class XJDeviceWorkListActivity extends BaseRefreshRecyclerActivity<XJWork
                 scanEamCode = nfcEntity.content;
                 dealSign(nfcEntity.content.trim());
             }
-        } else if (CodeUtlis.UHF_TYPE.equals(codeResultEvent.type)) {
-            dealSign(scanResultCode);
-        } else if (CodeUtlis.HW_TYPE.equals(codeResultEvent.type)) {
+        } else {
             dealSign(scanResultCode);
         }
     }
@@ -527,11 +525,15 @@ public class XJDeviceWorkListActivity extends BaseRefreshRecyclerActivity<XJWork
         RxView.clicks(btnBegin)
                 .throttleFirst(200, TimeUnit.MILLISECONDS)
                 .subscribe(o -> {
-                    if (!TextUtils.isEmpty(ceMaterielNum.getContent())) {
-                        goSMZX();
-                    } else {
+                    if (TextUtils.isEmpty(ceMaterielNum.getContent())) {
                         ToastUtils.show(context, R.string.xj_device_please_inputname);
+                        return;
                     }
+                    if (TextUtils.isEmpty(ctCheckPeople.getContent())) {
+                        ToastUtils.show(context, R.string.xj_device_please_select_user);
+                        return;
+                    }
+                    goSMZX();
                 });
         mXJWorkAdapter.setOnItemChildViewClickListener((childView, position, action, obj) -> {
             XJWorkEntity xjWorkEntity = (XJWorkEntity) obj;

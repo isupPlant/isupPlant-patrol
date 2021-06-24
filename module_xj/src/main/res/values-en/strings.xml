@@ -44,6 +44,7 @@
 	<string name="xj_device_work_empty">"There is no inspection content under the device"</string>
 	<string name="xj_device_work_query_empty">"The inspection task of the device is not queried"</string>
 	<string name="xj_device_please_inputname">"Please enter the task name"</string>
+	<string name="xj_device_please_select_user">"Please select inspector"</string>
 	<string name="xj_device_local_empty">"Local No Patrol Record"</string>
 	<string name="xj_device_scan_again">"There is no inspection item that can be submitted, whether to rescan"</string>
 	<string name="xj_device_continue_submit">"Do you continue to submit if there is an unfinished inspection item?"</string>
