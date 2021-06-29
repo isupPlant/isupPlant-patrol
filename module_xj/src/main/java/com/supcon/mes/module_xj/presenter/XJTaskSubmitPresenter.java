@@ -5,13 +5,13 @@ import android.text.TextUtils;
 
 import com.supcon.common.com_http.util.RxSchedulers;
 import com.supcon.common.view.util.LogUtil;
-import com.supcon.common.view.util.SharedPreferencesUtils;
 import com.supcon.mes.mbap.network.Api;
 import com.supcon.mes.mbap.utils.GsonUtil;
 import com.supcon.mes.middleware.SupPlantApplication;
 import com.supcon.mes.middleware.constant.Constant;
 import com.supcon.mes.middleware.model.bean.AttachmentEntity;
 import com.supcon.mes.middleware.model.bean.BAP5CommonEntity;
+import com.supcon.mes.middleware.model.bean.DataUtil;
 import com.supcon.mes.middleware.model.bean.xj.XJTaskAreaEntity;
 import com.supcon.mes.middleware.model.bean.xj.XJTaskEntity;
 import com.supcon.mes.middleware.model.bean.xj.XJTaskWorkEntity;
@@ -166,6 +166,9 @@ public class XJTaskSubmitPresenter extends XJTaskSubmitContract.Presenter {
 
                 for (XJTaskAreaEntity xjAreaEntity : xjTaskEntity.areas) {
                     if (xjAreaEntity.works != null && xjAreaEntity.works.size() != 0) {
+                        if (xjAreaEntity.completeTime == 0) {
+                            xjAreaEntity.completeTime =  System.currentTimeMillis();
+                        }
                         areaEntities.add(xjAreaEntity);
                         workEntities.addAll(xjAreaEntity.works);
                     }
